@@ -6,3 +6,7 @@
 	path = libs/jsonrpcserver
 	url = https://github.com/ondra-novak/jsonrpcserver.git
 	branch = master
+[submodule "libs/openssl"]
+	path = libs/openssl
+	url = https://github.com/openssl/openssl.git
+	branch = OpenSSL_1_0_2-stable

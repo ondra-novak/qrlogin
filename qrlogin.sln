@@ -9,34 +9,20 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lightspeed-15.01", "libs\li
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug Static|Win32 = Debug Static|Win32
 		Debug|Win32 = Debug|Win32
-		Release Static|Win32 = Release Static|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0CF57B76-7A9F-4960-9A31-F2CFE541F1DC}.Debug Static|Win32.ActiveCfg = Debug|Win32
-		{0CF57B76-7A9F-4960-9A31-F2CFE541F1DC}.Debug Static|Win32.Build.0 = Debug|Win32
 		{0CF57B76-7A9F-4960-9A31-F2CFE541F1DC}.Debug|Win32.ActiveCfg = Debug|Win32
 		{0CF57B76-7A9F-4960-9A31-F2CFE541F1DC}.Debug|Win32.Build.0 = Debug|Win32
-		{0CF57B76-7A9F-4960-9A31-F2CFE541F1DC}.Release Static|Win32.ActiveCfg = Release|Win32
-		{0CF57B76-7A9F-4960-9A31-F2CFE541F1DC}.Release Static|Win32.Build.0 = Release|Win32
 		{0CF57B76-7A9F-4960-9A31-F2CFE541F1DC}.Release|Win32.ActiveCfg = Release|Win32
 		{0CF57B76-7A9F-4960-9A31-F2CFE541F1DC}.Release|Win32.Build.0 = Release|Win32
-		{9E1232C0-6D3A-4DBB-A636-72F5C4FB13E8}.Debug Static|Win32.ActiveCfg = Debug|Win32
-		{9E1232C0-6D3A-4DBB-A636-72F5C4FB13E8}.Debug Static|Win32.Build.0 = Debug|Win32
 		{9E1232C0-6D3A-4DBB-A636-72F5C4FB13E8}.Debug|Win32.ActiveCfg = Debug|Win32
 		{9E1232C0-6D3A-4DBB-A636-72F5C4FB13E8}.Debug|Win32.Build.0 = Debug|Win32
-		{9E1232C0-6D3A-4DBB-A636-72F5C4FB13E8}.Release Static|Win32.ActiveCfg = Release|Win32
-		{9E1232C0-6D3A-4DBB-A636-72F5C4FB13E8}.Release Static|Win32.Build.0 = Release|Win32
 		{9E1232C0-6D3A-4DBB-A636-72F5C4FB13E8}.Release|Win32.ActiveCfg = Release|Win32
 		{9E1232C0-6D3A-4DBB-A636-72F5C4FB13E8}.Release|Win32.Build.0 = Release|Win32
-		{9200DF2A-2CE6-41FC-B6BF-EF7DE0DC95F6}.Debug Static|Win32.ActiveCfg = Debug Static|Win32
-		{9200DF2A-2CE6-41FC-B6BF-EF7DE0DC95F6}.Debug Static|Win32.Build.0 = Debug Static|Win32
 		{9200DF2A-2CE6-41FC-B6BF-EF7DE0DC95F6}.Debug|Win32.ActiveCfg = Debug|Win32
 		{9200DF2A-2CE6-41FC-B6BF-EF7DE0DC95F6}.Debug|Win32.Build.0 = Debug|Win32
-		{9200DF2A-2CE6-41FC-B6BF-EF7DE0DC95F6}.Release Static|Win32.ActiveCfg = Release Static|Win32
-		{9200DF2A-2CE6-41FC-B6BF-EF7DE0DC95F6}.Release Static|Win32.Build.0 = Release Static|Win32
 		{9200DF2A-2CE6-41FC-B6BF-EF7DE0DC95F6}.Release|Win32.ActiveCfg = Release|Win32
 		{9200DF2A-2CE6-41FC-B6BF-EF7DE0DC95F6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
