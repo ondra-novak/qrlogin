@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\lightspeed\src&quot;;&quot;$(SolutionDir)\jsonrpcserver&quot;;&quot;$(SolutionDir)\openssl\inc32&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\libs\lightspeed\src&quot;;&quot;$(SolutionDir)\libs\jsonrpcserver&quot;;&quot;$(SolutionDir)\libs\openssl\inc32&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -112,7 +112,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\lightspeed\src&quot;;&quot;$(SolutionDir)\jsonrpcserver&quot;;&quot;$(SolutionDir)\openssl\inc32&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\libs\lightspeed\src&quot;;&quot;$(SolutionDir)\libs\jsonrpcserver&quot;;&quot;$(SolutionDir)\libs\openssl\inc32&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -165,11 +165,11 @@
 	<References>
 		<ProjectReference
 			ReferencedProjectIdentifier="{9E1232C0-6D3A-4DBB-A636-72F5C4FB13E8}"
-			RelativePathToProject=".\jsonrpcserver\jsonrpcserver.vcproj"
+			RelativePathToProject=".\libs\jsonrpcserver\jsonrpcserver.vcproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{9200DF2A-2CE6-41FC-B6BF-EF7DE0DC95F6}"
-			RelativePathToProject=".\lightspeed\lightspeed.vcproj"
+			RelativePathToProject=".\libs\lightspeed\lightspeed.vcproj"
 		/>
 	</References>
 	<Files>
@@ -200,10 +200,6 @@
 			</File>
 			<File
 				RelativePath=".\src\RewritePath.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\rpcApi.h"
 				>
 			</File>
 			<File
@@ -239,10 +235,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\rpcApi.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\signmsg.cpp"
 				>
 			</File>
@@ -253,6 +245,14 @@
 		</Filter>
 		<File
 			RelativePath=".\conf\client.html"
+			>
+		</File>
+		<File
+			RelativePath=".\log\folder.txt"
+			>
+		</File>
+		<File
+			RelativePath=".\conf\qrpass.conf"
 			>
 		</File>
 	</Files>

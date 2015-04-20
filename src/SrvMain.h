@@ -8,7 +8,7 @@
 #ifndef QRPASS_BREDY_SRVMAIN_H_
 #define QRPASS_BREDY_SRVMAIN_H_
 
-#include "jsonrpc/JSONRPCMain.h"
+#include "httpserver/serverMain.h"
 #include "jsonrpc/ijsonrpc.h"
 #include "httpserver/simpleWebSite.h"
 #include "lightspeed/base/containers/string.h"
@@ -22,15 +22,14 @@
 namespace qrpass {
 
 using namespace LightSpeed;
-using namespace jsonsrv;
 using namespace BredyHttpSrv;
 
-class SrvMain: public AbstractJSONRPCServer {
+class SrvMain: public BredyHttpSrv::AbstractServerMain {
 public:
 	SrvMain();
 
 	virtual natural onInitServer(const Args& args, SeqFileOutput serr, const IniConfig &config);
-	virtual natural onStartServer(IJsonRpc& jsonServer, BredyHttpSrv::IHttpMapper &httpMapper);
+	virtual natural onStartServer(IHttpMapper &httpMapper);
 
 	AllocPointer<SimpleWebSite> website;
 
@@ -119,6 +118,7 @@ public:
 	void failedLogin(StringA ident);
 	void pingActive();
 	void scheduledPing(IJobScheduler *scheduler);
+
 
 };
 

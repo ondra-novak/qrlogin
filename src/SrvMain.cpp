@@ -19,6 +19,7 @@
 #include <openssl/sha.h>
 #include "lightspeed/utils/base64.h"
 
+#include "lightspeed/base/debug/dbglog.h"
 using BredyHttpSrv::QueryParser;
 using coinstock::generateAddressFromSignature;
 using LightSpeed::UrlEncoder;
@@ -61,8 +62,7 @@ natural SrvMain::onInitServer(const Args& args, SeqFileOutput serr,
 }
 
 
-natural SrvMain::onStartServer(IJsonRpc& jsonServer,
-		BredyHttpSrv::IHttpMapper& httpMapper) {
+natural SrvMain::onStartServer(BredyHttpSrv::IHttpMapper& httpMapper) {
 
 	httpMapper.addSite("",website);
 	httpMapper.addSite("/c",&challenge);

@@ -52,8 +52,8 @@ inline std::string toBase58Check(const std::vector<unsigned char>& payload, unsi
     data.push_back(version);                                        // prepend version byte
     data += payload;
     uchar_vector checksum = sha256_2(data);
-    checksum.assign(checksum.begin(), checksum.begin() + 4);        // compute checksum
-    data += checksum;                                               // append checksum
+    checksum.erase(checksum.begin() + 4,checksum.end());			// compute checksum
+    data += checksum;                                              // append checksum
     BigInt bn(data);
     std::string base58check = bn.getInBase(58, _base58chars);             // convert to base58
     std::string leading0s(countLeading0s(data), _base58chars[0]);         // prepend leading 0's (1 in base58)
@@ -66,7 +66,7 @@ inline std::string toBase58Check(const std::vector<unsigned char>& payload, cons
     data += version;                                            // prepend version byte
     data += payload;
     uchar_vector checksum = sha256_2(data);
-    checksum.assign(checksum.begin(), checksum.begin() + 4);        // compute checksum
+	checksum.erase(checksum.begin() + 4,checksum.end());			// compute checksum
     data += checksum;                                               // append checksum
     BigInt bn(data);
     std::string base58check = bn.getInBase(58, _base58chars);             // convert to base58
