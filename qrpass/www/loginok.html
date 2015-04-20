@@ -1,0 +1,41 @@
+<html>
+<head>
+<title>QR Passport</title>
+<link rel="stylesheet" href="mobile_styles.css" type="text/css" />
+<meta name="viewport" content="width=device-width">
+<script type="text/javascript" src="libs.js"></script>
+<script type="text/javascript">
+var lang=window.location.hash.substr(1);
+
+function saveAs(uri, filename) {
+    var link = document.createElement('a');
+      document.body.appendChild(link); // Firefox requires the link to be in the body
+      link.download = filename;
+      link.href = uri;
+      link.click();
+      document.body.removeChild(link); // remove the link when done
+}
+
+function start() {
+	loadLang(lang,function() {
+		showPage();			
+	});
+}	
+
+function showPage() {
+	document.getElementById("delivered").appendChild(document.createTextNode(langtab["delivered"]));
+	document.getElementById("backup").appendChild(document.createTextNode(langtab["backup"]));
+	document.getElementById("backup").addEventListener("click",function(){
+		saveAs("data:application/octet-stream;charset=utf-8,"+encodeURIComponent(localStorage["secretKey"]),"qrlogin_backup.json");
+	})
+}
+
+</script>
+</head>
+
+<body onload="start()">
+<p id="delivered"></p>
+<p><button id="backup"></button></p>
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>QR Login - OAuth2 module</title>
+<script src="libs.js" type="text/javascript"></script>
+<script src="auth.js" type="text/javascript"></script>
+<script src="bitcoinjs-min.js" type="text/javascript"></script>
+<script src="qrcode.js" type="text/javascript"></script>
+<script src="secure-random.js" type="text/javascript"></script>
+<meta name="viewport" content="width=500px">
+<link rel="stylesheet" href="auth.css" type="text/css" />
+</head>
+<body onload="start()">
+<h1><img src="img/small_logo.png">QR Login</h1>
+
+<ul class="selector"><li id="str_login">Login</li><li id="str_manage">Manage</li></ul>
+<div class="selectorblock">
+<div>
+<div id="qrblock"></div>
+</div>
+</div>
+<div id="clickinfo">Please click or tap on QR code to use current browser</div>
+</body>
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"></head>
+<style>
+.curses {
+	float:right;
+	width: 500px;
+	border: 1px solid;
+	padding: 5px;
+	background-color: #EED;
+}
+body {
+	background-color:white;
+}
+
+.loginBox {
+	display:none;
+	width: 17em; 
+	position: absolute; 
+	right:100px;
+	top:100px;
+	border: 1px solid;
+	background-color:#CCC;
+	padding:10px;
+	text-align:right;
+}
+.extendBox {
+	display:none;width: 17em; 
+	position: absolute; 
+	right:100px; 
+	top:100px;
+	border: 1px solid;
+	background-color:#CCC;
+	padding:10px;
+	text-align:right;
+}
+.extendBox input{
+  width: 50px;
+}
+.openSesBox {
+	display:none;
+	width: 30em; 
+	position: absolute; 
+	right:100px;
+	 top:100px;
+	 border: 1px solid;
+	 padding:10px;
+	text-align:right;
+	background-color:#CCC;
+	}
+	
+.inputBox {
+	width:600px;
+	float:left;
+}
+.inputBox .helpButton {
+	width: 20px;
+	float:right;
+}
+.inputBox textArea{
+width:100%;
+margin-left:-3px;
+}
+.resultBox {
+	border-top: 1px dotted;
+	clear: both;
+	margin-top: 20px;
+}
+
+</style>
+
+<body>
+
+	<div class="curses">
+	<div>Current session: <span id="cursession">(none)</span></div>
+	<div><span id="cursessionuser"></span></div>
+	<div>
+	<input value="open session" onclick="doOpenSession()" id="opensessionbutt" type="button">
+	<input value="logout" onclick="doLogout()" id="logoutbutt" style="display:none" type="button">	
+	</div>	
+	</div>	
+	</div>
+	<form class="inputBox">
+	Method: <input name="method" id="method" type="text">
+	<input value="..." onclick="methodChoose()" type="button">
+	<input value="&lt;" onclick="getFromHistoryPrev()" type="button">
+	<input value="&gt;" onclick="getFromHistoryNext()" type="button">
+	<div id="hiddenList" class="hiddenList" style="display:none;position:relative">
+	<div style="position:absolute;width:300px;left: 10em;">
+	<select size="16" onchange="setMethodName(this)" id="methodList" style="min-width: 300px;"></select>
+	</div>
+	</div>	
+	<div>JSON arguments: <br>
+	<textarea rows="5" cols="80" name="data" id="data">[]</textarea><br>	
+	<input class="helpButton" value="?" onclick="helpOnMethod()" type="button">
+	<input value="odeslat" onclick="sendRequest()" type="button">
+	</div>
+	</form>
+	<div class="resultBox">
+	<h2>Result:</h2>
+	<div class="error" id="error"></div>
+	<pre class="result" id="result"></pre>
+	<h3 id="contexttitle" style="display:none;">Context:</h3>
+	<pre class="context" id="context"></div>
+	</div>
+	<div class="loginBox" id="loginBox">
+	<form>
+	Username: <input name="username" id="username" type="text"><br>
+	Password: <input name="password" id="password" type="password"><br>
+	<input value="Login" onclick="doLoginSubmit();" type="button">
+	<input value="Cancel" onclick="doLoginCancel();" type="button">
+	</form>
+	</div>
+	<div class="openSesBox" id="openSesBox" style="">
+	<form>
+	SessionId: <input name="entersessionid" id="entersessionid" type="text" value="" style="width:30em"><br>
+	<input value="Open" onclick="doOpenSessionSubmit();" type="button">
+	<input value="Cancel" onclick="doOpenSessionCancel()" type="button">
+	</form>
+	</div>
+	
+
+
+<script type="text/javascript">
+//Gets the browser specific XmlHttpRequest Object
+function getXmlHttpRequestObject() 
+{
+	if (window.XMLHttpRequest) {
+		return new XMLHttpRequest(); //Not IE	
+	}else if(window.ActiveXObject) {
+		return new ActiveXObject("Microsoft.XMLHTTP"); //IE	
+	} else {
+		alert("Your browser doesn't support the XmlHttpRequest object.  Better upgrade to Firefox.");	
+	}
+}
+
+var idcounter=1;
+var wget = getXmlHttpRequestObject();
+var methodwget = getXmlHttpRequestObject();
+var historie = new Array();
+var cursession = null;
+
+
+function print_r(arr,level) {
+	var dumped_text = "";
+	if(!level) level = 0;
+	
+	//The padding given at the beginning of the line.
+	var level_padding = "";
+	for(var j=0;j<level+1;j++) level_padding += "    ";
+	
+	if(typeof(arr) == 'object') { //Array/Hashes/Objects 
+		for(var item in arr) {
+			var value = arr[item];
+			
+			if(typeof(value) == 'object') { //If it is an array,
+				dumped_text += level_padding + "<strong>" + item + ":</strong> ...<br />";
+				dumped_text += print_r(value,level+1);
+			} else {
+				dumped_text += level_padding + "<strong>" + item + ":</strong> \"" + value + "\"<br />";
+			}
+		}
+	} else { //Stings/Chars/Numbers etc.
+		dumped_text = arr + "   ("+typeof(arr)+")";
+	}
+	return dumped_text;
+}
+
+function storeToHistory(method,data) {
+		if (historie.length > 0)
+		{
+			if (historie[0].method == method &&
+					historie[0].data == data) return;
+
+			var rec = historie.pop();
+			historie.push(rec);
+			if (rec.method == method && rec.data == data) return;
+		}
+		historie.push({"method":method,"data":data});
+		if (historie.length > 1000) historie.shift();
+}
+
+function getFromHistoryPrev() {
+		if (historie.length > 0) {
+			var rec = historie.pop();
+			historie.splice(0,0,rec);
+			rec = historie.pop();
+			document.getElementById("method").value = rec.method;
+			document.getElementById("data").value = rec.data;
+			historie.push(rec);
+		}
+}
+
+
+function getFromHistoryNext() {
+	if (historie.length > 0) {
+			var rec = historie[0];
+			document.getElementById("method").value = rec.method;
+			document.getElementById("data").value = rec.data;
+			historie.shift();
+			historie.push(rec);
+	}
+}
+
+function doJSONRPCRequest(method,data,callback) {
+	var session = cursession == null? "":", \"context\":{\"session\":\""+cursession+"\"}";
+	var id=idcounter; 
+	var body="{\"method\":\""+method+"\",\"params\":" + data + ",\"id\":\"" + id + "\"" + session + "}";
+	idcounter++;
+	wget.abort();
+	wget.open("POST",location.href);
+	wget.setRequestHeader("Content-Type","application/json");
+	wget.send(body);
+	wget.onreadystatechange=function()
+	{	
+		if (wget.readyState==4) {
+			if (wget.status != 200) {
+				 callback(null,"Http request failed. Code: "+wget.status);
+			} else {	
+				var res = wget.responseText;
+				var objres;
+				var error = null;
+				var context = null;
+				try {
+					eval("objres = "+res);
+					if (objres.error != null) error = objres.error;
+					if (objres.context) context = objres.context; 
+				} catch (e) {
+					error = res;
+				}
+				if (error != null) callback(null,error,context);
+				else callback(objres.result,null,context);
+			}
+		}
+	}
+}
+
+function sendRequest() {
+
+	var method = document.getElementById("method").value;
+	var data = document.getElementById("data").value;
+	
+	storeToHistory(method,data);
+
+	document.getElementById("error").innerHTML = "";
+	document.getElementById("result").innerHTML = "...please wait...";
+
+	doJSONRPCRequest(method, data, function(res,error,context) {
+		document.getElementById("error").innerHTML = error == null?"":print_r(error);
+		document.getElementById("result").innerHTML = res == null?"":print_r(res);
+		document.getElementById("context").innerHTML = context == null?"":print_r(context);
+		if (context == null) document.getElementById("contexttitle").style.display = "none";
+		else {
+			document.getElementById("contexttitle").style.display = "block";
+			if (context.session) {
+				document.getElementById("entersessionid").value = context.session;
+			}
+		}
+		
+	});
+}
+
+function methodChoose() {
+	var list = document.getElementById("methodList");
+	var listcont = document.getElementById("hiddenList"); 
+	if (listcont.style.display == "block") {
+		listcont.style.display = "none";
+		return; 
+	} else {
+		listcont.style.display = "block";
+	}
+
+	doJSONRPCRequest("Server.listMethods", "[]", function(res,error) {
+		if (res != null) {
+			var cursel = list.selectedIndex; 
+			var llen = list.length;
+			for (i = 0; i < llen; i++) {
+				list.remove(0);
+			}
+			llen = res.length;
+			for (i = 0; i < llen; i++) {
+				list.add(new Option(res[i],res[i]),null);
+			}
+			list.selectedIndex = cursel;
+		}
+	});
+	
+}
+
+
+function setMethodName(sel) {
+	var item = sel.selectedIndex;
+	var val = sel.options[item].value;
+	var sep = val.indexOf(' ');
+	var args = "[]";
+	if (sep != -1) {
+		args = val.substr(sep+1);
+		val = val.substr(0,sep);
+	} 
+	document.getElementById("method").value = val;
+	document.getElementById("data").value = args;
+	var listcont = document.getElementById("hiddenList"); 
+	listcont.style.display = "none";	
+}
+
+function doLogin() {
+	document.getElementById("loginBox").style.display="block";	
+	document.getElementById("username").focus();
+}
+
+function doExtend() {
+	document.getElementById("extendBox").style.display="block";	
+	document.getElementById("time").focus();
+}
+
+function doOpenSession() {
+	document.getElementById("openSesBox").style.display="block";	
+	document.getElementById("entersessionid").focus();
+}
+
+function updateSessionInfo() {
+	if (cursession != null) {
+//		document.getElementById("opensessionbutt").style.display="none";
+		document.getElementById("logoutbutt").style.display="inline";
+		document.getElementById("cursession").innerHTML = cursession;
+		doJSONRPCRequest("User.getBasicInfo","[]",function(res,error) {
+			if (res == null) alert(print_r(error));
+			else document.getElementById("cursessionuser").innerHTML = print_r(res);
+		})
+	} else {
+		document.getElementById("logoutbutt").style.display="none";
+		document.getElementById("opensessionbutt").style.display="inline";
+		document.getElementById("cursession").innerHTML = "(none)";
+		document.getElementById("cursessionuser").innerHTML = "";
+	}		
+
+}
+
+function doLogout() {
+	cursession = null;
+	updateSessionInfo();
+}
+
+function doLoginCancel() {
+	document.getElementById("loginBox").style.display="none";	
+}
+
+function doExtendCancel() {
+	document.getElementById("extendBox").style.display="none";	
+}
+
+function doOpenSessionCancel() {
+	document.getElementById("openSesBox").style.display="none";	
+}
+
+
+
+function stripHTML(html)
+{
+   var tmp = document.createElement("DIV");
+   tmp.innerHTML = html;
+   return tmp.textContent||tmp.innerText;
+}
+
+
+function doLoginSubmit() {
+	var username = document.getElementById("username").value;
+	var password = document.getElementById("password").value;
+
+	doJSONRPCRequest("Session.create", "[\""+username+"\",\""+password+"\"]", function(res,error) {
+		if (error != null) {
+			alert(stripHTML(print_r(error)));
+		} else {
+			cursession=res;
+			document.getElementById("loginBox").style.display="none";
+			updateSessionInfo();
+		}
+	});
+			
+}
+
+function doExtendSubmit() {
+	var time = document.getElementById("time").value;
+	var level = document.getElementById("level").value;
+
+	doJSONRPCRequest("Session.extend", "["+time
+			+(level!=""?(",\""+level+"\""):"")
+			+"]", function(res,error) {
+		if (error != null) {
+			alert(stripHTML(print_r(error)));
+		} else {
+			cursession=res;
+			updateSessionInfo();
+			document.getElementById("extendBox").style.display="none";
+		}
+	});
+			
+}
+
+function doOpenSessionSubmit() {
+	var ses = document.getElementById("entersessionid").value;
+	cursession=ses;
+	updateSessionInfo();
+	document.getElementById("openSesBox").style.display="none";			
+}
+
+function helpOnMethod() {
+	var method = document.getElementById("method").value;
+
+	document.getElementById("error").innerHTML = "";
+	document.getElementById("result").innerHTML = "...please wait...";
+
+	doJSONRPCRequest("Server.help", "[\""+method+"\"]", function(res,error) {
+		document.getElementById("error").innerHTML = error == null?"":print_r(error);
+		document.getElementById("result").innerHTML = res == null?"":print_r(res);
+	});
+
+}
+
+</script>
+
+
+
+</body></html>

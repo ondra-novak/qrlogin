@@ -1,0 +1,150 @@
+body {
+	background-color: white;
+	margin: 0;
+	font-family: sans-serif;
+}
+
+h1 {
+	background-color: #321;
+	color: white;
+	padding-top: 20px;
+	margin: 0;
+	top: 0;
+	text-align: center;		
+	position:fixed;
+	width: 100%;
+	height: 120px;
+}
+
+h1 img {
+	vertical-align: middle;
+	margin-right: 20px;
+}
+
+ul.menu {
+	display: table;
+	background-color: #ADB;
+	width: 100%;
+	margin: 0;
+	position:fixed;
+	top: 140px;
+	
+}
+
+ul.menu li {
+	display: table-cell;
+	text-align: center;
+	height: 50px;
+	vertical-align:middle;
+	
+}
+
+div.content {
+	max-width: 800px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+div.page {
+	padding-top: 200px;
+	min-height: 100vh;
+}
+
+div.page h2 {
+	text-align: center;
+}
+
+.testwindow {
+	text-align: center;
+	padding: 20px;
+	font-size: larger;
+}
+
+.testwindow input {
+	width: 100%;
+	text-align: center;
+	font-size: larger;
+}
+
+.testwindow button {
+	font-size: larger;
+}
+
+.waitanim {
+	display:inline-block;
+	width: 100px;
+	height: 15px;
+	border: 1px solid #888;
+	border-radius: 5px;
+	background-color: #CCC;	
+	overflow: hidden;
+	visibility: hidden;
+		
+}
+
+ol > li {
+	
+	margin-top: 1.5em;
+}
+
+li {
+		text-indent: -20px;
+		padding-left: 20px;
+	
+}
+
+pre {
+	font-size: larger;
+	text-indent: 0;
+	padding-left: 0;
+}
+
+/* Standard syntax */
+@keyframes waitanimkeys {
+    0%   {margin-left:-10px;width: 0px;margin-right: 110px}
+    50%  {margin-left:-10px;width: 110px;margin-right: -10px}
+    100% {margin-left:110px;width: 0px;margin-right: -10px}
+}
+
+@-webkit-keyframes waitanimkeys {
+    0%   {margin-left:-10px;width: 0px;margin-right: 110px}
+    50%  {margin-left:-10px;width: 110px;margin-right: -10px}
+    100% {margin-left:110px;width: 0px;margin-right: -10px}
+}
+
+.waitanim > div {
+	animation-name: waitanimkeys;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-play-state: running;    
+	-webkit-animation-name: waitanimkeys;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-play-state: running;    
+    width: 20px;
+    height: 15px;
+    background-color: #888;
+    border-radius: 10px;
+    margin-right: auto;
+}
+
+#addsitedetail {
+	display:none;
+}
+
+dd {
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+.author {
+	display: table;
+}
+
+.author div {
+	display:table-cell;
+	vertical-align: middle;
+	padding: 5px;
+}

@@ -1,0 +1,54 @@
+body {
+	text-align:center;
+	max-width: 400px;
+	margin-left:auto;
+	margin-right:auto;
+	font-family: sans-serif;	
+	
+}
+
+h1 img {
+	vertical-align: middle;
+	margin-right: 50px;	
+}
+
+h1 {
+		background-color: #CCF;	
+		padding: 10px;
+}
+
+
+ul.selector {
+	display: table;
+	margin: 0;
+	padding: 0;
+	width: 352px;
+	border-collapse: collapse;
+}
+
+ul.selector li {
+	display: table-cell;
+	margin: 0;
+	padding: 10px;
+	border: 1px solid #EED;
+	background-color: #FFD;
+	cursor: pointer;
+	
+}
+
+ul.selector li.hl {
+	background-color: #DDA;
+	border: 3px solid #880;
+	cursor: default;
+}
+
+
+
+.selectorblock {
+	background-color: #EEC;
+	padding: 10px;
+}
+
+.selectorblock IFRAME {
+	border: 0;
+}
