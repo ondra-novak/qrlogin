@@ -24,4 +24,7 @@ Build scripts don't include the building steps for the OpenSSL. You have to buil
 6. Run qrpass project with the following arguments: "default run" or "default start"
 7. Browse for http://localhost:14526/
 
+### Linux
+
+Comming soon, preparing build-scripts
 
