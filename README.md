@@ -12,7 +12,7 @@ working demo: https://qrlogin.novacisko.cz/
 **Prerequisites**
 
 * MSVC 2008
-* OpenSSL (compiled on https://github.com/openssl/openssl/branches/OpenSSL_1_0_2-stable)
+* OpenSSL (compiled on https://github.com/openssl/openssl/tree/OpenSSL_1_0_2-stable)
 
 Building scripts don't include building steps for OpenSSL. You will need to build it manually 
 
