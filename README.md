@@ -26,5 +26,32 @@ Build scripts don't include the building steps for the OpenSSL. You have to buil
 
 ### Linux
 
-Comming soon, preparing build-scripts
+**Prerequisites**
+
+ * g++ 4.8
+ * libssl-dev
+ * autotools, libtool, automake, make, etc...
+
+ ```
+ $ git clone --recurse-submodules git@github.com:ondra-novak/qrlogin.git
+ $ cd qrlogin
+ $ autoreconf -if
+ $ ./configure
+ $ make -j4
+ ```
+ 
+ **qrpass** is the main binary that should appear in the ./bin/ folder
+
+ ```
+ $ ./bin/qrpass /tmp/qrpass.pid start
+ $ xdg-open http://localhost:14526/
+ ```
+ to stop service
+
+ ```
+ $ ./bin/qrpass /tmp/qrpass.pid stop
+ ```
+
+
+ 
 
