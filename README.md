@@ -51,7 +51,9 @@ Build scripts don't include the building steps for the OpenSSL. You have to buil
  ```
  $ ./bin/qrpass /tmp/qrpass.pid stop
  ```
+### Linux - Eclipse
 
+ You should be able to import project to Eclipe CDT with GIT module. Just import repository to Eclipse and checkout all projects. You will need to perform autoreconf/configure similar to previous section.
 
  
 
