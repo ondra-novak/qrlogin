@@ -26,4 +26,7 @@ clean-src:
 	rm -f bin/qrpass
 
 
+install: qrpass
+	sh install.sh
+
 FORCE:

@@ -31,3 +31,14 @@ log/logfile
 log/rpclogfile
 /Debug/
 /Release/
+/Build/
+/.deps/
+/bin/
+Makefile
+Makefile.in
+configure
+/autom4te.cache/
+config.log
+config.status
+libtool
+aclocal.m4

@@ -281,7 +281,7 @@ void SrvMain::shiftBanksIfNeeded() {
 void SrvMain::scheduledPing(IJobScheduler* scheduler) {
 	pingActive();
 	shiftBanksIfNeeded();
-	scheduler->schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,scheduler),10,ThreadMode::schedulerThread);
+	scheduler->schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,scheduler),30,ThreadMode::schedulerThread);
 }
 
 static natural sendOAuth2Error(IHttpRequest &request, ConstStrA error) {
