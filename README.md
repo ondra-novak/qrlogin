@@ -18,7 +18,7 @@ Build scripts don't include the building steps for the OpenSSL. You have to buil
 
 1. Checkout project + all submodules
 2. Build OpenSSL inside libs\openssl 
-3. Open project (sln) in Visual Studio 2008. It might work in a newer version (expect MSVC2013, compiler bug - http://goo.gl/sDVREg)
+3. Open project (sln) in Visual Studio 2008. It might work in a newer version (now compiles in VS2013 Community Version)
 4. Choose configuration (Debug or Release)
 5. Hit the "Build Solution" button
 6. Run qrpass project with the following arguments: "default run" or "default start"
