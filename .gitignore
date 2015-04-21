@@ -29,3 +29,5 @@
 tmp/
 log/logfile
 log/rpclogfile
+/Debug/
+/Release/

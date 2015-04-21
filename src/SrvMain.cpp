@@ -367,6 +367,7 @@ natural SrvMain::GetIdentity::onRequest(IHttpRequest& request,ConstStrA vpath) {
 
 	SeqFileOutput out(&request);
 	JSON::toStream(response,out,false);
+	return 0;
 }
 
 } /* namespace qrpass */
