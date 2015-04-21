@@ -34,25 +34,35 @@ Build scripts don't include the building steps for the OpenSSL. You have to buil
  * libssl-dev
  * autotools, libtool, automake, make, etc...
 
+**Build**
+
  ```
  $ git clone --recurse-submodules git@github.com:ondra-novak/qrlogin.git
  $ cd qrlogin
- $ autoreconf -if
- $ ./configure
+ $ sh bootstrap.sh
  $ make -j4
  ```
- 
- **qrpass** is the main binary that should appear in the ./bin/ folder
 
+**Installation**
  ```
- $ ./bin/qrpass /tmp/qrpass.pid start
+ $ sudo sh install.sh
+ ```
+
+**Testing**
+ ```
  $ xdg-open http://localhost:14526/
  ```
- to stop service
 
+**Starting or stopping service**
  ```
- $ ./bin/qrpass /tmp/qrpass.pid stop
+ $ sudo service qrlogin start|stop|restart|status|logrotate
  ```
+
+**Uninstall**
+ ```
+ s sudo sh uninstall.sh
+ ```
+
 ### Linux - Eclipse
 
  You should be able to import project to Eclipe CDT with GIT module. Just import repository to Eclipse and checkout all projects. You will need to perform autoreconf/configure similar to previous section.
