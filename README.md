@@ -26,6 +26,8 @@ Build scripts don't include the building steps for the OpenSSL. You have to buil
 
 ### Linux
 
+**Tested on Ubuntu: 14.04**
+
 **Prerequisites**
 
  * g++ 4.8
