@@ -113,8 +113,11 @@ where <strong>idenity</strong> is unique idenity string for the autentificated u
 </div>
 </div>
 <div class="page" id="sourcecode">
-<h2>Source code</h2>
-TBD soon!
+<h2>Sources available at:</h2>
+<div class="sources" id="sources">
+    <div><a href="https://github.com/ondra-novak/qrlogin" target="_blank"><img src="img/GitHub-Mark-120px-plus.png" /></a></div>
+    <div><a href="https://github.com/ondra-novak/qrlogin" target="_blank">https://github.com/ondra-novak/qrlogin</a></div>
+</div>
 </div>
 <div class="page" id="author">
 <h2>About the author</h2>
@@ -177,6 +180,10 @@ function validateToken(token) {
         }
 	}
 	rq.send(request);		
+}
+
+if (!window.location.origin) {
+    window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
 }
 
 function putUrl() {

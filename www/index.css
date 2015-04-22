@@ -148,3 +148,15 @@ dd {
 	vertical-align: middle;
 	padding: 5px;
 }
+
+.sources {
+	text-align: center;
+}
+
+.github {
+	width: 300px;
+}
+
+img {
+	border: 0;
+}
