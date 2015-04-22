@@ -62,6 +62,11 @@ Build scripts don't include the building steps for the OpenSSL. You have to buil
  ```
  s sudo sh uninstall.sh
  ```
+ 
+**Running behind reverse proxy**
+
+It is strongly recommended to run service behind a reverse proxy, for example behind Nginx. You should also update the field "baseURL" of the conf/qrlogin.conf to appropriate real url.
+
 
 ### Linux - Eclipse
 
