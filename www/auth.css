@@ -46,7 +46,10 @@ ul.selector li.hl {
 
 .selectorblock {
 	background-color: #EEC;
-	padding: 10px;
+	padding: 10px;	
+}
+.selectorblock div {
+	height: 320px;
 }
 
 .selectorblock IFRAME {
