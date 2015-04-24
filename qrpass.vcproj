@@ -220,6 +220,10 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath=".\www\img\author.jpg"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Source Files"
@@ -244,7 +248,27 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\conf\client.html"
+			RelativePath=".\www\auth.css"
+			>
+		</File>
+		<File
+			RelativePath=".\www\auth.html"
+			>
+		</File>
+		<File
+			RelativePath=".\www\auth.js"
+			>
+		</File>
+		<File
+			RelativePath=".\www\bitcoinjs-min.js"
+			>
+		</File>
+		<File
+			RelativePath=".\www\bitcoinsig.js"
+			>
+		</File>
+		<File
+			RelativePath=".\www\challenge.html"
 			>
 		</File>
 		<File
@@ -252,7 +276,83 @@
 			>
 		</File>
 		<File
+			RelativePath=".\www\img\GitHub-Mark-120px-plus.png"
+			>
+		</File>
+		<File
+			RelativePath=".\www\img\GitHub_Logo.png"
+			>
+		</File>
+		<File
+			RelativePath=".\www\img\howitworks.png"
+			>
+		</File>
+		<File
+			RelativePath=".\www\identreset.html"
+			>
+		</File>
+		<File
+			RelativePath=".\www\index.css"
+			>
+		</File>
+		<File
+			RelativePath=".\www\index.html"
+			>
+		</File>
+		<File
+			RelativePath=".\www\libs.js"
+			>
+		</File>
+		<File
+			RelativePath=".\www\loginfailed.html"
+			>
+		</File>
+		<File
+			RelativePath=".\www\loginok.html"
+			>
+		</File>
+		<File
+			RelativePath=".\www\img\logo.png"
+			>
+		</File>
+		<File
+			RelativePath=".\www\mobile_styles.css"
+			>
+		</File>
+		<File
+			RelativePath=".\www\mobileapp.js"
+			>
+		</File>
+		<File
+			RelativePath=".\www\img\placeholder.png"
+			>
+		</File>
+		<File
+			RelativePath=".\www\qrcode.js"
+			>
+		</File>
+		<File
+			RelativePath=".\www\img\qrlogin.png"
+			>
+		</File>
+		<File
 			RelativePath=".\conf\qrpass.conf"
+			>
+		</File>
+		<File
+			RelativePath=".\www\secure-random.js"
+			>
+		</File>
+		<File
+			RelativePath=".\www\img\sequence.png"
+			>
+		</File>
+		<File
+			RelativePath=".\www\img\small_logo.png"
+			>
+		</File>
+		<File
+			RelativePath=".\www\img\th_sequence.png"
 			>
 		</File>
 	</Files>

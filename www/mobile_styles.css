@@ -1,6 +1,77 @@
 
 body {
 	font-family: sans-serif;	
+	background-color: #FFF;
+	margin:0;
+	padding:0;
+	font-size: 25px;
+}
+
+.header 
+{
+	text-align:center;
 	background-color: #DDD;
-	padding: 10px;
+	padding: 10px 0 10px 0;
+	
+}
+
+img.logo 
+{
+	width:64px;
+	height:64px;
+	display:block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+div.serviceid 
+{
+	padding: 10px 0 10px 0;
+	font-weight:bold;
+}
+
+label 
+{
+	display:block;
+}
+
+div.password 
+{
+	margin: 0 10px 0 10px;
+	display:none;
+}
+input.password
+{
+	display:block;
+	width: 100%;
+	font-size: 30px;
+	text-align:center;
+
+}
+
+button#accept_button,button#create_button
+{
+	display:none;
+	width: 10em;
+	background-color: #8A8;
+	color: White;
+	font-size: 25px;
+	font-weight: bold;
+	margin: 10px auto auto auto;
+	padding: 20px 0 20px 0;
+	border: 2px solid #080;
+	
+}
+
+button#create_button
+{
+	background-color: #88A;
+	border: 2px solid #008;
+}
+
+div.spinner 
+{
+	text-align:center;
+	margin-top:50px;
+	display:none;
 }

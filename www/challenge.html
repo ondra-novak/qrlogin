@@ -7,25 +7,32 @@
 <script src="bitcoinsig.js" type="text/javascript"></script>
 <script src="secure-random.js" type="text/javascript"></script>
 <script src="libs.js" type="text/javascript"></script>
-<meta name="viewport" content="width=device-width">
+<script src="mobileapp.js" type="text/javascript"></script>
+<meta name="viewport" content="width=320">
 </head>
 
-<body onload="start()">
+<body onload="startSign()">
+<div class="header">
+<img src="img/small_logo.png" class="logo"/>
+<div class="serviceid"><span id="serviceId"></span></div>
+</div>
 
-<p><span id="host">Host</span>: <span id="serviceId"></span></p>
+<div class="password" id="password_form">
+<label><span id="enter_password">Enter password</span>
+<input type="password" class="password" id="password_input" />
+</label>
+<label><input type="checkbox" id="always_blank" /><span id="keep_password_blank">Always blank</span></label>
+</div>
+<div class="accept"><button id="accept_button" />Login</button></div>
+<div class="create"><button id="create_button" />Create profile</button></div>
+<div class="spinner" id="spinner"><img src="img/spinner.gif"></div>
 
-<p id="progress"></p>
-<p id="restorebackup" style="visibility:hidden"><br><input type="file" id="backupfile"></p>
+
 <script type="text/javascript">
  
 
 
-function featureTest() {
-	
-	if (localStorage) return true;
-	alert(langtab["feature_test_failed"]);
-	return false;
-}
+
 
 var args = location.hash.substr(1).split(',');
 var lang = args[0];

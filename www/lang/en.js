@@ -13,5 +13,9 @@
 "host":"Service ID",
 "login":"Login",
 "manage":"Manage keys",
-"clickinfo":"Please click or tap on QR code to use current browser"
+"clickinfo":"Please click or tap on QR code to use current browser",
+"always_blank":"Don't ask password",
+"accept_button":"Log me in",
+"create_button":"Create new profile"
+
 }

@@ -14,5 +14,7 @@
 "login":"Přihlásit se",
 "manage":"Správa klíčů v zařízení",
 "clickinfo":"Prosím klepněte na QR kód, pokud chcete pro správu klíčů použít tento prohlížeč"
-
+"always_blank":"Neptej se na heslo",
+"accept_button":"Přihlásit",
+"create_button":"Vytvořit nový profil"
 }
