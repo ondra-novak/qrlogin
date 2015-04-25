@@ -1,12 +1,18 @@
 <html>
 <head>
-<title>QR Passport</title>
+<title>QR Login</title>
 <link rel="stylesheet" href="mobile_styles.css" type="text/css" />
 <meta name="viewport" content="width=device-width">
+<script type="text/javascript" src="libs.js"></script>
+<script type="text/javascript" src="mobileapp.js"></script>
 </head>
 
-<body>
-Request failed. Please try to scan it again.
+<body onload="startFailPage()">
+<div class="header">
+<img src="img/qrlogo-sw.png" class="logo"/>
+</div>
+<p id="failed">Please try again</p>
+<img src="img/failed.png" />
 </body>
 
 </html>

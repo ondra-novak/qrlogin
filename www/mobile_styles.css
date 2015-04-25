@@ -77,3 +77,9 @@ div.spinner
 	margin-top:50px;
 	display:none;
 }
+
+label.always_blank 
+{
+	display:block;
+	padding: 0.5em 0 0.5em 0;
+}

@@ -9,6 +9,8 @@ function QRLogin(args, lang, qrcodeBox) {
 	var qrcode = new QRCode(qrcodeBox, {
 		   useSVG : true,
 	  });
+	  
+	  
 
 	function base64EncodeUrl(str){
 	    return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
@@ -39,6 +41,7 @@ function QRLogin(args, lang, qrcodeBox) {
 			var logurl = "l?c="+curcode
 			
 			if (window.EventSource) {
+		        if (eventSource != null) eventSource.close();
 				eventSource = new EventSource(logurl);
 				eventSource.addEventListener("message",function(event) {
 					var response = event.data;
@@ -51,6 +54,7 @@ function QRLogin(args, lang, qrcodeBox) {
 					}
 				}.bind(this))
 			} else {
+			    if (connection != null) connection.abort();
 				connection = new XMLHttpRequest();	
 				connection.open("GET",logurl,true);
 				connection.onreadystatechange = function(request) {
@@ -119,6 +123,11 @@ function QRLogin(args, lang, qrcodeBox) {
 				
 		window.top.location = redir;
 	}
+	
+	this.setLang = function(l) {
+	    lang = l;
+	    this.reload();
+	}
 }
 
 
@@ -129,19 +138,49 @@ function updateLang() {
 	langSetText(document.getElementById("clickinfo"),"clickinfo");
 }
 
+function LangPanel(panel,curlang, qrlogin) {
+    var lang = curlang;
+    var langlist = ["cs","en"];
+    var i;
+    var lpanel = panel;
+    
+    
+    function drawPanel() {
+        while(lpanel.firstChild) {
+            lpanel.removeChild(panel.firstChild);
+        }
+        
+        for (i = 0; i < langlist.length;i++) {
+            if (langlist[i] == lang) continue;
+            var img = document.createElement("img");
+            
+            img.src = "img/lang_"+langlist[i]+".gif";
+            img.onclick = function(l) {
+                qrlogin.setLang(l);                
+                lang = l;
+                drawPanel();
+                loadLang(lang,updateLang);
+            }.bind(this,langlist[i]);
+            lpanel.appendChild(img);
+            
+        }
+    }
+    drawPanel();
+}
+
 function start() {
 	
 	var querystr = getQueryString(location.search);
 	var lang = querystr["lang"];
-	if (lang) {
-		loadLang(lang,updateLang)
-	} else {
+	if (!lang) {
 		lang = "en";
 	}
+	loadLang(lang,updateLang);
 	
 	var str_login = document.getElementById("str_login");
 	var str_manage = document.getElementById("str_manage");
 	var qrblock = document.getElementById("qrblock");
+	var panel = document.getElementById("langpanel");
 	
 	var qrlogin = new QRLogin(querystr, lang, qrblock); 
 	qrlogin.reload(false);
@@ -157,5 +196,7 @@ function start() {
 		str_login.classList.remove("hl");
 		qrlogin.reload(true);
 	});
+	
+	var langpanel = new LangPanel(panel,lang,qrlogin);
 	
 }

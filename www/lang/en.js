@@ -16,6 +16,7 @@
 "clickinfo":"Please click or tap on QR code to use current browser",
 "always_blank":"Don't ask password",
 "accept_button":"Log me in",
-"create_button":"Create new profile"
+"create_button":"Create new profile",
+"failed":"Failed to deliver, try to rescan"
 
 }

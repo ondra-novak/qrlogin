@@ -15,6 +15,7 @@ h1 img {
 h1 {
 		background-color: #629262;	
 		padding: 10px;
+	margin-bottom: 0;
 }
 
 
@@ -54,4 +55,10 @@ ul.selector li.hl {
 
 .selectorblock IFRAME {
 	border: 0;
+}
+
+#langpanel 
+{
+	text-align:right;
+	margin-bottom: 2em;
 }

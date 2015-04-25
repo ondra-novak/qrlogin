@@ -24,6 +24,13 @@ function langSetText(element, index) {
 	}
 }
 
+function langSetTextId(element, index) {
+    if (!index) {
+        index = element;
+    }
+    langSetText(document.getElementById(element), index);
+}
+
 function getQueryString(qs) {
     var a = qs.substr(1).split('&'); 
 	if (a == "") return {};

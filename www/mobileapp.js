@@ -5,6 +5,8 @@ if (!Date.now) {
 }
 
 
+
+
 function SignPage() {
 
     var args = location.hash.substr(1).split(',');
@@ -22,10 +24,10 @@ function SignPage() {
     var keystore = localStorage["secretKey"] ? JSON.parse(localStorage["secretKey"]) : {}
 
     function updateLang() {
-        langSetText(document.getElementById("enter_password"), "enter_password");
-        langSetText(document.getElementById("keep_password_blank"), "always_blank");
-        langSetText(document.getElementById("accept_button"), "accept_button");
-        langSetText(document.getElementById("create_button"), "create_button");
+        langSetTextId("enter_password");
+        langSetTextId("keep_password_blank", "always_blank");
+        langSetTextId("accept_button");
+        langSetTextId("create_button");
     }
 
     function showPwd(create) {
@@ -137,6 +139,54 @@ function SignPage() {
 
 
 function startSign() {
-    window.signPage = new SignPage();
+    window.signPage = new SignPage;
+
+}
+
+function OKPage() {
+    var lang = window.location.hash.substr(1);
+
+    function updateLang() {
+        langSetTextId("delivered");
+    }
+
+    function init() {
+        loadLang(lang, updateLang);
+    }
+
+    init();    
+   
+
+}
+
+function startOKPage() {
+
+    window.okPage = new OKPage;
+
+
+
+}
+
+function FailPage() {
+    var lang = window.location.hash.substr(1);
+
+    function updateLang() {
+        langSetTextId("failed");
+    }
+
+    function init() {
+        loadLang(lang, updateLang);
+    }
+
+    init();
+
+
+}
+
+function startFailPage() {
+
+    window.okPage = new FailPage;
+
+
 
 }

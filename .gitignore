@@ -42,3 +42,5 @@ config.log
 config.status
 libtool
 aclocal.m4
+*.sdf
+bin-Win32-Debug/
