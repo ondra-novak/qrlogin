@@ -224,6 +224,22 @@
 				RelativePath=".\www\img\author.jpg"
 				>
 			</File>
+			<File
+				RelativePath=".\www\img\favicon.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\www\img\lang_cs.gif"
+				>
+			</File>
+			<File
+				RelativePath=".\www\img\lang_en.gif"
+				>
+			</File>
+			<File
+				RelativePath=".\www\img\spinner.gif"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Source Files"
@@ -269,6 +285,10 @@
 		</File>
 		<File
 			RelativePath=".\www\challenge.html"
+			>
+		</File>
+		<File
+			RelativePath=".\www\img\failed.png"
 			>
 		</File>
 		<File
@@ -336,6 +356,18 @@
 			>
 		</File>
 		<File
+			RelativePath=".\www\img\qrlogo-sw.png"
+			>
+		</File>
+		<File
+			RelativePath=".\www\img\qrlogo.png"
+			>
+		</File>
+		<File
+			RelativePath=".\www\img\qrlogofb.png"
+			>
+		</File>
+		<File
 			RelativePath=".\conf\qrpass.conf"
 			>
 		</File>
@@ -349,6 +381,10 @@
 		</File>
 		<File
 			RelativePath=".\www\img\small_logo.png"
+			>
+		</File>
+		<File
+			RelativePath=".\www\img\success.png"
 			>
 		</File>
 		<File
