@@ -1,6 +1,6 @@
 {
 "feature_test_failed":"Váš prohlížeč nepodporuje některé funkce potřebné pro běh této služby. Zkuste novější prohlížeč.",	
-"enter_password":"Vložte heslo",
+"enter_password":"Vložte heslo (volitelné)",
 "sending_response":"Odesílám odpověď na server...",
 "confirm_new_identity":"Potvrďte, že si přejete vytvořit novou identitu na této stránce",
 "do_you_want_protect":"Přejete si ochránit identitu heslem (pak je třeba jej pokaždé zadavávat)",

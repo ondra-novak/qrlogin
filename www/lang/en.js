@@ -1,6 +1,6 @@
 {
 "feature_test_failed":"This browser cannot be used for QR Passport. Please try open URL in another browser",	
-"enter_password":"Enter password",
+"enter_password":"Enter password (optional)",
 "sending_response":"Sending response...",
 "confirm_new_identity":"Confirm a new identity will be created",
 "do_you_want_protect":"Do you want to protect the identity by a password?",

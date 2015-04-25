@@ -28,6 +28,18 @@ function SignPage() {
         langSetText(document.getElementById("create_button"), "create_button");
     }
 
+    function showPwd(create) {
+        password_form.style.display = "block";
+        if (create)
+            create_button.style.display = "block";
+        else
+            accept_button.style.display = "block";
+        password_input.focus();
+        if (password_input.prompt) password_input.prompt();
+        else password_input.click();
+  
+    }
+
     function init() {
         loadLang(lang, updateLang);
         var serviceId = document.getElementById("serviceId");
@@ -37,14 +49,12 @@ function SignPage() {
 
             var keyinfo = keystore[host];
             if (keyinfo.hasPwd) {
-                password_form.style.display = "block";
-                accept_button.style.display = "block";
+                showPwd(false);
             } else {
                 setTimeout(signAndPushRequest, 1);
             }
         } else {
-            password_form.style.display = "block";
-            create_button.style.display = "block";
+            showPwd(true);
         }
         accept_button.addEventListener("click",signAndPushRequest);
         create_button.addEventListener("click",createKey);

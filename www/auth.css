@@ -13,7 +13,7 @@ h1 img {
 }
 
 h1 {
-		background-color: #CCF;	
+		background-color: #629262;	
 		padding: 10px;
 }
 
@@ -30,22 +30,22 @@ ul.selector li {
 	display: table-cell;
 	margin: 0;
 	padding: 10px;
-	border: 1px solid #EED;
-	background-color: #FFD;
+	border: 1px solid #CFC;
+	background-color: #EFE;
 	cursor: pointer;
 	
 }
 
 ul.selector li.hl {
-	background-color: #DDA;
-	border: 3px solid #880;
+	background-color: #ADA;
+	border: 3px solid #629262;
 	cursor: default;
 }
 
 
 
 .selectorblock {
-	background-color: #EEC;
+	background-color: #DFD;
 	padding: 10px;	
 }
 .selectorblock div {
