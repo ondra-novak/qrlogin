@@ -4,7 +4,43 @@ if (!Date.now) {
     Date.now = function() { return new Date().getTime(); }
 }
 
+//keys without password are already hashed to speedup things
+function prehashKey(key) {
+    return { 
+        secret: Crypto.SHA256(keyinfo.secret, { asBytes: true }),
+        hasPwd: false
+    };
+}
 
+function fromOldFormat(domain) {
+    //transfer keys from old version
+    var keystore = localStorage["secretKey"] ? JSON.parse(localStorage["secretKey"]) : {}
+    if (keystore[domain]) {
+        var key = keystore[domain];
+        if (!key.hasPwd) {
+            key = prehashKey(key);
+        }
+        setKey(domain, key);
+        delete keystore[domain];
+        localStorage["secretKey"] = JSON.stringify(keystore);
+        return key;
+    }
+}
+
+function getKey(domain) {
+
+    var kstr = localStorage["keyStorage_" + domain];
+    if (kstr) {
+        return JSON.parse(kstr);
+    } else {
+
+        return false;
+    }
+}
+
+function setKey(domain, keyinfo) {
+    localStorage["keyStorage_" + domain] = JSON.stringify(keyinfo);
+}
 
 
 function SignPage() {
@@ -21,8 +57,7 @@ function SignPage() {
     var always_blank_label= document.getElementById("keep_password_blank");
     var spinner = document.getElementById("spinner");
 
-    var keystore = localStorage["secretKey"] ? JSON.parse(localStorage["secretKey"]) : {}
-
+    
     function updateLang() {
         langSetTextId("enter_password");
         langSetTextId("keep_password_blank", "always_blank");
@@ -47,9 +82,10 @@ function SignPage() {
         var serviceId = document.getElementById("serviceId");
         serviceId.appendChild(document.createTextNode(host));
 
-        if (keystore[host]) {
+        var keyinfo = getKey(host);
 
-            var keyinfo = keystore[host];
+        if (keyinfo) {
+
             if (keyinfo.hasPwd) {
                 showPwd(false);
             } else {
@@ -91,27 +127,34 @@ function SignPage() {
 
     function signAndPushRequest2() {
 
-        var keyinfo = keystore[host];
+        var keyinfo = getKey(host);
         var key;
 
         if (keyinfo.hasPwd) {
             var removepwd = always_blank.checked;
             if (removepwd) {
                 keyinfo.hasPwd = false;
+                keyinfo.secret = Crypto.SHA256(keyinfo.secret, { asBytes: true });
                 saveKeys();
-                key = combineKeyAndPin(keyinfo.secret);
+                key = keyinfo.secret;
             } else {
                 var pin = password_input.value;
                 key = combineKeyAndPin(keyinfo.secret, pin);
             }
         } else {
-            key = combineKeyAndPin(keyinfo.secret);
+            key = keyinfo.secret;
         }
 
 
         var timestamp = Math.floor(Date.now() / 1000);
         var msg = "login to " + host + ", challenge is " + c + ", timestamp " + timestamp;
         var signature = signRequest(msg, key);
+        //if failed
+        if (signature === false) {
+            //schedule new try
+            setTimeout(signAndPushRequest2, 1);
+            return;
+        }
         location.href = "r?c=" + c + "&r=" + encodeURIComponent(signature) + "&t=" + timestamp + "#" + lang;
 
     }

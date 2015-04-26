@@ -101,21 +101,3 @@ function sign_message(private_key, message, compressed, addrtype) {
     return false;
 }
 
-function bitcoinsig_test() {
-    var k = '5JeWZ1z6sRcLTJXdQEDdB986E6XfLAkj9CgNE4EHzr5GmjrVFpf';
-    var a = '17mDAmveV5wBwxajBsY7g1trbMW1DVWcgL';
-    var s = 'HDiv4Oe9SjM1FFVbKk4m3N34efYiRgkQGGoEm564ldYt44jHVTuX23+WnihNMi4vujvpUs1M529P3kftjDezn9E=';
-    var m = 'test message';
-    payload = Bitcoin.Base58.decode(k);
-    secret = payload.slice(1, 33);
-    compressed = payload.length == 38;
-    console.log(verify_message(s, m));
-    sig = sign_message(new Bitcoin.ECKey(secret), m, compressed);
-    console.log(verify_message(sig, m));
-}
-
-if (typeof require != 'undefined' && require.main === module) {
-    window = global; navigator = {}; Bitcoin = {};
-    eval(require('fs').readFileSync('./bitcoinjs-min.js')+'');
-    eval(require('path').basename(module.filename,'.js')+'_test()');
-}
