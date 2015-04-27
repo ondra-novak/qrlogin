@@ -1,0 +1,47 @@
+<html>
+<head>
+<title>QRlogin</title>
+<link rel="stylesheet" href="mobile_styles.css" type="text/css" />
+<script src="secure-random.js" type="text/javascript"></script>
+<script src="libs.js" type="text/javascript"></script>
+<script src="mobileapp.js" type="text/javascript"></script>
+<script src="aes.js" type="text/javascript"></script>
+<meta name="viewport" content="width=320">
+</head>
+
+<body onload="startManage()">
+<div class="header">
+<img src="img/qrlogo-sw.png" class="logo"/>
+<div class="serviceid"><span id="serviceId"></span></div>
+</div>
+
+<div id="noprofile">You haven't created identity for this site yet</div>
+<div class="panel" id="panel">
+<p id="backup_label">Backup key on the computer</p>
+<button id="backup_button" >Backup keys</button>
+<p id="enable_pwd_label">Enable password for your key</p>
+<button id="enablepwd_button" >Enable password</button>
+<hr>
+<button id="erase_button" >Erase key</button>
+</div>
+<div class="eraseask" id="eraseask">
+<p id="erase_ask_label">Do you realy want to ERASE YOUR KEY to the current site? Your identity will no longer available</p>
+<div class="buttonbar"><button id="erase_yes">Yes</button> <button id="erase_no">No</button></div>
+</div>
+<div class="spinner" id="spinner"><img src="img/spinner.gif"></div>
+<div id="done_sect">
+<p id="done_text">Succesfuly delivered</p>
+<img src="img/success.png" />
+</div>
+<div id="failed_sect">
+<p id="failed">Please try again</p>
+<img src="img/failed.png" />
+</div>
+
+
+
+</body>
+
+
+
+</html>

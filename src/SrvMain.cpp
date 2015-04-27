@@ -34,9 +34,10 @@ static SrvMain theApp;
 
 SrvMain::SrvMain()
 	:challenge("/challenge.html")
-	,identReset("/identreset.html")
+	,identReset("/identreset.html") //<obsolete
 	,frame("/frame.html")
 	,auth("/auth.html")
+	,manage("/manage.html")
 	,response(*this)
 	,loginMonitor(*this)
 	,verify(*this)
@@ -66,11 +67,12 @@ natural SrvMain::onStartServer(BredyHttpSrv::IHttpMapper& httpMapper) {
 
 	httpMapper.addSite("",website);
 	httpMapper.addSite("/c",&challenge);
+	httpMapper.addSite("/m",&manage);
 	httpMapper.addSite("/r",&response);
 	httpMapper.addSite("/l",&loginMonitor);
 	httpMapper.addSite("/verify",&verify);
 	httpMapper.addSite("/token",&verify);
-	httpMapper.addSite("/ident",&getIdent);
+	httpMapper.addSite("/ident",&getIdent); //<obsolete
 	httpMapper.addSite("/e",&identReset);
 	httpMapper.addSite("/frame",&frame);
 	httpMapper.addSite("/auth",&auth);
@@ -115,6 +117,7 @@ natural SrvMain::Response::onRequest(IHttpRequest& request, ConstStrA vpath) {
 	StringA ident;
 	StringA response;
 	natural timestamp;
+	bool quiet = false;
 
 	while (qp.hasItems()) {
 		const QueryField &qf = qp.getNext();
@@ -123,9 +126,19 @@ natural SrvMain::Response::onRequest(IHttpRequest& request, ConstStrA vpath) {
 		if (qf.name == "t") {
 			if (!parseUnsignedNumber(qf.value.getFwIter(),timestamp,10)) return stNotFound;
 		}
+		if (qf.name == "q") {
+			quiet = qf.value == "1";
+		}
 	}
 
-	return owner.acceptLogin(ident,response,timestamp)?request.callHandler("/loginok.html"):request.callHandler("/loginfailed.html");
+	bool result = owner.acceptLogin(ident,response,timestamp);
+	if (quiet) {
+		request.status(result?200:409);
+		request.sendHeaders();
+		return 0;
+	} else {
+		return result?request.callHandler("/loginok.html"):request.callHandler("/loginfailed.html");
+	}
 
 }
 

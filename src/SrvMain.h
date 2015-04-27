@@ -84,10 +84,25 @@ public:
 		virtual natural onData(IHttpRequest &request) {return 0;}
 	};
 
+	class Backup: public IHttpHandler {
+	public:
+		SrvMain &owner;
+		Backup(SrvMain &owner):owner(owner) {}
+
+		virtual natural onRequest(IHttpRequest &request, ConstStrA vpath);
+		virtual natural onData(IHttpRequest &request) {return 0;}
+	};
+
+	class PostBackup: public IHttpHandler {
+	public:
+
+	};
+
 	RewritePath challenge;
 	RewritePath identReset;
 	RewritePath frame;
 	RewritePath auth;
+	RewritePath manage;
 	Response response;
 	LoginMonitor loginMonitor;
 	Verify verify;
@@ -105,6 +120,7 @@ public:
 	FastLock lock;
 
 	TokenMap tokenMap[2];
+	TokenMap backupMap[2];
 	FastLock tokenMapLock;
 	TimeStamp lastShiftTime;
 
@@ -118,6 +134,7 @@ public:
 	void failedLogin(StringA ident);
 	void pingActive();
 	void scheduledPing(IJobScheduler *scheduler);
+	void receiveBackup()
 
 
 };

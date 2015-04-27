@@ -30,46 +30,48 @@ function QRLogin(args, lang, qrcodeBox) {
 	
 	var apikey = getDomainFromUrl(args.redirect_uri)	
 	
+	
 	this.reload = function(manage) {
 		challengeUrl = location.href.split('?')[0]
+
+		var bytes = secureRandom(20);
+		curcode = base64EncodeUrl(Crypto.util.bytesToBase64(bytes));
+		var logurl = "l?c="+curcode
+		
+		if (window.EventSource) {
+	        if (eventSource != null) eventSource.close();
+			eventSource = new EventSource(logurl);
+			eventSource.addEventListener("message",function(event) {
+				var response = event.data;
+				this.processResponse(response);
+				eventSource.close();
+			}.bind(this));
+			eventSource.addEventListener("error",function(event) {
+				if (eventSource.readyState == 2) {
+					qrcodeBox.style.visibility = "hidden";
+				}
+			}.bind(this))
+		} else {
+		    if (connection != null) connection.abort();
+			connection = new XMLHttpRequest();	
+			connection.open("GET",logurl,true);
+			connection.onreadystatechange = function(request) {
+	            if (connection.readyState == 4 ) {
+	                if (connection.status == 200) {
+	                    var response = connection.responseText;
+	                    this.processResponse(response);
+	                } else if (connection.status == 409) {
+	                	this.reload();
+	                }
+	            }
+			}.bind(this);
+			connection.send();
+		}
+
 		
 		if (manage) {
-			challengeUrl = challengeUrl.substr(0,challengeUrl.lastIndexOf("/")+1)+"e#"+lang+","+apikey;
-		} else {
-			var bytes = secureRandom(20);
-			curcode = base64EncodeUrl(Crypto.util.bytesToBase64(bytes));
-			var logurl = "l?c="+curcode
-			
-			if (window.EventSource) {
-		        if (eventSource != null) eventSource.close();
-				eventSource = new EventSource(logurl);
-				eventSource.addEventListener("message",function(event) {
-					var response = event.data;
-					this.processResponse(response);
-					eventSource.close();
-				}.bind(this));
-				eventSource.addEventListener("error",function(event) {
-					if (eventSource.readyState == 2) {
-						qrcodeBox.style.visibility = "hidden";
-					}
-				}.bind(this))
-			} else {
-			    if (connection != null) connection.abort();
-				connection = new XMLHttpRequest();	
-				connection.open("GET",logurl,true);
-				connection.onreadystatechange = function(request) {
-		            if (connection.readyState == 4 ) {
-		                if (connection.status == 200) {
-		                    var response = connection.responseText;
-		                    this.processResponse(response);
-		                } else if (connection.status == 409) {
-		                	this.reload();
-		                }
-		            }
-				}.bind(this);
-				connection.send();
-			}
-				
+			challengeUrl = challengeUrl.substr(0,challengeUrl.lastIndexOf("/")+1)+"m#"+lang+","+apikey+","+curcode;
+		} else {				
 			challengeUrl = challengeUrl.substr(0,challengeUrl.lastIndexOf("/")+1)+"c#"+lang+","+apikey+","+curcode;
 		}
 		qrcode.makeCode(challengeUrl)

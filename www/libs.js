@@ -31,6 +31,11 @@ function langSetTextId(element, index) {
     langSetText(document.getElementById(element), index);
 }
 
+function langGetText(index, defText) {
+	if (langtab[index]) return langtab[index];
+	else return defText;
+}
+
 function getQueryString(qs) {
     var a = qs.substr(1).split('&'); 
 	if (a == "") return {};

@@ -4,22 +4,13 @@ if (!Date.now) {
     Date.now = function() { return new Date().getTime(); }
 }
 
-//keys without password are already hashed to speedup things
-function prehashKey(key) {
-    return { 
-        secret: Crypto.SHA256(keyinfo.secret, { asBytes: true }),
-        hasPwd: false
-    };
-}
 
 function fromOldFormat(domain) {
     //transfer keys from old version
     var keystore = localStorage["secretKey"] ? JSON.parse(localStorage["secretKey"]) : {}
     if (keystore[domain]) {
         var key = keystore[domain];
-        if (!key.hasPwd) {
-            key = prehashKey(key);
-        }
+        key.prehash = Crypto.SHA256(key.secret, { asBytes: true });
         setKey(domain, key);
         delete keystore[domain];
         localStorage["secretKey"] = JSON.stringify(keystore);
@@ -42,6 +33,10 @@ function setKey(domain, keyinfo) {
     localStorage["keyStorage_" + domain] = JSON.stringify(keyinfo);
 }
 
+function eraseKey(domain) {
+    delete localStorage["keyStorage_" + domain];
+
+}
 
 function SignPage() {
 
@@ -56,13 +51,18 @@ function SignPage() {
     var always_blank= document.getElementById("always_blank");
     var always_blank_label= document.getElementById("keep_password_blank");
     var spinner = document.getElementById("spinner");
+    var delivered_sect = document.getElementById("delivered_sect");
+    var failed_sect = document.getElementById("failed_sect");
 
-    
+
+
     function updateLang() {
         langSetTextId("enter_password");
         langSetTextId("keep_password_blank", "always_blank");
         langSetTextId("accept_button");
         langSetTextId("create_button");
+        langSetTextId("delivered");
+        langSetTextId("failed");
     }
 
     function showPwd(create) {
@@ -82,8 +82,12 @@ function SignPage() {
         var serviceId = document.getElementById("serviceId");
         serviceId.appendChild(document.createTextNode(host));
 
+        //import keys if necesery
+        fromOldFormat(host);
+        //get key
         var keyinfo = getKey(host);
 
+        //key exist?
         if (keyinfo) {
 
             if (keyinfo.hasPwd) {
@@ -111,10 +115,6 @@ function SignPage() {
         setTimeout(signAndPushRequest2, 10);
     }
 
-    function saveKeys() {
-        localStorage["secretKey"] = JSON.stringify(keystore);
-    }
-
     function combineKeyAndPin(key, pin) {
         var keypin = key + pin;
         return Crypto.SHA256(keypin, { asBytes: true });
@@ -134,15 +134,15 @@ function SignPage() {
             var removepwd = always_blank.checked;
             if (removepwd) {
                 keyinfo.hasPwd = false;
-                keyinfo.secret = Crypto.SHA256(keyinfo.secret, { asBytes: true });
-                saveKeys();
-                key = keyinfo.secret;
+                setKey(host, keyinfo)
+                key = keyinfo.prehash;
             } else {
                 var pin = password_input.value;
-                key = combineKeyAndPin(keyinfo.secret, pin);
+                if (pin == "") key = keyinfo.prehash;
+                else key = combineKeyAndPin(keyinfo.secret, pin);
             }
         } else {
-            key = keyinfo.secret;
+            key = keyinfo.prehash;
         }
 
 
@@ -155,7 +155,20 @@ function SignPage() {
             setTimeout(signAndPushRequest2, 1);
             return;
         }
-        location.href = "r?c=" + c + "&r=" + encodeURIComponent(signature) + "&t=" + timestamp + "#" + lang;
+        var url = "r?c=" + c + "&r=" + encodeURIComponent(signature) + "&t=" + timestamp + "&q=1";
+        var connection = new XMLHttpRequest();	
+		connection.open("GET",url,true);
+		connection.onreadystatechange = function(request) {
+            if (connection.readyState == 4 ) {
+            	spinner.style.display="none";
+                if (connection.status == 200) {
+                	delivered_sect.style.display="block";
+                } else {
+                	failed_sect.style.display="block";
+                }
+            }
+		}
+		connection.send();
 
     }
     function createKey() {
@@ -168,11 +181,14 @@ function SignPage() {
     function createKey2() {
 
         var bytes = secureRandom(32);
-        keystore[host] = {
-            secret: Crypto.util.bytesToHex(bytes) + c,
-            hasPwd: !always_blank.checked
-        }
-        saveKeys();
+        var secret = Crypto.util.bytesToHex(bytes) + c; 
+        var keyinfo  = {
+            secret: secret,
+            hasPwd: !always_blank.checked,
+            prehash: Crypto.SHA256(secret, { asBytes: true })
+        };
+                
+        setKey(host,keyinfo);
         signAndPushRequest();
     }
 
@@ -230,6 +246,116 @@ function startFailPage() {
 
     window.okPage = new FailPage;
 
-
-
 }
+
+
+function ManagePage() {
+    var args = location.hash.substr(1).split(',');
+    var lang = args[0];
+    var host = args[1];
+    var c = args[2];
+    
+    function updateLang() {
+        langSetTextId("backup_label");
+        langSetTextId("backup_button");
+        langSetTextId("enable_pwd_label");
+        langSetTextId("enablepwd_button");
+        langSetTextId("erase_button");
+        langSetTextId("done_text");
+        langSetTextId("erase_ask_label");
+        langSetTextId("erase_yes");
+        langSetTextId("erase_no");
+        langSetTextId("noprofile");
+        
+    }
+
+    var backup_button = document.getElementById("backup_button");
+    var enable_pwd_button = document.getElementById("enablepwd_button");
+    var erase_key_button = document.getElementById("erase_button");
+    var erase_key_yes = document.getElementById("erase_yes");
+    var erase_key_no =  document.getElementById("erase_no");
+    var panel =  document.getElementById("panel");
+    var noprofile =  document.getElementById("noprofile");
+    var eraseask =  document.getElementById("eraseask");
+    var done_sect = document.getElementById("done_sect");
+    var failed_sect = document.getElementById("failed_sect");
+    
+    
+    
+    function init() {
+        var serviceId = document.getElementById("serviceId");
+        serviceId.appendChild(document.createTextNode(host));
+        loadLang(lang, updateLang);
+        
+        if (!getKey(host)) {
+        	noprofile.style.display="block";        	        	
+        } else {
+        	panel.style.display="block";
+	        
+	        erase_key_yes.addEventListener("click", function() {
+	        	eraseask.style.display="none";
+	        	eraseKey(host);
+	        	done_sect.style.display="block";        	
+	        });
+	        erase_key_no.addEventListener("click", function() {
+	        	eraseask.style.display="none";
+	        	panel.style.display="block";        	        	
+	        });
+	        erase_key_button.addEventListener("click", function() {
+	        	panel.style.display="none";        	        	
+	        	eraseask.style.display="block";
+	        });
+	        enable_pwd_button.addEventListener("click", function() {
+	        	
+	        	var key = getKey(host);
+	        	key.hasPwd = true;
+	        	setKey(host,key);
+	        	panel.style.display="none";
+	        	done_sect.style.display="block";        	
+	        	
+	        });
+	        backup_button.addEventListener("click", function() {
+	        	
+	        	var promptText = langGetText("backup_prompt","You are going to send your key outside of the mobile device. " +
+	        			"Ensure, that target computer (the computer which shows the QR code) is complete " +
+	        			"under your control and the QR code is shown on the proper page.\r\n\r\n" +
+	        			"You key will be encrypted. Please enter a passphrase that will be used " +
+	        			"to encrypt your key");
+	        	
+	        	var pwd = prompt(promptText,"");
+	        	var key = getKey(host);
+	        	
+	        	var enckey = GibberishAES.enc(key.secret,pwd);
+	        	
+	            var url = "backup?c=" + c;
+	            var connection = new XMLHttpRequest();	
+	    		connection.open("POST",url,true);
+	    		connection.onreadystatechange = function(request) {
+	                if (connection.readyState == 4 ) {
+	                	spinner.style.display="none";
+	                    if (connection.status == 200) {
+	                    	done_sect.style.display="block";
+	                    } else  {
+	                    	failed_sect.style.display="block";
+	                    }
+	                }
+	    		}
+	    		panel.style.display="none";
+	    		spinner.style.display="block";
+	    		connection.send(enckey);
+	        	
+	        })
+	        
+        }
+
+    }
+    
+    init();
+
+};	
+
+function startManage() {
+	window.managePage = new ManagePage;
+}
+
+

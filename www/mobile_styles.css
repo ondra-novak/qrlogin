@@ -51,22 +51,29 @@ input.password
 
 }
 
-button#accept_button,button#create_button
+button
 {
-	display:none;
 	width: 10em;
-	background-color: #8A8;
 	color: White;
 	font-size: 25px;
 	font-weight: bold;
 	margin: 10px auto auto auto;
 	padding: 20px 0 20px 0;
 	border: 2px solid #080;
+	background-color: #444;
+	
+}
+
+button#accept_button
+{
+	display:none;
+	background-color: #8A8;
 	
 }
 
 button#create_button
 {
+	display:none;
 	background-color: #88A;
 	border: 2px solid #008;
 }
@@ -82,4 +89,21 @@ label.always_blank
 {
 	display:block;
 	padding: 0.5em 0 0.5em 0;
+}
+
+#delivered_sect, #failed_sect {
+	display:none;
+}
+
+#eraseask {
+	display:none;
+}
+#done_sect {
+	display:none;
+}
+#panel {
+	display:none;
+}
+#noprofile{
+	display: none;
 }

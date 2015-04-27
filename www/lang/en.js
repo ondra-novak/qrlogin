@@ -1,9 +1,5 @@
 {
-"feature_test_failed":"This browser cannot be used for QR Passport. Please try open URL in another browser",	
 "enter_password":"Enter password (optional)",
-"sending_response":"Sending response...",
-"confirm_new_identity":"Confirm a new identity will be created",
-"do_you_want_protect":"Do you want to protect the identity by a password?",
 "confirm_reset":"Confirm reset identity - all information about your identity will be erased",
 "erased":"Erased!",
 "delivered":"Request has been delivered to the server",
@@ -17,6 +13,12 @@
 "always_blank":"Don't ask password",
 "accept_button":"Log me in",
 "create_button":"Create new profile",
-"failed":"Failed to deliver, try to rescan"
+"failed":"Failed to deliver, try to rescan",
+"backup_label":"Safety backup your key in the PC",
+"backup_button":"Backup key",
+"enable_pwd_label":"Re-enable password dialog",
+"enablepwd_button":"Enable password",
+"erase_button":"Erase key",
+"done_text":"Success"
 
 }
