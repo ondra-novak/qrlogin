@@ -42,6 +42,7 @@ SrvMain::SrvMain()
 	,loginMonitor(*this)
 	,verify(*this)
 	,getIdent(*this)
+	,rcvBackup(*this)
 
 {
 
@@ -76,6 +77,7 @@ natural SrvMain::onStartServer(BredyHttpSrv::IHttpMapper& httpMapper) {
 	httpMapper.addSite("/e",&identReset);
 	httpMapper.addSite("/frame",&frame);
 	httpMapper.addSite("/auth",&auth);
+	httpMapper.addSite("/backup",&rcvBackup);
 
 	IJobScheduler &scheduler = httpMapper.getIfc<IJobScheduler>();
 	scheduler.schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,&scheduler),30,ThreadMode::schedulerThread);
@@ -274,10 +276,33 @@ StringA SrvMain::getIdentityFromToken(StringA token) {
 }
 StringA SrvMain::getIdentityFromToken_lk(StringA token) {
 	const StringA *id = tokenMap[0].find(token);
-	if (id == 0) tokenMap[1].find(token);
+	if (id == 0) id = tokenMap[1].find(token);
 	if (id == 0) return StringA();
 	else return *id;
 }
+
+StringA SrvMain::getBackupFile(StringA ident) {
+	Synchronized<FastLock> _(tokenMapLock);
+	return getBackupFile_lk(ident);
+}
+LightSpeed::StringA SrvMain::getBackupFile_lk(StringA ident) {
+	const StringA *id = backupMap[0].find(ident);
+	StringA out;
+	if (id == 0) {
+		id = backupMap[1].find(ident);
+		if (id == 0) {
+			return StringA();
+		} else {
+			out = *id;
+			backupMap[1].erase(ident);
+		}
+	} else {
+		out = *id;
+		backupMap[0].erase(ident);
+	}
+	return out;
+}
+
 
 void SrvMain::shiftBanksIfNeeded() {
 	Synchronized<FastLock> _(tokenMapLock);
@@ -286,6 +311,8 @@ void SrvMain::shiftBanksIfNeeded() {
 	if (ellapsed.getHours() >= 1) {
 		tokenMap[0].swap(tokenMap[1]);
 		tokenMap[0].clear();
+		backupMap[0].swap(backupMap[1]);
+		backupMap[0].clear();
 		lastShiftTime = now;
 	}
 
@@ -295,6 +322,16 @@ void SrvMain::scheduledPing(IJobScheduler* scheduler) {
 	pingActive();
 	shiftBanksIfNeeded();
 	scheduler->schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,scheduler),30,ThreadMode::schedulerThread);
+}
+
+bool SrvMain::receiveBackup( StringA chanId, StringA content )
+{
+	{
+		Synchronized<FastLock> _(tokenMapLock);
+		backupMap[0].replace(chanId,content);
+	}
+	return acceptLogin(chanId,"backup",0);
+	
 }
 
 static natural sendOAuth2Error(IHttpRequest &request, ConstStrA error) {
@@ -382,6 +419,38 @@ natural SrvMain::GetIdentity::onRequest(IHttpRequest& request,ConstStrA vpath) {
 	JSON::toStream(response,out,false);
 	return 0;
 }
+
+LightSpeed::natural SrvMain::Backup::onRequest( IHttpRequest &request, ConstStrA vpath )
+{
+	StringA c;
+	QueryParser qp(vpath);
+	while (qp.hasItems()) {
+		const QueryField &qf = qp.getNext();
+		if (qf.name == "c") c= qf.value;
+	}
+
+	if (c.empty()) return stNotFound;
+
+	if (request.getMethod() == "POST") {
+
+		AutoArrayStream<char> buffer;
+		SeqFileInput fin(&request);
+		SeqTextInA txtin(fin);
+		buffer.copy(txtin);
+		if (owner.receiveBackup(c,buffer.getArray())) return stCreated;
+		else return 409;
+	} else {
+		StringA res = owner.getBackupFile(c);
+		if (res.empty()) return stNotFound;
+
+		request.header(IHttpRequest::fldContentType,"application/octet-stream");
+		request.header(IHttpRequest::fldContentLength,ToString<natural>(res.length()));
+		request.header(IHttpRequest::fldContentDisposition,"attachment;filename=qrlogin-secret.key");
+		request.writeAll(res.data(),res.length());
+		return stOK;
+	}
+}
+
 
 } /* namespace qrpass */
 

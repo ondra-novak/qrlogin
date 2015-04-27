@@ -93,10 +93,6 @@ public:
 		virtual natural onData(IHttpRequest &request) {return 0;}
 	};
 
-	class PostBackup: public IHttpHandler {
-	public:
-
-	};
 
 	RewritePath challenge;
 	RewritePath identReset;
@@ -107,6 +103,7 @@ public:
 	LoginMonitor loginMonitor;
 	Verify verify;
 	GetIdentity getIdent;
+	Backup rcvBackup;
 
 	FilePath apikeys;
 
@@ -134,9 +131,9 @@ public:
 	void failedLogin(StringA ident);
 	void pingActive();
 	void scheduledPing(IJobScheduler *scheduler);
-	void receiveBackup()
-
-
+	bool receiveBackup(StringA chanId, StringA content);
+	StringA getBackupFile(StringA ident);
+	StringA getBackupFile_lk(StringA ident);
 };
 
 } /* namespace qrpass */

@@ -17,9 +17,7 @@
 
 <div id="noprofile">You haven't created identity for this site yet</div>
 <div class="panel" id="panel">
-<p id="backup_label">Backup key on the computer</p>
 <button id="backup_button" >Backup keys</button>
-<p id="enable_pwd_label">Enable password for your key</p>
 <button id="enablepwd_button" >Enable password</button>
 <hr>
 <button id="erase_button" >Erase key</button>
@@ -27,6 +25,19 @@
 <div class="eraseask" id="eraseask">
 <p id="erase_ask_label">Do you realy want to ERASE YOUR KEY to the current site? Your identity will no longer available</p>
 <div class="buttonbar"><button id="erase_yes">Yes</button> <button id="erase_no">No</button></div>
+</div>
+<div class="password" id="passphrase_panel">
+<label><span id="passphrase_label_1">You are going to send your key outside of 
+the&nbsp;mobile device. Ensure, that the&nbsp;target computer (the&nbsp;computer 
+that shows the&nbsp;QR code) is complete under your control and the&nbsp;QR code 
+is shown on the proper page</span>
+<br /><br /><strong><span id="passphrase_label_2">You key will be encrypted. Please enter a passphrase (mandatory)</span></strong>
+<input type="text" class="password" id="passphrase" />
+</label>
+<div class="buttonbar">
+<button id="backup_key_button">Backup key</button>
+<button id="cancel_button">Cancel</button>
+</div>
 </div>
 <div class="spinner" id="spinner"><img src="img/spinner.gif"></div>
 <div id="done_sect">

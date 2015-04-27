@@ -256,9 +256,7 @@ function ManagePage() {
     var c = args[2];
     
     function updateLang() {
-        langSetTextId("backup_label");
         langSetTextId("backup_button");
-        langSetTextId("enable_pwd_label");
         langSetTextId("enablepwd_button");
         langSetTextId("erase_button");
         langSetTextId("done_text");
@@ -279,7 +277,10 @@ function ManagePage() {
     var eraseask =  document.getElementById("eraseask");
     var done_sect = document.getElementById("done_sect");
     var failed_sect = document.getElementById("failed_sect");
-    
+    var passphrase_panel = document.getElementById("passphrase_panel");
+    var backup_key_button= document.getElementById("backup_key_button");
+    var cancel_button = document.getElementById("cancel_button");
+    var passphrase = document.getElementById("passphrase");
     
     
     function init() {
@@ -301,6 +302,10 @@ function ManagePage() {
 	        	eraseask.style.display="none";
 	        	panel.style.display="block";        	        	
 	        });
+	        cancel_button.addEventListener("click", function() {
+	            passphrase_panel.style.display = "none";
+	            panel.style.display = "block";
+	        });
 	        erase_key_button.addEventListener("click", function() {
 	        	panel.style.display="none";        	        	
 	        	eraseask.style.display="block";
@@ -315,36 +320,39 @@ function ManagePage() {
 	        	
 	        });
 	        backup_button.addEventListener("click", function() {
-	        	
-	        	var promptText = langGetText("backup_prompt","You are going to send your key outside of the mobile device. " +
-	        			"Ensure, that target computer (the computer which shows the QR code) is complete " +
-	        			"under your control and the QR code is shown on the proper page.\r\n\r\n" +
-	        			"You key will be encrypted. Please enter a passphrase that will be used " +
-	        			"to encrypt your key");
-	        	
-	        	var pwd = prompt(promptText,"");
-	        	var key = getKey(host);
-	        	
-	        	var enckey = GibberishAES.enc(key.secret,pwd);
-	        	
+
+	            passphrase_panel.style.display = "block";
+	            panel.style.display = "none";
+	            
+	        });
+
+
+	        backup_key_button.addEventListener("click", function() {
+
+
+	            var pwd = passphrase.value;
+	            if (pwd.length < 4) return;
+	            var key = getKey(host);
+
+	            var enckey = GibberishAES.enc(key.secret, pwd);
+
 	            var url = "backup?c=" + c;
-	            var connection = new XMLHttpRequest();	
-	    		connection.open("POST",url,true);
-	    		connection.onreadystatechange = function(request) {
-	                if (connection.readyState == 4 ) {
-	                	spinner.style.display="none";
-	                    if (connection.status == 200) {
-	                    	done_sect.style.display="block";
-	                    } else  {
-	                    	failed_sect.style.display="block";
+	            var connection = new XMLHttpRequest();
+	            connection.open("POST", url, true);
+	            connection.onreadystatechange = function(request) {
+	                if (connection.readyState == 4) {
+	                    spinner.style.display = "none";
+	                    if (connection.status == 201) {
+	                        done_sect.style.display = "block";
+	                    } else {
+	                        failed_sect.style.display = "block";
 	                    }
 	                }
-	    		}
-	    		panel.style.display="none";
-	    		spinner.style.display="block";
-	    		connection.send(enckey);
-	        	
-	        })
+	            }
+	            passphrase_panel.style.display = "none";
+	            spinner.style.display = "block";
+	            connection.send(enckey);
+	        });
 	        
         }
 

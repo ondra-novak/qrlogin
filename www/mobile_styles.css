@@ -107,3 +107,30 @@ label.always_blank
 #noprofile{
 	display: none;
 }
+
+#passphrase_panel label
+{
+	font-size: 15px;
+	text-align: justify;
+}
+
+#eraseask 
+{
+	margin: 5px;
+}
+
+#backup_button,#enablepwd_button
+{
+	background-color: #669;
+}
+
+#erase_button, #erase_yes
+{
+	background-color: #A00;
+}
+
+#backup_key_button 
+{
+	background-color: #695;
+	
+}

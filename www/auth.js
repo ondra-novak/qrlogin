@@ -115,14 +115,22 @@ function QRLogin(args, lang, qrcodeBox) {
 			this.reload();
 			return;
 		}
-		
-		var redir = args.redirect_uri;
-		var qmark = redir.indexOf('?');
-		if (qmark == -1) redir = redir + "?"; else redir = redir + '&';
-		redir = redir + "code=" + encodeURIComponent(r);
-		if (args.scope) redir = redir + "&scope=" + encodeURIComponent(args.scope);
-		if (args.state) redir = redir + "&state=" + encodeURIComponent(args.state);
+
+        var redir;		
+		if (r.substr(0,7) == "backup:") {
+		    
+		    redir = "backup?c="+curcode;
+            		
+		} else {
+		    redir = args.redirect_uri;
+    		var qmark = redir.indexOf('?');
+	    	if (qmark == -1) redir = redir + "?"; else redir = redir + '&';
+		    redir = redir + "code=" + encodeURIComponent(r);
+		    if (args.scope) redir = redir + "&scope=" + encodeURIComponent(args.scope);
+		    if (args.state) redir = redir + "&state=" + encodeURIComponent(args.state);
+		}
 				
+	    this.reload();
 		window.top.location = redir;
 	}
 	
