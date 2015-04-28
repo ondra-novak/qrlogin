@@ -2,10 +2,11 @@
 <head>
 <title>QRlogin</title>
 <link rel="stylesheet" href="mobile_styles.css" type="text/css" />
-<script src="secure-random.js" type="text/javascript"></script>
-<script src="libs.js" type="text/javascript"></script>
+<script src="libs/bitcoinjs-min.js" type="text/javascript"></script>
+<script src="libs/common.js" type="text/javascript"></script>
+<script src="libs/aes.js" type="text/javascript"></script>
+<script src="libs/sha256.js" type="text/javascript"></script>
 <script src="mobileapp.js" type="text/javascript"></script>
-<script src="aes.js" type="text/javascript"></script>
 <meta name="viewport" content="width=320">
 </head>
 
@@ -31,7 +32,7 @@
 the&nbsp;mobile device. Ensure, that the&nbsp;target computer (the&nbsp;computer 
 that shows the&nbsp;QR code) is complete under your control and the&nbsp;QR code 
 is shown on the proper page</span>
-<br /><br /><strong><span id="passphrase_label_2">You key will be encrypted. Please enter a passphrase (mandatory)</span></strong>
+<br /><br /><strong><span id="passphrase_label_2">You key will be encrypted. Please enter a passphrase (mandatory, min 8 letters)</span></strong>
 <input type="text" class="password" id="passphrase" />
 </label>
 <div class="buttonbar">

@@ -281,7 +281,32 @@ function ManagePage() {
     var backup_key_button= document.getElementById("backup_key_button");
     var cancel_button = document.getElementById("cancel_button");
     var passphrase = document.getElementById("passphrase");
-    
+
+    function extendKey(pwd,cb) {        
+        var cycles = 65535 / pwd.length;
+     
+
+        var last = Crypto.util.hexToBytes("0000000000000000000000000000000000000000000000000000000000000000");
+        var c = 0;
+
+        var run1000 = function() {
+
+            var stop = c + 500;
+            if (stop > cycles) stop = cycles;
+            while (c < stop) {
+                var hasher = new jsSHA(Crypto.util.bytesToHex(last), 'HEX');
+                last = Crypto.util.hexToBytes(hasher.getHMAC(pwd, "TEXT", "SHA-256", "HEX"));
+                c++;
+            }
+            if (c == cycles) {
+                cb(last);
+            } else {
+                setTimeout(run1000, 10);
+            }
+        }
+
+        setTimeout(run1000, 100);
+    }
     
     function init() {
         var serviceId = document.getElementById("serviceId");
@@ -329,29 +354,34 @@ function ManagePage() {
 
 	        backup_key_button.addEventListener("click", function() {
 
-
 	            var pwd = passphrase.value;
-	            if (pwd.length < 4) return;
-	            var key = getKey(host);
+	            if (pwd.length < 8) return;
 
-	            var enckey = GibberishAES.enc(key.secret, pwd);
 
-	            var url = "backup?c=" + c;
-	            var connection = new XMLHttpRequest();
-	            connection.open("POST", url, true);
-	            connection.onreadystatechange = function(request) {
-	                if (connection.readyState == 4) {
-	                    spinner.style.display = "none";
-	                    if (connection.status == 201) {
-	                        done_sect.style.display = "block";
-	                    } else {
-	                        failed_sect.style.display = "block";
-	                    }
-	                }
-	            }
 	            passphrase_panel.style.display = "none";
 	            spinner.style.display = "block";
-	            connection.send(enckey);
+
+
+	            var key = getKey(host);
+	            extendKey(pwd, function(pwd) {
+
+	                var enckey = GibberishAES.enc(key.secret, pwd);
+
+	                var url = "backup?c=" + c;
+	                var connection = new XMLHttpRequest();
+	                connection.open("POST", url, true);
+	                connection.onreadystatechange = function(request) {
+	                    if (connection.readyState == 4) {
+	                        spinner.style.display = "none";
+	                        if (connection.status == 201) {
+	                            done_sect.style.display = "block";
+	                        } else {
+	                            failed_sect.style.display = "block";
+	                        }
+	                    }
+	                }
+	                connection.send(enckey);
+	            });
 	        });
 	        
         }
