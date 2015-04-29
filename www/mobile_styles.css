@@ -61,6 +61,7 @@ button
 	padding: 20px 0 20px 0;
 	border: 2px solid #080;
 	background-color: #444;
+	display: block;
 	
 }
 
@@ -133,4 +134,22 @@ label.always_blank
 {
 	background-color: #695;
 	
+}
+
+#progressbar {
+	height: 10px;
+	margin-left: auto;
+	margin-right: auto;
+	border: 1px solid;	
+	width: 70%;
+	margin-top: 50px;
+	display:none;
+}
+
+#progressbar div {
+	height: 10px;
+	width: 0%;
+	margin-left: 0;
+	margin-right: auto;
+	background-color: green;
 }

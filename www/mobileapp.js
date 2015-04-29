@@ -281,8 +281,9 @@ function ManagePage() {
     var backup_key_button= document.getElementById("backup_key_button");
     var cancel_button = document.getElementById("cancel_button");
     var passphrase = document.getElementById("passphrase");
+    var progressbar = document.getElementById("progressbar");
 
-    function extendKey(pwd,cb) {        
+    function extendKey(pwd,progress,cb) {        
         var cycles = 65535 / pwd.length;
      
 
@@ -298,7 +299,8 @@ function ManagePage() {
                 last = Crypto.util.hexToBytes(hasher.getHMAC(pwd, "TEXT", "SHA-256", "HEX"));
                 c++;
             }
-            if (c == cycles) {
+            progress.style.width=(c/cycles * 100)+"%";
+            if (c >= cycles) {
                 cb(last);
             } else {
                 setTimeout(run1000, 10);
@@ -348,6 +350,7 @@ function ManagePage() {
 
 	            passphrase_panel.style.display = "block";
 	            panel.style.display = "none";
+	            passphrase.focus();
 	            
 	        });
 
@@ -357,13 +360,14 @@ function ManagePage() {
 	            var pwd = passphrase.value;
 	            if (pwd.length < 8) return;
 
-
 	            passphrase_panel.style.display = "none";
-	            spinner.style.display = "block";
-
+	            progressbar.style.display="block";
 
 	            var key = getKey(host);
-	            extendKey(pwd, function(pwd) {
+	            extendKey(pwd, progressbar.firstChild, function(pwd) {
+
+	            	progressbar.style.display = "none";
+		            spinner.style.display = "block";
 
 	                var enckey = GibberishAES.enc(key.secret, pwd);
 

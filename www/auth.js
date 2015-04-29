@@ -1,4 +1,4 @@
-function QRLogin(args, lang, qrcodeBox) {
+function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	
 //	var qrcodeBox = document.getElementById("qrcode");
 	var curcode = null;
@@ -33,6 +33,7 @@ function QRLogin(args, lang, qrcodeBox) {
 	
 	this.reload = function(manage) {
 		challengeUrl = location.href.split('?')[0]
+		restoreBox.style.display="none";
 
 		var bytes = secureRandom(20);
 		curcode = base64EncodeUrl(Crypto.util.bytesToBase64(bytes));
@@ -138,6 +139,14 @@ function QRLogin(args, lang, qrcodeBox) {
 	    lang = l;
 	    this.reload();
 	}
+	
+	this.restoreBackup = function() {
+		var target = qrcodeBox.parentElement;
+		target.style.position="relative";
+		target.appendChild(restoreBox);
+		restoreBox.style.display="block";
+		
+	}
 }
 
 
@@ -189,22 +198,32 @@ function start() {
 	
 	var str_login = document.getElementById("str_login");
 	var str_manage = document.getElementById("str_manage");
+	var str_restorebackup = document.getElementById("str_restorebackup");
 	var qrblock = document.getElementById("qrblock");
 	var panel = document.getElementById("langpanel");
+	var restorePanel = document.getElementById("restoreform");
 	
-	var qrlogin = new QRLogin(querystr, lang, qrblock); 
+	var qrlogin = new QRLogin(querystr, lang, qrblock, restorePanel); 
 	qrlogin.reload(false);
 		
 	str_login.classList.add("hl");
 	str_login.addEventListener("click",function() {
 		str_login.classList.add("hl");
 		str_manage.classList.remove("hl");
+		str_restorebackup.classList.remove("hl");		
 		qrlogin.reload(false);
 	});
 	str_manage.addEventListener("click",function() {
 		str_manage.classList.add("hl");
 		str_login.classList.remove("hl");
+		str_restorebackup.classList.remove("hl");
 		qrlogin.reload(true);
+	});
+	str_restorebackup.addEventListener("click",function() {
+		str_login.classList.remove("hl");
+		str_manage.classList.remove("hl");
+		str_restorebackup.classList.add("hl");		
+		qrlogin.restoreBackup();
 	});
 	
 	var langpanel = new LangPanel(panel,lang,qrlogin);
