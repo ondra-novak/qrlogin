@@ -79,3 +79,9 @@ ul.selector li.hl {
 	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }
+
+#restoreform input.error 
+{
+	border: solid 2px red;
+}
+

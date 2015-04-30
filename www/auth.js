@@ -9,8 +9,9 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	var qrcode = new QRCode(qrcodeBox, {
 		   useSVG : true,
 	  });
+	var curmode = false;
 	  
-	  
+	var fileinput = restoreBox.getElementsByTagName("input")[0];
 
 	function base64EncodeUrl(str){
 	    return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
@@ -30,9 +31,15 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	
 	var apikey = getDomainFromUrl(args.redirect_uri)	
 	
+	var getFullUrl = function(x) {
+	    var challengeUrl = location.href.split('?')[0];
+	    challengeUrl = challengeUrl.substr(0,challengeUrl.lastIndexOf("/")+1)+x;
+	    return challengeUrl;
+	}
+	
 	
 	this.reload = function(manage) {
-		challengeUrl = location.href.split('?')[0]
+	    curmode = manage;
 		restoreBox.style.display="none";
 
 		var bytes = secureRandom(20);
@@ -62,7 +69,7 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	                    var response = connection.responseText;
 	                    this.processResponse(response);
 	                } else if (connection.status == 409) {
-	                	this.reload();
+	                	this.reload(curmode);
 	                }
 	            }
 			}.bind(this);
@@ -71,9 +78,9 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 
 		
 		if (manage) {
-			challengeUrl = challengeUrl.substr(0,challengeUrl.lastIndexOf("/")+1)+"m#"+lang+","+apikey+","+curcode;
+			challengeUrl = getFullUrl("m#"+lang+","+apikey+","+curcode);
 		} else {				
-			challengeUrl = challengeUrl.substr(0,challengeUrl.lastIndexOf("/")+1)+"c#"+lang+","+apikey+","+curcode;
+			challengeUrl = getFullUrl("c#"+lang+","+apikey+","+curcode);
 		}
 		qrcode.makeCode(challengeUrl)
 		qrcodeBox.style.visibility = "visible";
@@ -113,7 +120,7 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	this.processResponse = function(response) {
 		var r = response.trim();
 		if (r == "") {
-			this.reload();
+			this.reload(curmode);
 			return;
 		}
 
@@ -121,6 +128,7 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 		if (r.substr(0,7) == "backup:") {
 		    
 		    redir = "backup?c="+curcode;
+		    this.reload(true);
             		
 		} else {
 		    redir = args.redirect_uri;
@@ -131,22 +139,65 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 		    if (args.state) redir = redir + "&state=" + encodeURIComponent(args.state);
 		}
 				
-	    this.reload();
+
 		window.top.location = redir;
 	}
 	
 	this.setLang = function(l) {
 	    lang = l;
-	    this.reload();
+	    this.reload(curmode);
 	}
 	
 	this.restoreBackup = function() {
 		var target = qrcodeBox.parentElement;
 		target.style.position="relative";
 		target.appendChild(restoreBox);
-		restoreBox.style.display="block";
+		restoreBox.style.display="block";		
+        fileinput.classList.remove("error");
+		
 		
 	}
+	
+	var init = function() {
+	
+	    fileinput.addEventListener("change", uploadFile.bind(this,fileinput));	
+	}
+	
+	var uploadFile = function(fileinput) {
+	    window.browsedFile = fileinput;
+	    var files = fileinput.files;
+	    if (files.length == 1) {
+	        var f = files[0];
+	        if (f.size > 1024) {
+	            fileinput.classList.add("error");
+	        } else {
+	            var bytes = secureRandom(20);
+		        var curcode = base64EncodeUrl(Crypto.util.bytesToBase64(bytes));
+		        var connection = new XMLHttpRequest();	
+		        connection.open("POST","backup?c="+curcode+"&restore=1",true);
+		        connection.onreadystatechange = function(request) {
+                    if (connection.readyState == 4 ) {
+                        if (connection.status == 201) {
+                            restoreBox.style.display="none";
+                            challengeUrl = getFullUrl("k#"+lang+","+apikey+","+curcode)
+                    		qrcode.makeCode(challengeUrl);
+		                    qrcodeBox.style.visibility = "visible";
+                        } else {
+                            fileinput.classList.add("error");                                            	        
+                        }
+                    }
+		        }.bind(this);
+		        var r = new FileReader();
+		        r.onload = function(e) {
+		            var contents = e.target.result;
+		            connection.send(contents);    
+		        }
+		        r.readAsText(f);
+	        }
+	    }
+	}
+	
+	init.call(this);
 }
 
 

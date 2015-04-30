@@ -105,7 +105,7 @@ label.always_blank
 #panel {
 	display:none;
 }
-#noprofile{
+#noprofile, #alreadyprofile{
 	display: none;
 }
 

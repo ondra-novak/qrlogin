@@ -38,11 +38,14 @@ SrvMain::SrvMain()
 	,frame("/frame.html")
 	,auth("/auth.html")
 	,manage("/manage.html")
+	,restoreKey("/restore.html")
 	,response(*this)
 	,loginMonitor(*this)
 	,verify(*this)
 	,getIdent(*this)
 	,rcvBackup(*this)
+	,lastTokenShiftTime(0)
+	,lastBackupShiftTime(0)
 
 {
 
@@ -78,6 +81,7 @@ natural SrvMain::onStartServer(BredyHttpSrv::IHttpMapper& httpMapper) {
 	httpMapper.addSite("/frame",&frame);
 	httpMapper.addSite("/auth",&auth);
 	httpMapper.addSite("/backup",&rcvBackup);
+	httpMapper.addSite("/k",&restoreKey);
 
 	IJobScheduler &scheduler = httpMapper.getIfc<IJobScheduler>();
 	scheduler.schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,&scheduler),30,ThreadMode::schedulerThread);
@@ -283,7 +287,11 @@ StringA SrvMain::getIdentityFromToken_lk(StringA token) {
 
 StringA SrvMain::getBackupFile(StringA ident) {
 	Synchronized<FastLock> _(tokenMapLock);
-	return getBackupFile_lk(ident);
+	StringA bkf = getBackupFile_lk(ident);
+	LS_LOG.progress("Giving out key-backup file: ident=%1, result=%2")
+		<< ident << !bkf.empty();
+	return bkf;
+
 }
 LightSpeed::StringA SrvMain::getBackupFile_lk(StringA ident) {
 	const StringA *id = backupMap[0].find(ident);
@@ -305,16 +313,24 @@ LightSpeed::StringA SrvMain::getBackupFile_lk(StringA ident) {
 
 
 void SrvMain::shiftBanksIfNeeded() {
+	LS_LOGOBJ(lg);
 	Synchronized<FastLock> _(tokenMapLock);
 	TimeStamp now = TimeStamp::now();
-	TimeStamp ellapsed = now - lastShiftTime;
+	TimeStamp ellapsed = now - lastTokenShiftTime;
 	if (ellapsed.getHours() >= 1) {
 		tokenMap[0].swap(tokenMap[1]);
 		tokenMap[0].clear();
+		lastTokenShiftTime = now;
+		lg.info("Token map rotated");
+	}
+	ellapsed = now - lastBackupShiftTime;
+	if (ellapsed.getMins() >= 1) {
 		backupMap[0].swap(backupMap[1]);
 		backupMap[0].clear();
-		lastShiftTime = now;
+		lastBackupShiftTime = now;
+		lg.info("Backup map rotated");
 	}
+
 
 }
 
@@ -324,13 +340,21 @@ void SrvMain::scheduledPing(IJobScheduler* scheduler) {
 	scheduler->schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,scheduler),30,ThreadMode::schedulerThread);
 }
 
-bool SrvMain::receiveBackup( StringA chanId, StringA content )
+bool SrvMain::receiveBackup( StringA chanId, StringA content, bool restore )
 {
+	LS_LOGOBJ(lg);
 	{
 		Synchronized<FastLock> _(tokenMapLock);
-		backupMap[0].replace(chanId,content);
+		bool exist = false;
+		backupMap[0].insert(chanId,content,&exist);
+		if (exist) return false;
 	}
-	return acceptLogin(chanId,"backup",0);
+	bool result =  restore || acceptLogin(chanId,"backup",0);
+	
+	lg.progress("Received key backup: channel=%1, restore=%2, result=%3")
+		<< chanId << restore << result;
+
+	return result;
 	
 }
 
@@ -424,9 +448,11 @@ LightSpeed::natural SrvMain::Backup::onRequest( IHttpRequest &request, ConstStrA
 {
 	StringA c;
 	QueryParser qp(vpath);
+	bool restore = false;
 	while (qp.hasItems()) {
 		const QueryField &qf = qp.getNext();
 		if (qf.name == "c") c= qf.value;
+		if (qf.name == "restore") restore = true;
 	}
 
 	if (c.empty()) return stNotFound;
@@ -437,7 +463,7 @@ LightSpeed::natural SrvMain::Backup::onRequest( IHttpRequest &request, ConstStrA
 		SeqFileInput fin(&request);
 		SeqTextInA txtin(fin);
 		buffer.copy(txtin);
-		if (owner.receiveBackup(c,buffer.getArray())) return stCreated;
+		if (owner.receiveBackup(c,buffer.getArray(), restore)) return stCreated;
 		else return 409;
 	} else {
 		StringA res = owner.getBackupFile(c);

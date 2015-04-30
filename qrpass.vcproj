@@ -225,11 +225,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\www\img\favicon.ico"
+				RelativePath=".\www\favicon.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\www\favicon.ico"
+				RelativePath=".\www\img\favicon.ico"
 				>
 			</File>
 			<File
@@ -332,14 +332,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\www\loginfailed.html"
-			>
-		</File>
-		<File
-			RelativePath=".\www\loginok.html"
-			>
-		</File>
-		<File
 			RelativePath=".\www\img\logo.png"
 			>
 		</File>
@@ -381,6 +373,10 @@
 		</File>
 		<File
 			RelativePath=".\conf\qrpass.conf"
+			>
+		</File>
+		<File
+			RelativePath=".\www\restore.html"
 			>
 		</File>
 		<File

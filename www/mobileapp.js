@@ -202,50 +202,31 @@ function startSign() {
 
 }
 
-function OKPage() {
-    var lang = window.location.hash.substr(1);
+function extendKey(pwd, progress, cb) {
+    var cycles = 65535 / pwd.length;
 
-    function updateLang() {
-        langSetTextId("delivered");
+
+    var last = Crypto.util.hexToBytes("0000000000000000000000000000000000000000000000000000000000000000");
+    var c = 0;
+
+    var run1000 = function() {
+
+        var stop = c + 500;
+        if (stop > cycles) stop = cycles;
+        while (c < stop) {
+            var hasher = new jsSHA(Crypto.util.bytesToHex(last), 'HEX');
+            last = Crypto.util.hexToBytes(hasher.getHMAC(pwd, "TEXT", "SHA-256", "HEX"));
+            c++;
+        }
+        progress.style.width = (c / cycles * 100) + "%";
+        if (c >= cycles) {
+            cb(last);
+        } else {
+            setTimeout(run1000, 10);
+        }
     }
 
-    function init() {
-        loadLang(lang, updateLang);
-    }
-
-    init();    
-   
-
-}
-
-function startOKPage() {
-
-    window.okPage = new OKPage;
-
-
-
-}
-
-function FailPage() {
-    var lang = window.location.hash.substr(1);
-
-    function updateLang() {
-        langSetTextId("failed");
-    }
-
-    function init() {
-        loadLang(lang, updateLang);
-    }
-
-    init();
-
-
-}
-
-function startFailPage() {
-
-    window.okPage = new FailPage;
-
+    setTimeout(run1000, 100);
 }
 
 
@@ -283,32 +264,6 @@ function ManagePage() {
     var passphrase = document.getElementById("passphrase");
     var progressbar = document.getElementById("progressbar");
 
-    function extendKey(pwd,progress,cb) {        
-        var cycles = 65535 / pwd.length;
-     
-
-        var last = Crypto.util.hexToBytes("0000000000000000000000000000000000000000000000000000000000000000");
-        var c = 0;
-
-        var run1000 = function() {
-
-            var stop = c + 500;
-            if (stop > cycles) stop = cycles;
-            while (c < stop) {
-                var hasher = new jsSHA(Crypto.util.bytesToHex(last), 'HEX');
-                last = Crypto.util.hexToBytes(hasher.getHMAC(pwd, "TEXT", "SHA-256", "HEX"));
-                c++;
-            }
-            progress.style.width=(c/cycles * 100)+"%";
-            if (c >= cycles) {
-                cb(last);
-            } else {
-                setTimeout(run1000, 10);
-            }
-        }
-
-        setTimeout(run1000, 100);
-    }
     
     function init() {
         var serviceId = document.getElementById("serviceId");
@@ -361,15 +316,17 @@ function ManagePage() {
 	            if (pwd.length < 8) return;
 
 	            passphrase_panel.style.display = "none";
-	            progressbar.style.display="block";
+	            progressbar.style.display = "block";
 
 	            var key = getKey(host);
 	            extendKey(pwd, progressbar.firstChild, function(pwd) {
 
-	            	progressbar.style.display = "none";
-		            spinner.style.display = "block";
+	                progressbar.style.display = "none";
+	                spinner.style.display = "block";
+	                
+	                delete key.prehash;
 
-	                var enckey = GibberishAES.enc(key.secret, pwd);
+	                var enckey = GibberishAES.enc(JSON.stringify(key), pwd);
 
 	                var url = "backup?c=" + c;
 	                var connection = new XMLHttpRequest();
@@ -400,4 +357,102 @@ function startManage() {
 	window.managePage = new ManagePage;
 }
 
+function RestorePage() {
+    var args = location.hash.substr(1).split(',');
+    var lang = args[0];
+    var host = args[1];
+    var c = args[2];
 
+    function updateLang() {
+        langSetTextId("alreadyprofile");
+        langSetTextId("passphrase_label_restore");
+        langSetTextId("restore_key_button");
+        langSetTextId("failed");
+    }
+
+    var alreadyprofile = document.getElementById("alreadyprofile");
+    var passphrase_panel = document.getElementById("passphrase_panel");
+    var passphrase = document.getElementById("passphrase");
+    var restore_key_button = document.getElementById("restore_key_button");
+    var spinner = document.getElementById("spinner");
+    var progressbar = document.getElementById("progressbar");
+    var done_sect = document.getElementById("done_sect");
+    var failed_sect = document.getElementById("failed_sect");
+    var encrypted_key;
+
+    var init = function() {
+        var serviceId = document.getElementById("serviceId");
+        serviceId.appendChild(document.createTextNode(host));
+        loadLang(lang, updateLang);
+
+        if (getKey(host)) {
+            alreadyprofile.style.display = "block";
+        } else {
+            spinner.style.display = "block";
+            loadKey(function(key) {
+                spinner.style.display = "none";
+                if (key == "") {
+                    failed_sect.style.display = "block";
+                } else {
+                    passphrase_panel.style.display = "block";
+                    restore_key_button.addEventListener("click", importKey);
+                    encrypted_key = key;
+                }
+            });
+        }
+    }
+
+    var importKey = function() {
+        var pwd = passphrase.value;
+        if (pwd.length < 8) return;
+
+        passphrase_panel.style.display = "none";
+        progressbar.style.display = "block";
+
+        extendKey(pwd, progressbar.firstChild, function(pwd) {
+
+            progressbar.style.display = "none";
+
+
+            try {
+                var key = GibberishAES.dec(encrypted_key, pwd);
+                if (key) {
+                    var keyinfo = JSON.parse(key);
+                    keyinfo.prehash = Crypto.SHA256(keyinfo.secret, { asBytes: true });
+
+                    setKey(host, keyinfo);
+                    done_sect.style.display = "block";
+                } else {
+                    passphrase_panel.style.display = "block";
+                }
+            } catch (e) {
+                passphrase_panel.style.display = "block";
+            }
+
+        });
+
+    }
+
+    var loadKey = function(cb) {
+        var url = "backup?c=" + c;
+        var connection = new XMLHttpRequest();
+        connection.open("GET", url, true);
+        connection.onreadystatechange = function(request) {
+            if (connection.readyState == 4) {
+                if (connection.status == 200) {
+                    var response = connection.responseText;
+                    cb(response);
+                } else {
+                    cb("");
+                }
+            }
+        }
+        connection.send();
+    }
+
+    init();
+}
+
+function startRestore() {
+    window.managePage = new RestorePage();
+}

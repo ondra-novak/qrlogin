@@ -99,6 +99,7 @@ public:
 	RewritePath frame;
 	RewritePath auth;
 	RewritePath manage;
+	RewritePath restoreKey;
 	Response response;
 	LoginMonitor loginMonitor;
 	Verify verify;
@@ -119,7 +120,8 @@ public:
 	TokenMap tokenMap[2];
 	TokenMap backupMap[2];
 	FastLock tokenMapLock;
-	TimeStamp lastShiftTime;
+	TimeStamp lastTokenShiftTime;
+	TimeStamp lastBackupShiftTime;
 
 	StringA createToken(StringA signature, StringA identity);
 	StringA getIdentityFromToken(StringA token);
@@ -131,7 +133,7 @@ public:
 	void failedLogin(StringA ident);
 	void pingActive();
 	void scheduledPing(IJobScheduler *scheduler);
-	bool receiveBackup(StringA chanId, StringA content);
+	bool receiveBackup(StringA chanId, StringA content, bool restore);
 	StringA getBackupFile(StringA ident);
 	StringA getBackupFile_lk(StringA ident);
 };
