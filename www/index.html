@@ -161,7 +161,7 @@ function validateToken(token) {
 	document.getElementById("waitanim").style.visibility="visible";
 	var out = document.getElementById("IDtarget");
 	out.value="";
-	location.href = "#testit"
+	setTimeout(function() { location.href = "#testit" }, 5);
 	if (window.history.pushState) window.history.pushState("", "", "/");
 	var qrloginUrl = location.origin+"/token";
 	var rq = new XMLHttpRequest();

@@ -244,6 +244,7 @@ function ManagePage() {
     var backup_key_button= getBlockById("backup_key_button");
     var transfer_key_button = getBlockById("transfer_key_button");
     var cancel_button = getBlockById("cancel_button");
+    var transfer_cancel = getBlockById("transfer_cancel");
     var passphrase = getBlockById("passphrase");
     var passphrase2 = getBlockById("passphrase2");
     var progressbar = getBlockById("progressbar");
@@ -257,10 +258,14 @@ function ManagePage() {
         var serviceId = getBlockById("serviceId");
         serviceId.appendChild(document.createTextNode(host));
         loadLang(lang);
+        var keyinfo =  getKey(host);
         
-        if (!getKey(host)) {
-        	noprofile.show();        	        	
-        } else {
+        if (!keyinfo) {
+        	noprofile.show();
+         } else {
+            if (keyinfo.hasPwd) {
+                enable_pwd_button.hide();
+            }
         	panel.show();
 	        
 	        erase_key_yes.addEventListener("click", function() {
@@ -274,6 +279,10 @@ function ManagePage() {
 	        });
 	        cancel_button.addEventListener("click", function() {
 	            passphrase_panel.hide();
+	            panel.show();
+	        });
+	        transfer_cancel.addEventListener("click", function() {
+	            transfer_panel.hide();
 	            panel.show();
 	        });
 	        erase_key_button.addEventListener("click", function() {

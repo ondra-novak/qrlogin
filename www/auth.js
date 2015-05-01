@@ -10,6 +10,8 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	    useSVG: true, correctLevel: 0
 	  });
 	var curmode = false;
+	var restpanel = false;
+	
 	  
 	var fileinput = restoreBox.getElementsByTagName("input")[0];
 
@@ -29,12 +31,12 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 		
 	} 
 	
-	var apikey = getDomainFromUrl(args.redirect_uri)	
-	
-	
+	var apikey = getDomainFromUrl(args.redirect_uri)
+
+
 	this.reload = function(manage) {
 	    curmode = manage;
-	    restoreBox.hide();
+	    restoreBox.hide(); restpanel = false; 
 
 	    var bytes = secureRandom(20);
 	    curcode = base64EncodeUrl(Crypto.util.bytesToBase64(bytes));
@@ -77,7 +79,6 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	        challengeUrl = getFullUrl("c#" + lang + "," + apikey + "," + curcode);
 	    }
 	    qrcode.makeCode(challengeUrl)
-	    qrcodeBox.style.visibility = "visible";
 	}
 	
 	
@@ -136,10 +137,11 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 
 		window.top.location = redir;
 	}
-	
+
 	this.setLang = function(l) {
 	    lang = l;
-	    this.reload(curmode);
+	    if (!restpanel) this.reload(curmode);
+	    else restoreBox.show();
 	}
 
 	this.restoreBackup = function() {
@@ -148,6 +150,7 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	    target.appendChild(restoreBox);
 	    restoreBox.show();
 	    fileinput.classList.remove("error");
+	    restpanel = true;
 
 
 	}
@@ -203,11 +206,12 @@ function LangPanel(panel,curlang, qrlogin) {
             
             img.src = "img/lang_"+langlist[i]+".gif";
             img.onclick = function(l) {
-                qrlogin.setLang(l);                
+                qrlogin.setLang(l);
                 lang = l;
                 drawPanel();
                 loadLang(lang);
-            }.bind(this,langlist[i]);
+                localStorage["default_lang"] = lang;
+            } .bind(this, langlist[i]);
             lpanel.appendChild(img);
             
         }
@@ -220,7 +224,9 @@ function start() {
 	var querystr = getQueryString(location.search);
 	var lang = querystr["lang"];
 	if (!lang) {
-		lang = "en";
+	    if (localStorage) lang = localStorage["default_lang"];
+	    if (!lang)
+		    lang = "en";
 	}
 	loadLang(lang);
 	

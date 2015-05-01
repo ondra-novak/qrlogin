@@ -55,6 +55,9 @@ function getBlockById(id) {
     element.hide = function() {
         this.style.display = "none";
     }
+    element.isVisible = function() {
+        return this.style.display != "none";
+    }
     return element;
 
 }

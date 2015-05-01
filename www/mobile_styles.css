@@ -59,7 +59,7 @@ button
 	font-weight: bold;
 	margin: 10px auto auto auto;
 	padding: 20px 0 20px 0;
-	border: 2px solid #080;
+	border: 2px solid black;
 	background-color: #444;
 	display: block;
 	
@@ -120,7 +120,7 @@ label.always_blank
 	margin: 5px;
 }
 
-#backup_button,#enablepwd_button
+#backup_button,#enablepwd_button, #transfer_button, #transfer_key_button
 {
 	background-color: #669;
 }
@@ -155,5 +155,6 @@ label.always_blank
 }
 #qrbox 
 {
-	padding: 20px;
+	width: 250px;
+	margin: 0px auto 0px auto;
 }
