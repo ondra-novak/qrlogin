@@ -1,42 +1,39 @@
 <html>
 <head>
-<title>QRlogin</title>
-<link rel="stylesheet" href="mobile_styles.css" type="text/css" />
-<script src="libs/bitcoinjs-min.js" type="text/javascript"></script>
-<script src="libs/common.js" type="text/javascript"></script>
-<script src="libs/aes.js" type="text/javascript"></script>
-<script src="libs/sha256.js" type="text/javascript"></script>
-<script src="mobileapp.js" type="text/javascript"></script>
-<meta name="viewport" content="width=320">
+    <title>QRlogin</title>
+    <link rel="stylesheet" href="mobile_styles.css" type="text/css" />
+    <script src="libs/bitcoinjs-min.js" type="text/javascript"></script>
+    <script src="libs/common.js" type="text/javascript"></script>
+    <script src="libs/aes.js" type="text/javascript"></script>
+    <script src="libs/sha256.js" type="text/javascript"></script>
+    <script src="mobileapp.js" type="text/javascript"></script>
+    <meta name="viewport" content="width=320">
 </head>
-
 <body onload="startRestore()">
-<div class="header">
-<img src="img/qrlogo-sw.png" class="logo"/>
-<div class="serviceid"><span id="serviceId"></span></div>
-</div>
-
-<div id="alreadyprofile">You already have a key active for this site. You have to backup and erase this key first through the Manage Keys page!</div>
-<div class="password" id="passphrase_panel">
-<label><span id="passphrase_label_restore">Enter passphrase</span>
-<input type="text" class="password" id="passphrase" />
-</label>
-<button id="restore_key_button">Import key</button>
-</div>
-<div class="spinner" id="spinner"><img src="img/spinner.gif"></div>
-<div id="progressbar"><div></div></div>
-<div id="done_sect">
-<p id="done_text">Succesfuly imported</p>
-<img src="img/success.png" />
-</div>
-<div id="failed_sect">
-<p id="failed">Please try again</p>
-<img src="img/failed.png" />
-</div>
-
-
+    <div class="header">
+        <img src="img/qrlogo-sw.png" class="logo" />
+        <div class="serviceid">
+            <span id="serviceId"></span>
+        </div>
+    </div>
+    <div id="alreadyprofile" class="str_rstr_alreadyprofile">You already have a key active for this site. First, you have to backup and erase
+        this key through the Manage Keys page!</div>
+    <div class="password" id="passphrase_panel">
+        <label>
+            <span class="str_rstr_enterpassphrase">Enter passphrase</span>
+            <input type="text" class="password" id="passphrase" />
+        </label>
+        <button id="restore_key_button" class="str_rstr_import_key_button">Import key</button>
+    </div>
+    <div class="spinner" id="spinner">
+        <img src="img/spinner.gif"></div>
+    <div id="progressbar">
+        <div>
+        </div>
+    </div>
+    <div id="done_sect">
+        <p class="str_rstr_import_ok">Succesfuly imported</p>
+        <img src="img/success.png" />
+    </div>
 </body>
-
-
-
 </html>

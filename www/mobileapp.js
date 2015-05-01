@@ -44,33 +44,25 @@ function SignPage() {
     var lang = args[0];
     var host = args[1];
     var c = args[2];
-    var password_input = document.getElementById("password_input");
-    var password_form = document.getElementById("password_form");
-    var accept_button = document.getElementById("accept_button");
-    var create_button= document.getElementById("create_button");
-    var always_blank= document.getElementById("always_blank");
-    var always_blank_label= document.getElementById("keep_password_blank");
-    var spinner = document.getElementById("spinner");
-    var delivered_sect = document.getElementById("delivered_sect");
-    var failed_sect = document.getElementById("failed_sect");
+    var password_input = getBlockById("password_input");
+    var password_form = getBlockById("password_form");
+    var accept_button = getBlockById("accept_button");
+    var create_button= getBlockById("create_button");
+    var always_blank= getBlockById("always_blank");
+    var always_blank_label= getBlockById("keep_password_blank");
+    var spinner = getBlockById("spinner");
+    var delivered_sect = getBlockById("delivered_sect");
+    var failed_sect = getBlockById("failed_sect");
 
 
 
-    function updateLang() {
-        langSetTextId("enter_password");
-        langSetTextId("keep_password_blank", "always_blank");
-        langSetTextId("accept_button");
-        langSetTextId("create_button");
-        langSetTextId("delivered");
-        langSetTextId("failed");
-    }
 
     function showPwd(create) {
-        password_form.style.display = "block";
+        password_form.show();
         if (create)
-            create_button.style.display = "block";
+            create_button.show();
         else
-            accept_button.style.display = "block";
+            accept_button.show();
         password_input.focus();
         if (password_input.prompt) password_input.prompt();
         else password_input.click();
@@ -78,8 +70,8 @@ function SignPage() {
     }
 
     function init() {
-        loadLang(lang, updateLang);
-        var serviceId = document.getElementById("serviceId");
+        loadLang(lang);
+        var serviceId = getBlockById("serviceId");
         serviceId.appendChild(document.createTextNode(host));
 
         //import keys if necesery
@@ -108,16 +100,17 @@ function SignPage() {
     }
 
     function signAndPushRequest() {
-        password_form.style.display = "none";
-        create_button.style.display = "none";
-        accept_button.style.display = "none";
-        spinner.style.display = "block";
+        password_form.hide();
+        create_button.hide();
+        accept_button.hide();
+        spinner.show();
         setTimeout(signAndPushRequest2, 10);
     }
 
-    function combineKeyAndPin(key, pin) {
-        var keypin = key + pin;
-        return Crypto.SHA256(keypin, { asBytes: true });
+    function combineKeyAndPin(key, pwd) {
+        var hashedpwd = Crypto.SHA256(pwd,{ asBytes: true });
+        var keypwd = hashedpwd.concat(key);
+        return Crypto.SHA256(keypwd, { asBytes: true });
     }
 
     function signRequest(c, key) {
@@ -160,11 +153,11 @@ function SignPage() {
 		connection.open("GET",url,true);
 		connection.onreadystatechange = function(request) {
             if (connection.readyState == 4 ) {
-            	spinner.style.display="none";
+            	spinner.hide();
                 if (connection.status == 200) {
-                	delivered_sect.style.display="block";
+                	delivered_sect.show();
                 } else {
-                	failed_sect.style.display="block";
+                	failed_sect.show();
                 }
             }
 		}
@@ -173,15 +166,16 @@ function SignPage() {
     }
     function createKey() {
 
-        spinner.style.display = "block";
-        create_button.style.display = "none";
+        spinner.show();
+        create_button.hide();
         setTimeout(createKey2, 10);
     }
 
     function createKey2() {
 
         var bytes = secureRandom(32);
-        var secret = Crypto.util.bytesToHex(bytes) + c; 
+        var secret = Crypto.util.bytesToHex(bytes) + c;
+        secret = Crypto.SHA256(secret, { asBytes: true });
         var keyinfo  = {
             secret: secret,
             hasPwd: !always_blank.checked,
@@ -236,75 +230,64 @@ function ManagePage() {
     var host = args[1];
     var c = args[2];
     
-    function updateLang() {
-        langSetTextId("backup_button");
-        langSetTextId("enablepwd_button");
-        langSetTextId("erase_button");
-        langSetTextId("done_text");
-        langSetTextId("erase_ask_label");
-        langSetTextId("erase_yes");
-        langSetTextId("erase_no");
-        langSetTextId("noprofile");
-        
-    }
 
-    var backup_button = document.getElementById("backup_button");
-    var enable_pwd_button = document.getElementById("enablepwd_button");
-    var erase_key_button = document.getElementById("erase_button");
-    var erase_key_yes = document.getElementById("erase_yes");
-    var erase_key_no =  document.getElementById("erase_no");
-    var panel =  document.getElementById("panel");
-    var noprofile =  document.getElementById("noprofile");
-    var eraseask =  document.getElementById("eraseask");
-    var done_sect = document.getElementById("done_sect");
-    var failed_sect = document.getElementById("failed_sect");
-    var passphrase_panel = document.getElementById("passphrase_panel");
-    var backup_key_button= document.getElementById("backup_key_button");
-    var cancel_button = document.getElementById("cancel_button");
-    var passphrase = document.getElementById("passphrase");
-    var progressbar = document.getElementById("progressbar");
+    var backup_button = getBlockById("backup_button");
+    var enable_pwd_button = getBlockById("enablepwd_button");
+    var erase_key_button = getBlockById("erase_button");
+    var erase_key_yes = getBlockById("erase_yes");
+    var erase_key_no =  getBlockById("erase_no");
+    var panel =  getBlockById("panel");
+    var noprofile =  getBlockById("noprofile");
+    var eraseask =  getBlockById("eraseask");
+    var done_sect = getBlockById("done_sect");
+    var failed_sect = getBlockById("failed_sect");
+    var passphrase_panel = getBlockById("passphrase_panel");
+    var backup_key_button= getBlockById("backup_key_button");
+    var cancel_button = getBlockById("cancel_button");
+    var passphrase = getBlockById("passphrase");
+    var progressbar = getBlockById("progressbar");
 
     
     function init() {
-        var serviceId = document.getElementById("serviceId");
+        var serviceId = getBlockById("serviceId");
         serviceId.appendChild(document.createTextNode(host));
-        loadLang(lang, updateLang);
+        loadLang(lang);
         
         if (!getKey(host)) {
-        	noprofile.style.display="block";        	        	
+        	noprofile.show();        	        	
         } else {
-        	panel.style.display="block";
+        	panel.show();
 	        
 	        erase_key_yes.addEventListener("click", function() {
-	        	eraseask.style.display="none";
+	        	eraseask.hide();
 	        	eraseKey(host);
-	        	done_sect.style.display="block";        	
+	        	done_sect.show();        	
 	        });
 	        erase_key_no.addEventListener("click", function() {
-	        	eraseask.style.display="none";
-	        	panel.style.display="block";        	        	
+	        	eraseask.hide();
+	        	panel.show();        	        	
 	        });
 	        cancel_button.addEventListener("click", function() {
-	            passphrase_panel.style.display = "none";
-	            panel.style.display = "block";
+	            passphrase_panel.hide();
+	            panel.show();
 	        });
 	        erase_key_button.addEventListener("click", function() {
-	        	panel.style.display="none";        	        	
-	        	eraseask.style.display="block";
+	        	panel.hide();        	        	
+	        	eraseask.show();
 	        });
 	        enable_pwd_button.addEventListener("click", function() {
 	        	
 	        	var key = getKey(host);
 	        	key.hasPwd = true;
 	        	setKey(host,key);
-	        	panel.style.display="none";
-	        	done_sect.style.display="block";        	
+	        	panel.hide();
+	        	done_sect.show();        	
 	        	
 	        });
 	        backup_button.addEventListener("click", function() {
 
-	            passphrase_panel.style.display = "block";
-	            panel.style.display = "none";
+	            passphrase_panel.show();
+	            panel.hide();
 	            passphrase.focus();
 	            
 	        });
@@ -315,29 +298,35 @@ function ManagePage() {
 	            var pwd = passphrase.value;
 	            if (pwd.length < 8) return;
 
-	            passphrase_panel.style.display = "none";
-	            progressbar.style.display = "block";
+	            passphrase_panel.hide();
+	            progressbar.show();
 
 	            var key = getKey(host);
 	            extendKey(pwd, progressbar.firstChild, function(pwd) {
 
-	                progressbar.style.display = "none";
-	                spinner.style.display = "block";
-	                
-	                delete key.prehash;
+	                progressbar.hide();
+	                spinner.show();
 
-	                var enckey = GibberishAES.enc(JSON.stringify(key), pwd);
+	                var wif = new Bitcoin.Address(key.secret);
+	                wif.version = 0x80;
+
+	                var keyfile = {
+	                    wif: wif.toString(),
+	                    hasPwd: key.hasPwd
+	                }
+
+	                var enckey = GibberishAES.enc(JSON.stringify(keyfile), pwd);
 
 	                var url = "backup?c=" + c;
 	                var connection = new XMLHttpRequest();
 	                connection.open("POST", url, true);
 	                connection.onreadystatechange = function(request) {
 	                    if (connection.readyState == 4) {
-	                        spinner.style.display = "none";
+	                        spinner.hide();
 	                        if (connection.status == 201) {
-	                            done_sect.style.display = "block";
+	                            done_sect.show();
 	                        } else {
-	                            failed_sect.style.display = "block";
+	                            failed_sect.show();
 	                        }
 	                    }
 	                }
@@ -351,7 +340,21 @@ function ManagePage() {
     
     init();
 
-};	
+};
+
+function parseBase58Check(address) {
+    var bytes = Bitcoin.Base58.decode(address);
+    var end = bytes.length - 4;
+    var hash = bytes.slice(0, end);
+    var checksum = Crypto.SHA256(Crypto.SHA256(hash, { asBytes: true }), { asBytes: true });
+    if (checksum[0] != bytes[end] ||
+            checksum[1] != bytes[end + 1] ||
+            checksum[2] != bytes[end + 2] ||
+            checksum[3] != bytes[end + 3])
+        throw new Error("Wrong checksum");
+    var version = hash.shift();
+    return [version, hash];
+}
 
 function startManage() {
 	window.managePage = new ManagePage;
@@ -363,70 +366,63 @@ function RestorePage() {
     var host = args[1];
     var c = args[2];
 
-    function updateLang() {
-        langSetTextId("alreadyprofile");
-        langSetTextId("passphrase_label_restore");
-        langSetTextId("restore_key_button");
-        langSetTextId("failed");
-    }
 
-    var alreadyprofile = document.getElementById("alreadyprofile");
-    var passphrase_panel = document.getElementById("passphrase_panel");
-    var passphrase = document.getElementById("passphrase");
-    var restore_key_button = document.getElementById("restore_key_button");
-    var spinner = document.getElementById("spinner");
-    var progressbar = document.getElementById("progressbar");
-    var done_sect = document.getElementById("done_sect");
-    var failed_sect = document.getElementById("failed_sect");
-    var encrypted_key;
+    var alreadyprofile = getBlockById("alreadyprofile");
+    var passphrase_panel = getBlockById("passphrase_panel");
+    var passphrase = getBlockById("passphrase");
+    var restore_key_button = getBlockById("restore_key_button");
+    var spinner = getBlockById("spinner");
+    var progressbar = getBlockById("progressbar");
+    var done_sect = getBlockById("done_sect");
+    var failed_sect = getBlockById("failed_sect");
+    var encrypted_key = c.replace(/-/g, '+').replace(/_/g, '/').replace(/\./g, '='); ;
 
     var init = function() {
-        var serviceId = document.getElementById("serviceId");
+        var serviceId = getBlockById("serviceId");
         serviceId.appendChild(document.createTextNode(host));
-        loadLang(lang, updateLang);
+        loadLang(lang);
 
         if (getKey(host)) {
-            alreadyprofile.style.display = "block";
+            alreadyprofile.show();
         } else {
-            spinner.style.display = "block";
-            loadKey(function(key) {
-                spinner.style.display = "none";
-                if (key == "") {
-                    failed_sect.style.display = "block";
-                } else {
-                    passphrase_panel.style.display = "block";
-                    restore_key_button.addEventListener("click", importKey);
-                    encrypted_key = key;
-                }
-            });
+            passphrase_panel.show();
+            restore_key_button.addEventListener("click", importKey);
         }
     }
+
+
 
     var importKey = function() {
         var pwd = passphrase.value;
         if (pwd.length < 8) return;
 
-        passphrase_panel.style.display = "none";
-        progressbar.style.display = "block";
+        passphrase_panel.hide();
+        progressbar.show();
 
         extendKey(pwd, progressbar.firstChild, function(pwd) {
 
-            progressbar.style.display = "none";
+            progressbar.hide();
 
 
             try {
                 var key = GibberishAES.dec(encrypted_key, pwd);
                 if (key) {
-                    var keyinfo = JSON.parse(key);
-                    keyinfo.prehash = Crypto.SHA256(keyinfo.secret, { asBytes: true });
+                    var keyfile = JSON.parse(key);
+                    var secret = parseBase58Check(keyfile.wif)[1];
+                    var hasPwd = keyfile.hasPwd;
+                    var keyinfo = {
+                        secret:secret,
+                        hasPwd:hasPwd,
+                        prehash:Crypto.SHA256(secret, { asBytes: true })
+                    };
 
                     setKey(host, keyinfo);
-                    done_sect.style.display = "block";
+                    done_sect.show();
                 } else {
-                    passphrase_panel.style.display = "block";
+                    passphrase_panel.show();
                 }
             } catch (e) {
-                passphrase_panel.style.display = "block";
+                passphrase_panel.show();
             }
 
         });
@@ -434,20 +430,8 @@ function RestorePage() {
     }
 
     var loadKey = function(cb) {
-        var url = "backup?c=" + c;
-        var connection = new XMLHttpRequest();
-        connection.open("GET", url, true);
-        connection.onreadystatechange = function(request) {
-            if (connection.readyState == 4) {
-                if (connection.status == 200) {
-                    var response = connection.responseText;
-                    cb(response);
-                } else {
-                    cb("");
-                }
-            }
-        }
-        connection.send();
+        //key is no longer transfered through the network
+        cb(c);
     }
 
     init();

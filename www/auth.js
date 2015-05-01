@@ -7,7 +7,7 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	var connection = null;
 	var eventSource = null;
 	var qrcode = new QRCode(qrcodeBox, {
-		   useSVG : true,
+	    useSVG: true, correctLevel: 0
 	  });
 	var curmode = false;
 	  
@@ -36,54 +36,54 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	    challengeUrl = challengeUrl.substr(0,challengeUrl.lastIndexOf("/")+1)+x;
 	    return challengeUrl;
 	}
-	
-	
+
+
 	this.reload = function(manage) {
 	    curmode = manage;
-		restoreBox.style.display="none";
+	    restoreBox.hide();
 
-		var bytes = secureRandom(20);
-		curcode = base64EncodeUrl(Crypto.util.bytesToBase64(bytes));
-		var logurl = "l?c="+curcode
-		
-		if (window.EventSource) {
+	    var bytes = secureRandom(20);
+	    curcode = base64EncodeUrl(Crypto.util.bytesToBase64(bytes));
+	    var logurl = "l?c=" + curcode
+
+	    if (window.EventSource) {
 	        if (eventSource != null) eventSource.close();
-			eventSource = new EventSource(logurl);
-			eventSource.addEventListener("message",function(event) {
-				var response = event.data;
-				this.processResponse(response);
-				eventSource.close();
-			}.bind(this));
-			eventSource.addEventListener("error",function(event) {
-				if (eventSource.readyState == 2) {
-					qrcodeBox.style.visibility = "hidden";
-				}
-			}.bind(this))
-		} else {
-		    if (connection != null) connection.abort();
-			connection = new XMLHttpRequest();	
-			connection.open("GET",logurl,true);
-			connection.onreadystatechange = function(request) {
-	            if (connection.readyState == 4 ) {
+	        eventSource = new EventSource(logurl);
+	        eventSource.addEventListener("message", function(event) {
+	            var response = event.data;
+	            this.processResponse(response);
+	            eventSource.close();
+	        } .bind(this));
+	        eventSource.addEventListener("error", function(event) {
+	            if (eventSource.readyState == 2) {
+	                qrcodeBox.style.visibility = "hidden";
+	            }
+	        } .bind(this))
+	    } else {
+	        if (connection != null) connection.abort();
+	        connection = new XMLHttpRequest();
+	        connection.open("GET", logurl, true);
+	        connection.onreadystatechange = function(request) {
+	            if (connection.readyState == 4) {
 	                if (connection.status == 200) {
 	                    var response = connection.responseText;
 	                    this.processResponse(response);
 	                } else if (connection.status == 409) {
-	                	this.reload(curmode);
+	                    this.reload(curmode);
 	                }
 	            }
-			}.bind(this);
-			connection.send();
-		}
+	        } .bind(this);
+	        connection.send();
+	    }
 
-		
-		if (manage) {
-			challengeUrl = getFullUrl("m#"+lang+","+apikey+","+curcode);
-		} else {				
-			challengeUrl = getFullUrl("c#"+lang+","+apikey+","+curcode);
-		}
-		qrcode.makeCode(challengeUrl)
-		qrcodeBox.style.visibility = "visible";
+
+	    if (manage) {
+	        challengeUrl = getFullUrl("m#" + lang + "," + apikey + "," + curcode);
+	    } else {
+	        challengeUrl = getFullUrl("c#" + lang + "," + apikey + "," + curcode);
+	    }
+	    qrcode.makeCode(challengeUrl)
+	    qrcodeBox.style.visibility = "visible";
 	}
 	
 	
@@ -147,52 +147,40 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	    lang = l;
 	    this.reload(curmode);
 	}
-	
+
 	this.restoreBackup = function() {
-		var target = qrcodeBox.parentElement;
-		target.style.position="relative";
-		target.appendChild(restoreBox);
-		restoreBox.style.display="block";		
-        fileinput.classList.remove("error");
-		
-		
+	    var target = qrcodeBox.parentElement;
+	    target.style.position = "relative";
+	    target.appendChild(restoreBox);
+	    restoreBox.show();
+	    fileinput.classList.remove("error");
+
+
 	}
 	
 	var init = function() {
 	
 	    fileinput.addEventListener("change", uploadFile.bind(this,fileinput));	
 	}
-	
+
 	var uploadFile = function(fileinput) {
 	    window.browsedFile = fileinput;
 	    var files = fileinput.files;
 	    if (files.length == 1) {
 	        var f = files[0];
-	        if (f.size > 1024) {
+	        if (f.size > 150) {
 	            fileinput.classList.add("error");
 	        } else {
-	            var bytes = secureRandom(20);
-		        var curcode = base64EncodeUrl(Crypto.util.bytesToBase64(bytes));
-		        var connection = new XMLHttpRequest();	
-		        connection.open("POST","backup?c="+curcode+"&restore=1",true);
-		        connection.onreadystatechange = function(request) {
-                    if (connection.readyState == 4 ) {
-                        if (connection.status == 201) {
-                            restoreBox.style.display="none";
-                            challengeUrl = getFullUrl("k#"+lang+","+apikey+","+curcode)
-                    		qrcode.makeCode(challengeUrl);
-		                    qrcodeBox.style.visibility = "visible";
-                        } else {
-                            fileinput.classList.add("error");                                            	        
-                        }
-                    }
-		        }.bind(this);
-		        var r = new FileReader();
-		        r.onload = function(e) {
-		            var contents = e.target.result;
-		            connection.send(contents);    
-		        }
-		        r.readAsText(f);
+	            var r = new FileReader();
+	            r.onload = function(e) {
+	                var contents = e.target.result;
+	                contents = contents.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '.').replace(/\n/g, ''); ;
+	                challengeUrl = getFullUrl("k#" + lang + "," + apikey + "," + contents);
+	                qrcode.makeCode(challengeUrl);
+	                qrcodeBox.style.visibility = "visible";
+	                restoreBox.hide();
+	            }
+	            r.readAsText(f);
 	        }
 	    }
 	}
@@ -202,11 +190,6 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 
 
 
-function updateLang() {
-	langSetText(document.getElementById("str_login"),"login");
-	langSetText(document.getElementById("str_manage"),"manage");
-	langSetText(document.getElementById("clickinfo"),"clickinfo");
-}
 
 function LangPanel(panel,curlang, qrlogin) {
     var lang = curlang;
@@ -229,7 +212,7 @@ function LangPanel(panel,curlang, qrlogin) {
                 qrlogin.setLang(l);                
                 lang = l;
                 drawPanel();
-                loadLang(lang,updateLang);
+                loadLang(lang);
             }.bind(this,langlist[i]);
             lpanel.appendChild(img);
             
@@ -245,14 +228,14 @@ function start() {
 	if (!lang) {
 		lang = "en";
 	}
-	loadLang(lang,updateLang);
+	loadLang(lang);
 	
-	var str_login = document.getElementById("str_login");
-	var str_manage = document.getElementById("str_manage");
-	var str_restorebackup = document.getElementById("str_restorebackup");
-	var qrblock = document.getElementById("qrblock");
-	var panel = document.getElementById("langpanel");
-	var restorePanel = document.getElementById("restoreform");
+	var str_login = getBlockById("tab_login");
+	var str_manage = getBlockById("tab_manage");
+	var str_restorebackup = getBlockById("tab_restore");
+	var qrblock = getBlockById("qrblock");
+	var panel = getBlockById("langpanel");
+	var restorePanel = getBlockById("restoreform");
 	
 	var qrlogin = new QRLogin(querystr, lang, qrblock, restorePanel); 
 	qrlogin.reload(false);

@@ -1,60 +1,61 @@
 <html>
 <head>
-<title>QRlogin</title>
-<link rel="stylesheet" href="mobile_styles.css" type="text/css" />
-<script src="libs/bitcoinjs-min.js" type="text/javascript"></script>
-<script src="libs/common.js" type="text/javascript"></script>
-<script src="libs/aes.js" type="text/javascript"></script>
-<script src="libs/sha256.js" type="text/javascript"></script>
-<script src="mobileapp.js" type="text/javascript"></script>
-<meta name="viewport" content="width=320">
+    <title>QRlogin</title>
+    <link rel="stylesheet" href="mobile_styles.css" type="text/css" />
+    <script src="libs/bitcoinjs-min.js" type="text/javascript"></script>
+    <script src="libs/common.js" type="text/javascript"></script>
+    <script src="libs/aes.js" type="text/javascript"></script>
+    <script src="libs/sha256.js" type="text/javascript"></script>
+    <script src="mobileapp.js" type="text/javascript"></script>
+    <meta name="viewport" content="width=320">
 </head>
-
 <body onload="startManage()">
-<div class="header">
-<img src="img/qrlogo-sw.png" class="logo"/>
-<div class="serviceid"><span id="serviceId"></span></div>
-</div>
-
-<div id="noprofile">You haven't created identity for this site yet</div>
-<div class="panel" id="panel">
-<button id="backup_button" >Backup keys</button>
-<button id="enablepwd_button" >Enable password</button>
-<hr>
-<button id="erase_button" >Erase key</button>
-</div>
-<div class="eraseask" id="eraseask">
-<p id="erase_ask_label">Do you realy want to ERASE YOUR KEY for the current site? Your identity will no longer available</p>
-<div class="buttonbar"><button id="erase_yes">Yes</button> <button id="erase_no">No</button></div>
-</div>
-<div class="password" id="passphrase_panel">
-<label><span id="passphrase_label_1">You are going to send your key outside of 
-the&nbsp;mobile device. Ensure, that the&nbsp;target computer (the&nbsp;computer 
-that shows the&nbsp;QR code) is complete under your control and the&nbsp;QR code 
-is shown on the proper page</span>
-<br /><br /><strong><span id="passphrase_label_2">You key will be encrypted. Please enter a passphrase (mandatory, min 8 letters)</span></strong>
-<input type="text" class="password" id="passphrase" />
-</label>
-<div class="buttonbar">
-<button id="backup_key_button">Backup key</button>
-<button id="cancel_button">Cancel</button>
-</div>
-</div>
-<div class="spinner" id="spinner"><img src="img/spinner.gif"></div>
-<div id="progressbar"><div></div></div>
-<div id="done_sect">
-<p id="done_text">Succesfuly delivered</p>
-<img src="img/success.png" />
-</div>
-<div id="failed_sect">
-<p id="failed">Please try again</p>
-<img src="img/failed.png" />
-</div>
-
-
-
+    <div class="header">
+        <img src="img/qrlogo-sw.png" class="logo" />
+        <div class="serviceid">
+            <span id="serviceId"></span>
+        </div>
+    </div>
+    <p class="str_man_noprofile" id="noprofile">
+        You haven't created identity for this site yet</p>
+    <div class="panel" id="panel">
+        <button class="str_man_backup_button" id="backup_button">Backup keys</button>
+        <button class="str_man_enablepwd_button" id="enablepwd_button">Enable password</button>
+        <hr>
+        <button class="str_man_erase_button" id="erase_button">Erase key</button>
+    </div>
+    <div id="eraseask">
+        <p class="str_man_erase_ask_label">
+            Do you realy want to ERASE YOUR KEY for the current site? Your identity will no
+            longer available</p>
+        <div class="buttonbar">
+            <button class="str_man_erase_no"  id="erase_no">No</button>
+            <button class="str_man_erase_yes" id="erase_yes">Yes</button>
+        </div>
+    </div>
+    <div class="password" id="passphrase_panel">
+        <label>
+            <p class="str_man_label_1">You are going to send your key outside of the&nbsp;mobile
+                device. Ensure, that the&nbsp;target computer (the&nbsp;computer that shows the&nbsp;QR
+                code) is complete under your control and the&nbsp;QR code is shown on the proper
+                page</p>
+            <p><strong class="str_man_label_2">You key will be encrypted. Please enter a passphrase
+                (mandatory, min 8 letters)</strong></p>
+            <input type="text" class="password" id="passphrase" />
+        </label>
+        <div class="buttonbar">
+            <button class="str_man_backup_key_button" id="backup_key_button">Backup key</button>
+            <button class="str_man_cancel_button" id="cancel_button">Cancel</button>
+        </div>
+    </div>
+    <div id="spinner"><img src="img/spinner.gif"></div>
+    <div id="progressbar"><div></div></div>
+    <div id="done_sect"><p class="str_man_done_text">Succesfuly delivered</p>
+        <img src="img/success.png" />
+    </div>
+    <div id="failed_sect">
+        <p class="str_man_failed">Please try again</p>
+        <img src="img/failed.png" />
+    </div>
 </body>
-
-
-
 </html>
