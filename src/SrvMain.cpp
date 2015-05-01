@@ -44,8 +44,8 @@ SrvMain::SrvMain()
 	,verify(*this)
 	,getIdent(*this)
 	,rcvBackup(*this)
-	,lastTokenShiftTime(0)
-	,lastBackupShiftTime(0)
+	,lastTokenShiftTime(integer(0))
+	,lastBackupShiftTime(integer(0))
 
 {
 
