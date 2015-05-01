@@ -58,3 +58,9 @@ function getBlockById(id) {
     return element;
 
 }
+
+var getFullUrl = function(x) {
+    var challengeUrl = location.href.split('?')[0];
+    challengeUrl = challengeUrl.substr(0, challengeUrl.lastIndexOf("/") + 1) + x;
+    return challengeUrl;
+}

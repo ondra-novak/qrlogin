@@ -6,6 +6,7 @@
     <script src="libs/common.js" type="text/javascript"></script>
     <script src="libs/aes.js" type="text/javascript"></script>
     <script src="libs/sha256.js" type="text/javascript"></script>
+    <script src="libs/qrcode.js" type="text/javascript"></script>
     <script src="mobileapp.js" type="text/javascript"></script>
     <meta name="viewport" content="width=320">
 </head>
@@ -20,6 +21,7 @@
         You haven't created identity for this site yet</p>
     <div class="panel" id="panel">
         <button class="str_man_backup_button" id="backup_button">Backup keys</button>
+        <button class="str_man_transfer_button" id="transfer_button">Export key</button>
         <button class="str_man_enablepwd_button" id="enablepwd_button">Enable password</button>
         <hr>
         <button class="str_man_erase_button" id="erase_button">Erase key</button>
@@ -48,6 +50,17 @@
             <button class="str_man_cancel_button" id="cancel_button">Cancel</button>
         </div>
     </div>
+    <div class="transfer" id="transfer">
+        <label>
+            <p><strong class="str_man_label_2">You key will be encrypted. Please enter a passphrase
+                (mandatory, min 8 letters)</strong></p>
+            <input type="text" class="password" id="passphrase2" />
+        </label>
+        <div class="buttonbar">
+            <button class="str_man_transfer_key_button" id="transfer_key_button">Export key</button>
+            <button class="str_man_cancel_button" id="transfer_cancel">Cancel</button>
+        </div>
+    </div>
     <div id="spinner"><img src="img/spinner.gif"></div>
     <div id="progressbar"><div></div></div>
     <div id="done_sect"><p class="str_man_done_text">Succesfuly delivered</p>
@@ -56,6 +69,9 @@
     <div id="failed_sect">
         <p class="str_man_failed">Please try again</p>
         <img src="img/failed.png" />
+    </div>
+    <div id="qrbox">
+    
     </div>
 </body>
 </html>

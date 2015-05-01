@@ -49,7 +49,6 @@ function SignPage() {
     var accept_button = getBlockById("accept_button");
     var create_button= getBlockById("create_button");
     var always_blank= getBlockById("always_blank");
-    var always_blank_label= getBlockById("keep_password_blank");
     var spinner = getBlockById("spinner");
     var delivered_sect = getBlockById("delivered_sect");
     var failed_sect = getBlockById("failed_sect");
@@ -243,9 +242,15 @@ function ManagePage() {
     var failed_sect = getBlockById("failed_sect");
     var passphrase_panel = getBlockById("passphrase_panel");
     var backup_key_button= getBlockById("backup_key_button");
+    var transfer_key_button = getBlockById("transfer_key_button");
     var cancel_button = getBlockById("cancel_button");
     var passphrase = getBlockById("passphrase");
+    var passphrase2 = getBlockById("passphrase2");
     var progressbar = getBlockById("progressbar");
+    var transfer_button = getBlockById("transfer_button");
+    var transfer_panel = getBlockById("transfer");
+    var qrbox = getBlockById("qrbox");
+    var spinner = getBlockById("spinner");
 
     
     function init() {
@@ -289,7 +294,14 @@ function ManagePage() {
 	            passphrase_panel.show();
 	            panel.hide();
 	            passphrase.focus();
-	            
+
+	        });
+
+	        transfer_button.addEventListener("click", function() {
+	            transfer_panel.show();
+	            panel.hide();
+	            passphrase2.focus();
+
 	        });
 
 
@@ -333,6 +345,39 @@ function ManagePage() {
 	                connection.send(enckey);
 	            });
 	        });
+
+	        transfer_key_button.addEventListener("click", function() {
+
+	            var pwd = passphrase2.value;
+	            if (pwd.length < 8) return;
+
+	            transfer_panel.hide();
+	            progressbar.show();
+
+	            var key = getKey(host);
+	            extendKey(pwd, progressbar.firstChild, function(pwd) {
+
+	                progressbar.hide();
+
+	                var wif = new Bitcoin.Address(key.secret);
+	                wif.version = 0x80;
+
+	                var keyfile = {
+	                    wif: wif.toString(),
+	                    hasPwd: key.hasPwd
+	                }
+
+	                var enckey = GibberishAES.enc(JSON.stringify(keyfile), pwd);
+	                enckey = enckey.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '.').replace(/\n/g, '');
+
+	                var url = getFullUrl("k#" + lang + "," + host + "," + enckey);
+	                var qrcode = new QRCode(qrbox, {
+	                    useSVG: true, correctLevel: 0
+	                });
+	                qrcode.makeCode(url);
+
+	            });
+	        });
 	        
         }
 
@@ -374,7 +419,6 @@ function RestorePage() {
     var spinner = getBlockById("spinner");
     var progressbar = getBlockById("progressbar");
     var done_sect = getBlockById("done_sect");
-    var failed_sect = getBlockById("failed_sect");
     var encrypted_key = c.replace(/-/g, '+').replace(/_/g, '/').replace(/\./g, '='); ;
 
     var init = function() {

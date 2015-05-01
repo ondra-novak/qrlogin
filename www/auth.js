@@ -31,13 +31,7 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	
 	var apikey = getDomainFromUrl(args.redirect_uri)	
 	
-	var getFullUrl = function(x) {
-	    var challengeUrl = location.href.split('?')[0];
-	    challengeUrl = challengeUrl.substr(0,challengeUrl.lastIndexOf("/")+1)+x;
-	    return challengeUrl;
-	}
-
-
+	
 	this.reload = function(manage) {
 	    curmode = manage;
 	    restoreBox.hide();

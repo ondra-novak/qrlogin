@@ -105,7 +105,7 @@ label.always_blank
 #panel {
 	display:none;
 }
-#noprofile, #alreadyprofile{
+#noprofile, #alreadyprofile,#transfer{
 	display: none;
 }
 
@@ -152,4 +152,8 @@ label.always_blank
 	margin-left: 0;
 	margin-right: auto;
 	background-color: green;
+}
+#qrbox 
+{
+	padding: 20px;
 }
