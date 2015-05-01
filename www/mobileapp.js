@@ -5,19 +5,6 @@ if (!Date.now) {
 }
 
 
-function fromOldFormat(domain) {
-    //transfer keys from old version
-    var keystore = localStorage["secretKey"] ? JSON.parse(localStorage["secretKey"]) : {}
-    if (keystore[domain]) {
-        var key = keystore[domain];
-        key.prehash = Crypto.SHA256(key.secret, { asBytes: true });
-        setKey(domain, key);
-        delete keystore[domain];
-        localStorage["secretKey"] = JSON.stringify(keystore);
-        return key;
-    }
-}
-
 function getKey(domain) {
 
     var kstr = localStorage["keyStorage_" + domain];
@@ -73,8 +60,6 @@ function SignPage() {
         var serviceId = getBlockById("serviceId");
         serviceId.appendChild(document.createTextNode(host));
 
-        //import keys if necesery
-        fromOldFormat(host);
         //get key
         var keyinfo = getKey(host);
 
