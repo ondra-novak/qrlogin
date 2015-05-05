@@ -4,6 +4,10 @@
     "auth_restorebackup":"Import key",
     "auth_choose_file":"Browse a file with the key in your computer",
     "auth_clickinfo":"Please click or tap on QR code to use current browser",
+    "auth_keyready":"Key was downloaded",
+    "auth_savetofile":"Store as file",
+    "auth_print":"Print as QR",
+    "auth_counter":"Time left: ",
     "chn_enterpassword":"Enter password (optional)",
     "chn_disablepassword":"Don't ask password again",
     "chn_loginbutton":"Login",
@@ -29,6 +33,8 @@
     "rstr_alreadyprofile":"You already have a key active for this site. First, you have to backup and erase this key through the Manage Keys page",
     "rstr_enterpassphrase":"Enter password for decryption",
     "rstr_import_key_button":"Import key",
-    "rstr_import_ok":"Succesfuly imported"
+    "rstr_import_ok":"Succesfuly imported",
+    "prn_original_domain":"Domain:",
+    "prn_password":"Password / Hint:"
     
 }

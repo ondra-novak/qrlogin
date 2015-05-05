@@ -1,29 +1,24 @@
 var langtab = null;
 
 function loadLang(lang, cb) {
-	var connection = null;
-	connection = new XMLHttpRequest();	
-	connection.open("GET","lang/"+lang+".js",true);
-	connection.onreadystatechange = function(request) {
-	    if (connection.readyState == 4) {
-	        if (connection.status == 200) {
-	            langtab = JSON.parse(connection.responseText);
-	            for (var key in langtab) {
-	                var clsname = "str_" + key;
-	                var elm = document.getElementsByClassName(clsname);
-	                for (var z = 0; z<elm.length; z++) {
-	                    var e = elm[z];
-	                    e.removeChild(e.firstChild);
-	                    e.appendChild(document.createTextNode(langtab[key]));
-	                }	                
-	            }
-	            if (cb) cb();
-	        } else {
-	            if (lang != "en") loadLang("en", cb);
-	        }
-	    }
-	}
-	connection.send();
+
+    httpGet("lang/" + lang + ".js", function(connection) {
+        if (connection.status == 200) {
+            langtab = JSON.parse(connection.responseText);
+            for (var key in langtab) {
+                var clsname = "str_" + key;
+                var elm = document.getElementsByClassName(clsname);
+                for (var z = 0; z < elm.length; z++) {
+                    var e = elm[z];
+                    e.removeChild(e.firstChild);
+                    e.insertBefore(document.createTextNode(langtab[key]),e.firstChild);
+                }
+            }
+            if (cb) cb();
+        } else {
+            if (lang != "en") loadLang("en", cb);
+        }
+    });
 }
 
 
@@ -74,4 +69,28 @@ function base64_encodeURIComponent(txt) {
 
 function base64_decodeURIComponent(txt) {
 	return txt.replace(/-/g, '+').replace(/_/g, '/').replace(/\./g, '='); ;
+}
+
+function httpGet(url, cb) {
+    var connection = new XMLHttpRequest();
+    connection.open("GET", url, true);
+    connection.onreadystatechange = function(request) {
+        if (connection.readyState == 4) {
+            var response = connection.responseText;
+            cb(connection);
+        }
+    } .bind(this);
+    connection.send();
+}
+
+function httpPost(url,data, cb) {
+    var connection = new XMLHttpRequest();
+    connection.open("POST", url, true);
+    connection.onreadystatechange = function(request) {
+        if (connection.readyState == 4) {
+            var response = connection.responseText;
+            cb(connection);
+        }
+    } .bind(this);
+    connection.send(data);
 }

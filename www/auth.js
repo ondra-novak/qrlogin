@@ -1,4 +1,4 @@
-function QRLogin(args, lang, qrcodeBox, restoreBox) {
+function QRLogin(args, lang, qrcodeBox, restoreBox, downloadBox) {
 	
 //	var qrcodeBox = document.getElementById("qrcode");
 	var curcode = null;
@@ -11,6 +11,7 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	  });
 	var curmode = false;
 	var restpanel = false;
+	var downloadshown = false;	
 	
 	  
 	var fileinput = restoreBox.getElementsByTagName("input")[0];
@@ -36,7 +37,8 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 
 	this.reload = function(manage) {
 	    curmode = manage;
-	    restoreBox.hide(); restpanel = false; 
+	    restoreBox.hide(); restpanel = false;
+	    downloadBox.hide(); downloadshown = false;
 
 	    var bytes = secureRandom(20);
 	    curcode = base64EncodeUrl(Crypto.util.bytesToBase64(bytes));
@@ -112,64 +114,72 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	})
 
 
-	function printKey(token) {
-		var url = "backup?c="+token;
-        var connection = new XMLHttpRequest();
-        connection.open("GET", logurl, true);
-        connection.onreadystatechange = function(request) {
-            if (connection.readyState == 4) {
-                if (connection.status == 200) {
-                    var response = connection.responseText;
-                    
-                    
-                    
-                    
-                    
-                } else if (connection.status == 409) {
-                    this.reload(curmode);
-                }
-            }
-        } .bind(this);
-        connection.send();
-		
+    
+
+	this.showDownloadBox = function() {
+
+	    downloadBox.show();
+	    downloadshown = true;
+	    var timer = 61;
+
+	    function decTimer() {
+	        timer--;
+	        if (!downloadshown) return;
+	        if (timer == 0) {
+	            this.reload(curmode);
+	        } else {
+
+	            var e = downloadBox.getElementsByTagName("span")[0];
+	            e.removeChild(e.firstChild);
+	            e.appendChild(document.createTextNode(timer));
+	            setTimeout(bindDecTimer, 1000);
+	        }
+	    }
+	    var bindDecTimer =  decTimer.bind(this);
+
+	    setTimeout(bindDecTimer, 1);
 	}
-	
+
+	function printKey() {
+	    window.open("print.html#" + lang + "," + apikey + "," + curcode);
+	    this.reload(curmode);
+	}
+
+	function downloadKey() {
+	    location.href = "backup?c="+curcode;
+	    this.reload(curmode);
+	}
+
 
 	this.processResponse = function(response) {
-		var r = response.trim();
-		if (r == "") {
-			this.reload(curmode);
-			return;
-		}
+	    var r = response.trim();
+	    if (r == "") {
+	        this.reload(curmode);
+	        return;
+	    }
 
-        var redir;		
-		if (r.substr(0,7) == "backup:") {
-		    
-		    redir = "backup?c="+curcode;
-		    this.reload(true);
-            	
-		} else if (r.substr(0,6) == "print:") {
-		    
-			printKey(curcode);
-		    this.reload(true);
-            	
-		} else {
-		    redir = args.redirect_uri;
-    		var qmark = redir.indexOf('?');
-	    	if (qmark == -1) redir = redir + "?"; else redir = redir + '&';
-		    redir = redir + "code=" + encodeURIComponent(r);
-		    if (args.scope) redir = redir + "&scope=" + encodeURIComponent(args.scope);
-		    if (args.state) redir = redir + "&state=" + encodeURIComponent(args.state);
-		}
-				
+	    var redir;
+	    if (r.substr(0, 7) == "backup:") {
 
-		window.top.location = redir;
+	        this.showDownloadBox();
+
+	    } else {
+	        redir = args.redirect_uri;
+	        var qmark = redir.indexOf('?');
+	        if (qmark == -1) redir = redir + "?"; else redir = redir + '&';
+	        redir = redir + "code=" + encodeURIComponent(r);
+	        if (args.scope) redir = redir + "&scope=" + encodeURIComponent(args.scope);
+	        if (args.state) redir = redir + "&state=" + encodeURIComponent(args.state);
+	        window.top.location = redir;
+	    }
+
+
 	}
 
 	this.setLang = function(l) {
 	    lang = l;
-	    if (!restpanel) this.reload(curmode);
-	    else restoreBox.show();
+	    if (!restpanel && !downloadshown) this.reload(curmode);
+	    else if (restpanel) restoreBox.show();
 	}
 
 	this.restoreBackup = function() {
@@ -179,13 +189,18 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	    restoreBox.show();
 	    fileinput.classList.remove("error");
 	    restpanel = true;
+	    downloadBox.hide(); downloadshown = false;
 
 
 	}
-	
+
 	var init = function() {
-	
-	    fileinput.addEventListener("change", uploadFile.bind(this,fileinput));	
+
+	    fileinput.addEventListener("change", uploadFile.bind(this, fileinput));
+	    var buttons = downloadBox.getElementsByTagName("button");
+	    buttons[0].addEventListener("click", downloadKey.bind(this));
+	    buttons[1].addEventListener("click", printKey.bind(this));
+
 	}
 
 	var uploadFile = function(fileinput) {
@@ -263,9 +278,10 @@ function start() {
 	var qrblock = getBlockById("qrblock");
 	var panel = getBlockById("langpanel");
 	var restorePanel = getBlockById("restoreform");
+	var downloadBox = getBlockById("downloadask");
 	
-	var qrlogin = new QRLogin(querystr, lang, qrblock, restorePanel); 
-	qrlogin.reload(false);
+	window.qrlogin = new QRLogin(querystr, lang, qrblock, restorePanel,downloadBox);
+	window.qrlogin.reload(false);
 		
 	str_login.classList.add("hl");
 	str_login.addEventListener("click",function() {

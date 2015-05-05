@@ -49,8 +49,9 @@ ul.selector li.hl {
 	background-color: #DFD;
 	padding: 10px;	
 }
-.selectorblock div {
-	height: 320px;
+.selectorblock > div {
+	height: 380px;
+	position:relative;
 }
 
 .selectorblock IFRAME {
@@ -64,7 +65,7 @@ ul.selector li.hl {
 }
 
 
-#restoreform {
+#restoreform, #downloadask  {
 	padding: 100px 20px 0px 20px;
 	background-color: white;
 	border: 1px solid;
@@ -78,6 +79,7 @@ ul.selector li.hl {
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
+	z-index: 1000;
 }
 
 #restoreform input.error 
@@ -89,3 +91,15 @@ ul.selector li.hl {
 {
 	margin-top: 20px;
 }
+
+	
+
+#downloadask  button 
+{
+	display:block;
+	width: 200px;
+	height: 50px;
+	margin: 10px auto 10px auto;
+}
+
+	

@@ -4,6 +4,10 @@
     "auth_restorebackup":"Import klíče",
     "auth_choose_file":"Vyhledejte soubor s klíčem ve vašem počítači",
     "auth_clickinfo":"Klepněte na QR kód pro použití klíče uloženém v tomto prohlížeči",
+    "auth_keyready":"Klíč k identitě byl přenesen",
+    "auth_savetofile":"Uložit do souboru",
+    "auth_print":"Vytisknout jako QR",
+    "auth_counter":"Zbývá čas: ",
     "chn_enterpassword":"Heslo k identitě (volitelně)",
     "chn_disablepassword":"Přístě se na heslo neptat",
     "chn_loginbutton":"Přihlásit se",
@@ -19,7 +23,6 @@
     "man_erase_no":"Ne, storno",
     "man_label_1":"Chystáte se zálohovat klíč v počítači. Klíč bude zašifrován a přenesen na počítač přes internet. Ujistěte se, že počítač, který zobrazoval QR kód je dostatečně zabezpečený pro uložení klíče",
     "man_label_2":"Zadejte silné heslo (nejméně 8 písmen) kterým bude klíč zašifrován",
-    "man_label_3":"Chystáte se přenést klíč do jiného zařízení pomocí QR kódu",
     "man_backup_key_button":"Zálohovat klíč",
     "man_cancel_button":"Storno",
     "man_done_text":"Úspěšně provedeno",
@@ -30,7 +33,11 @@
     "rstr_alreadyprofile":"K této stránce existuje v zařízení klíč. Nejprve klíč zálohujte a smažte, aby mohl být importován nový.",
     "rstr_enterpassphrase":"Zadejte heslo pro dešifrování",
     "rstr_import_key_button":"Importovat",
-    "rstr_import_ok":"Úspěšně uloženo"
+    "rstr_import_ok":"Úspěšně uloženo",
+    "prn_original_domain":"Doména:",
+    "prn_password":"Heslo / Nápověda:"
+
+    
 
     
     

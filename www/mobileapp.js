@@ -226,70 +226,14 @@ function ManagePage() {
     var done_sect = getBlockById("done_sect");
     var failed_sect = getBlockById("failed_sect");
     var passphrase_panel = getBlockById("passphrase_panel");
-    var backup_download= getBlockById("backup_download");
-    var backup_printqr = getBlockById("backup_printqr");
+    var backup_key_button= getBlockById("backup_key_button");
     var cancel_button = getBlockById("cancel_button");
-    var backup_showqr = getBlockById("backup_showqr");
     var passphrase = getBlockById("passphrase");
     var progressbar = getBlockById("progressbar");
     var qrbox = getBlockById("qrbox");
     var spinner = getBlockById("spinner");
 
-    function backup_key(method) {
-        var pwd = passphrase.value;
-        if (pwd.length < 8) return;
-
-        passphrase_panel.hide();
-        progressbar.show();
-
-        var key = getKey(host);
-        extendKey(pwd, progressbar.firstChild, function(pwd) {
-
-            progressbar.hide();
-
-            var wif = new Bitcoin.Address(key.secret);
-            wif.version = 0x80;
-
-            var keyfile = {
-                wif: wif.toString(),
-                hasPwd: key.hasPwd
-            }
-
-            var enckey = GibberishAES.enc(JSON.stringify(keyfile), pwd);
-
-            method(enckey);
-        });    	
-    }
-
-    function send_key(print,enckey) {
-        var url = "backup?c=" + c;
-        if (print) url = url + "&print=1";
-        var connection = new XMLHttpRequest();
-        connection.open("POST", url, true);
-        connection.onreadystatechange = function(request) {
-            if (connection.readyState == 4) {
-                spinner.hide();
-                if (connection.status == 201) {
-                    done_sect.show();
-                } else {
-                    failed_sect.show();
-                }
-            }
-        }
-        connection.send(enckey);	        	
-        spinner.show();    	
-    }
-
-    function show_key(enckey) {
-    	enckey = base64_encodeURIComponent(enckey);
-    	 var url = getFullUrl("k#" + lang + "," + host + "," + enckey);
-         var qrcode = new QRCode(qrbox, {
-             useSVG: true, correctLevel: 0
-         });
-         qrcode.makeCode(url);
-         qrbox.show();  
-    }
-   
+    
     function init() {
         var serviceId = getBlockById("serviceId");
         serviceId.appendChild(document.createTextNode(host));
@@ -338,15 +282,46 @@ function ManagePage() {
 
 	        });
 
-	        backup_download.addEventListener("click", 
-	        		backup_key.bind(this,
-	        				send_key.bind(this,false)));
-	        backup_printqr.addEventListener("click", 
-	        		backup_key.bind(this,
-	        				send_key.bind(this,true)));
-	        backup_showqr.addEventListener("click", 
-	        		backup_key.bind(this,
-	        				show_key.bind(this)));
+	        backup_key_button.addEventListener("click", function() {
+
+	            var pwd = passphrase.value;
+	            if (pwd.length < 8) return;
+
+	            passphrase_panel.hide();
+	            progressbar.show();
+
+	            var key = getKey(host);
+	            extendKey(pwd, progressbar.firstChild, function(pwd) {
+
+	                progressbar.hide();
+	                spinner.show();
+
+	                var wif = new Bitcoin.Address(key.secret);
+	                wif.version = 0x80;
+
+	                var keyfile = {
+	                    wif: wif.toString(),
+	                    hasPwd: key.hasPwd
+	                }
+
+	                var enckey = GibberishAES.enc(JSON.stringify(keyfile), pwd);
+
+	                var url = "backup?c=" + c;
+	                var connection = new XMLHttpRequest();
+	                connection.open("POST", url, true);
+	                connection.onreadystatechange = function(request) {
+	                    if (connection.readyState == 4) {
+	                        spinner.hide();
+	                        if (connection.status == 201) {
+	                            done_sect.show();
+	                        } else {
+	                            failed_sect.show();
+	                        }
+	                    }
+	                }
+	                connection.send(enckey);
+	            });
+	        });
 	        
         }
 
