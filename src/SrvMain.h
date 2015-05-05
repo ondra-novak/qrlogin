@@ -128,13 +128,12 @@ public:
 	StringA getIdentityFromToken_lk(StringA token);
 	void shiftBanksIfNeeded();
 
-
 	bool registerMonitor(StringA ident, WaitingResponse *response);
 	bool acceptLogin(StringA ident, StringA response, natural timestamp);
 	void failedLogin(StringA ident);
 	void pingActive();
 	void scheduledPing(IJobScheduler *scheduler);
-	bool receiveBackup(StringA chanId, StringA content, bool print);
+	bool receiveBackup(StringA chanId, StringA content, bool restore);
 	StringA getBackupFile(StringA ident);
 	StringA getBackupFile_lk(StringA ident);
 };
