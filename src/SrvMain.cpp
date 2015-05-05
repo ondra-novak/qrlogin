@@ -340,7 +340,7 @@ void SrvMain::scheduledPing(IJobScheduler* scheduler) {
 	scheduler->schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,scheduler),30,ThreadMode::schedulerThread);
 }
 
-bool SrvMain::receiveBackup( StringA chanId, StringA content, bool restore )
+bool SrvMain::receiveBackup( StringA chanId, StringA content, bool print )
 {
 	LS_LOGOBJ(lg);
 	{
@@ -349,10 +349,10 @@ bool SrvMain::receiveBackup( StringA chanId, StringA content, bool restore )
 		backupMap[0].insert(chanId,content,&exist);
 		if (exist) return false;
 	}
-	bool result =  restore || acceptLogin(chanId,"backup",0);
+	bool result =  acceptLogin(chanId,print?"print":"backup",0);
 	
-	lg.progress("Received key backup: channel=%1, restore=%2, result=%3")
-		<< chanId << restore << result;
+	lg.progress("Received key backup: channel=%1, print=%2, result=%3")
+		<< chanId << print << result;
 
 	return result;
 	
@@ -448,11 +448,11 @@ LightSpeed::natural SrvMain::Backup::onRequest( IHttpRequest &request, ConstStrA
 {
 	StringA c;
 	QueryParser qp(vpath);
-	bool restore = false;
+	bool print = false;
 	while (qp.hasItems()) {
 		const QueryField &qf = qp.getNext();
 		if (qf.name == "c") c= qf.value;
-		if (qf.name == "restore") restore = true;
+		if (qf.name == "print") print = true;
 	}
 
 	if (c.empty()) return stNotFound;
@@ -463,7 +463,7 @@ LightSpeed::natural SrvMain::Backup::onRequest( IHttpRequest &request, ConstStrA
 		SeqFileInput fin(&request);
 		SeqTextInA txtin(fin);
 		buffer.copy(txtin);
-		if (owner.receiveBackup(c,buffer.getArray(), restore)) return stCreated;
+		if (owner.receiveBackup(c,buffer.getArray(), print)) return stCreated;
 		else return 409;
 	} else {
 		StringA res = owner.getBackupFile(c);

@@ -21,7 +21,6 @@
         You haven't created identity for this site yet</p>
     <div class="panel" id="panel">
         <button class="str_man_backup_button" id="backup_button">Backup key</button>
-        <button class="str_man_transfer_button" id="transfer_button">Export key</button>
         <button class="str_man_enablepwd_button" id="enablepwd_button">Enable password</button>
         <hr>
         <button class="str_man_erase_button" id="erase_button">Erase key</button>
@@ -46,20 +45,10 @@
             <input type="text" class="password" id="passphrase" />
         </label>
         <div class="buttonbar">
-            <button class="str_man_backup_key_button" id="backup_key_button">Backup key</button>
+            <button class="str_man_backup_showqr" id="backup_showqr">Show QR</button>
+            <button class="str_man_backup_printqr" id="backup_printqr">Print</button>
+            <button class="str_man_backup_download" id="backup_download">Download</button>
             <button class="str_man_cancel_button" id="cancel_button">Cancel</button>
-        </div>
-    </div>
-    <div class="transfer" id="transfer">
-        <label>
-            <p class="str_man_label_3">You are going to a different device through the QR code</p>
-            <p><strong class="str_man_label_2">You key will be encrypted. Please enter a passphrase
-                (mandatory, min 8 letters)</strong></p>
-            <input type="text" class="password" id="passphrase2" />
-        </label>
-        <div class="buttonbar">
-            <button class="str_man_transfer_key_button" id="transfer_key_button">Export key</button>
-            <button class="str_man_cancel_button" id="transfer_cancel">Cancel</button>
         </div>
     </div>
     <div id="spinner"><img src="img/spinner.gif"></div>

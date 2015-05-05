@@ -112,6 +112,29 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	})
 
 
+	function printKey(token) {
+		var url = "backup?c="+token;
+        var connection = new XMLHttpRequest();
+        connection.open("GET", logurl, true);
+        connection.onreadystatechange = function(request) {
+            if (connection.readyState == 4) {
+                if (connection.status == 200) {
+                    var response = connection.responseText;
+                    
+                    
+                    
+                    
+                    
+                } else if (connection.status == 409) {
+                    this.reload(curmode);
+                }
+            }
+        } .bind(this);
+        connection.send();
+		
+	}
+	
+
 	this.processResponse = function(response) {
 		var r = response.trim();
 		if (r == "") {
@@ -124,7 +147,12 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 		    
 		    redir = "backup?c="+curcode;
 		    this.reload(true);
-            		
+            	
+		} else if (r.substr(0,6) == "print:") {
+		    
+			printKey(curcode);
+		    this.reload(true);
+            	
 		} else {
 		    redir = args.redirect_uri;
     		var qmark = redir.indexOf('?');
@@ -170,8 +198,7 @@ function QRLogin(args, lang, qrcodeBox, restoreBox) {
 	        } else {
 	            var r = new FileReader();
 	            r.onload = function(e) {
-	                var contents = e.target.result;
-	                contents = contents.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '.').replace(/\n/g, ''); ;
+	                var contents = base64_encodeURIComponent(e.target.result);
 	                challengeUrl = getFullUrl("k#" + lang + "," + apikey + "," + contents);
 	                qrcode.makeCode(challengeUrl);
 	                qrcodeBox.style.visibility = "visible";

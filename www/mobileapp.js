@@ -226,19 +226,70 @@ function ManagePage() {
     var done_sect = getBlockById("done_sect");
     var failed_sect = getBlockById("failed_sect");
     var passphrase_panel = getBlockById("passphrase_panel");
-    var backup_key_button= getBlockById("backup_key_button");
-    var transfer_key_button = getBlockById("transfer_key_button");
+    var backup_download= getBlockById("backup_download");
+    var backup_printqr = getBlockById("backup_printqr");
     var cancel_button = getBlockById("cancel_button");
-    var transfer_cancel = getBlockById("transfer_cancel");
+    var backup_showqr = getBlockById("backup_showqr");
     var passphrase = getBlockById("passphrase");
-    var passphrase2 = getBlockById("passphrase2");
     var progressbar = getBlockById("progressbar");
-    var transfer_button = getBlockById("transfer_button");
-    var transfer_panel = getBlockById("transfer");
     var qrbox = getBlockById("qrbox");
     var spinner = getBlockById("spinner");
 
-    
+    function backup_key(method) {
+        var pwd = passphrase.value;
+        if (pwd.length < 8) return;
+
+        passphrase_panel.hide();
+        progressbar.show();
+
+        var key = getKey(host);
+        extendKey(pwd, progressbar.firstChild, function(pwd) {
+
+            progressbar.hide();
+
+            var wif = new Bitcoin.Address(key.secret);
+            wif.version = 0x80;
+
+            var keyfile = {
+                wif: wif.toString(),
+                hasPwd: key.hasPwd
+            }
+
+            var enckey = GibberishAES.enc(JSON.stringify(keyfile), pwd);
+
+            method(enckey);
+        });    	
+    }
+
+    function send_key(print,enckey) {
+        var url = "backup?c=" + c;
+        if (print) url = url + "&print=1";
+        var connection = new XMLHttpRequest();
+        connection.open("POST", url, true);
+        connection.onreadystatechange = function(request) {
+            if (connection.readyState == 4) {
+                spinner.hide();
+                if (connection.status == 201) {
+                    done_sect.show();
+                } else {
+                    failed_sect.show();
+                }
+            }
+        }
+        connection.send(enckey);	        	
+        spinner.show();    	
+    }
+
+    function show_key(enckey) {
+    	enckey = base64_encodeURIComponent(enckey);
+    	 var url = getFullUrl("k#" + lang + "," + host + "," + enckey);
+         var qrcode = new QRCode(qrbox, {
+             useSVG: true, correctLevel: 0
+         });
+         qrcode.makeCode(url);
+         qrbox.show();  
+    }
+   
     function init() {
         var serviceId = getBlockById("serviceId");
         serviceId.appendChild(document.createTextNode(host));
@@ -266,10 +317,6 @@ function ManagePage() {
 	            passphrase_panel.hide();
 	            panel.show();
 	        });
-	        transfer_cancel.addEventListener("click", function() {
-	            transfer_panel.hide();
-	            panel.show();
-	        });
 	        erase_key_button.addEventListener("click", function() {
 	        	panel.hide();        	        	
 	        	eraseask.show();
@@ -291,87 +338,15 @@ function ManagePage() {
 
 	        });
 
-	        transfer_button.addEventListener("click", function() {
-	            transfer_panel.show();
-	            panel.hide();
-	            passphrase2.focus();
-
-	        });
-
-
-	        backup_key_button.addEventListener("click", function() {
-
-	            var pwd = passphrase.value;
-	            if (pwd.length < 8) return;
-
-	            passphrase_panel.hide();
-	            progressbar.show();
-
-	            var key = getKey(host);
-	            extendKey(pwd, progressbar.firstChild, function(pwd) {
-
-	                progressbar.hide();
-	                spinner.show();
-
-	                var wif = new Bitcoin.Address(key.secret);
-	                wif.version = 0x80;
-
-	                var keyfile = {
-	                    wif: wif.toString(),
-	                    hasPwd: key.hasPwd
-	                }
-
-	                var enckey = GibberishAES.enc(JSON.stringify(keyfile), pwd);
-
-	                var url = "backup?c=" + c;
-	                var connection = new XMLHttpRequest();
-	                connection.open("POST", url, true);
-	                connection.onreadystatechange = function(request) {
-	                    if (connection.readyState == 4) {
-	                        spinner.hide();
-	                        if (connection.status == 201) {
-	                            done_sect.show();
-	                        } else {
-	                            failed_sect.show();
-	                        }
-	                    }
-	                }
-	                connection.send(enckey);
-	            });
-	        });
-
-	        transfer_key_button.addEventListener("click", function() {
-
-	            var pwd = passphrase2.value;
-	            if (pwd.length < 8) return;
-
-	            transfer_panel.hide();
-	            progressbar.show();
-
-	            var key = getKey(host);
-	            extendKey(pwd, progressbar.firstChild, function(pwd) {
-
-	                progressbar.hide();
-
-	                var wif = new Bitcoin.Address(key.secret);
-	                wif.version = 0x80;
-
-	                var keyfile = {
-	                    wif: wif.toString(),
-	                    hasPwd: key.hasPwd
-	                }
-
-	                var enckey = GibberishAES.enc(JSON.stringify(keyfile), pwd);
-	                enckey = enckey.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '.').replace(/\n/g, '');
-
-	                var url = getFullUrl("k#" + lang + "," + host + "," + enckey);
-	                var qrcode = new QRCode(qrbox, {
-	                    useSVG: true, correctLevel: 0
-	                });
-	                qrcode.makeCode(url);
-
-	            });
-	        });
+	        backup_download.addEventListener("click", 
+	        		backup_key.bind(this,
+	        				send_key.bind(this,false)));
+	        backup_printqr.addEventListener("click", 
+	        		backup_key.bind(this,
+	        				send_key.bind(this,true)));
+	        backup_showqr.addEventListener("click", 
+	        		backup_key.bind(this,
+	        				show_key.bind(this)));
 	        
         }
 
@@ -413,7 +388,7 @@ function RestorePage() {
     var spinner = getBlockById("spinner");
     var progressbar = getBlockById("progressbar");
     var done_sect = getBlockById("done_sect");
-    var encrypted_key = c.replace(/-/g, '+').replace(/_/g, '/').replace(/\./g, '='); ;
+    var encrypted_key = base64_decodeURIComponent(c);
 
     var init = function() {
         var serviceId = getBlockById("serviceId");

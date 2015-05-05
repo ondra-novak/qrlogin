@@ -67,3 +67,11 @@ var getFullUrl = function(x) {
     challengeUrl = challengeUrl.substr(0, challengeUrl.lastIndexOf("/") + 1) + x;
     return challengeUrl;
 }
+
+function base64_encodeURIComponent(txt) {
+	return txt.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '.').replace(/\n/g, '');
+}
+
+function base64_decodeURIComponent(txt) {
+	return txt.replace(/-/g, '+').replace(/_/g, '/').replace(/\./g, '='); ;
+}
