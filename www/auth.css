@@ -1,29 +1,68 @@
 body {
 	text-align:center;
-	max-width: 400px;
+	max-width: 800px;
 	margin-left:auto;
 	margin-right:auto;
 	font-family: sans-serif;	
 	
 }
 
-h1 img {
-	vertical-align: middle;
-	margin-right: 50px;	
+div.header img.logo {
+	padding: 10px;
+	height: 64px;
+	float:left;
 }
 
-h1 {
-		background-color: #629262;	
-		padding: 10px;
+div.header {
+	background-color: #629262;			
 	margin-bottom: 0;
+	text-align: left;
+	height: 84px;
+	background-image: url("img/qrlogo-sw.png");
+	background-repeat: no-repeat;
+	background-position: 10px 10px;
 }
 
+div.content {
+	position:relative;		
+}
+
+div.serviceInfo {
+	text-align: right;
+	display:table;
+	margin-left: auto;
+	margin-right: 0;
+}
+
+
+#serviceId {
+	font-size:larger;
+	font-weight: bold;
+	display:table-cell;	
+	color: yellow;
+	padding: 5px;
+	height: 74px;
+	vertical-align: middle;
+		background-color: #629262;			
+	
+}
+
+#serviceLogo img {
+	width: 74px;
+	height: 74px;
+	padding: 5px;
+	vertical-align: middle;
+}
+
+#serviceLogo {
+	display:table-cell;
+}
 
 ul.selector {
 	display: table;
 	margin: 0;
 	padding: 0;
-	width: 400px;
+	width: 100%;
 	border-collapse: collapse;
 }
 
@@ -31,26 +70,50 @@ ul.selector li {
 	display: table-cell;
 	margin: 0;
 	padding: 10px;
-	border: 1px solid #CFC;
-	background-color: #EFE;
-	cursor: pointer;
+	border: 1px solid white;
+background: #f6f8f9; /* Old browsers */
+background: -moz-linear-gradient(top,  #f6f8f9 0%, #e5ebee 50%, #d7dee3 51%, #f5f7f9 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f6f8f9), color-stop(50%,#e5ebee), color-stop(51%,#d7dee3), color-stop(100%,#f5f7f9)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #f6f8f9 0%,#e5ebee 50%,#d7dee3 51%,#f5f7f9 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #f6f8f9 0%,#e5ebee 50%,#d7dee3 51%,#f5f7f9 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #f6f8f9 0%,#e5ebee 50%,#d7dee3 51%,#f5f7f9 100%); /* IE10+ */
+background: linear-gradient(to bottom,  #f6f8f9 0%,#e5ebee 50%,#d7dee3 51%,#f5f7f9 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6f8f9', endColorstr='#f5f7f9',GradientType=0 ); /* IE6-9 */
 	
 }
 
 ul.selector li.hl {
-	background-color: #ADA;
-	border: 3px solid #629262;
+background: #8a8f91; /* Old browsers */
+background: -moz-linear-gradient(top,  #8a8f91 0%, #f5f7f9 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#8a8f91), color-stop(100%,#f5f7f9)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #8a8f91 0%,#f5f7f9 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #8a8f91 0%,#f5f7f9 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #8a8f91 0%,#f5f7f9 100%); /* IE10+ */
+background: linear-gradient(to bottom,  #8a8f91 0%,#f5f7f9 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8a8f91', endColorstr='#f5f7f9',GradientType=0 ); /* IE6-9 */
+
 	cursor: default;
 }
 
 
-
+.scanarea {
+	max-width: 400px;	
+	margin:0 auto 0 auto;
+}
 .selectorblock {
-	background-color: #DFD;
-	padding: 10px;	
+	background: #a0d0a0; /* Old browsers */
+background: #ededed; /* Old browsers */
+background: -moz-linear-gradient(top,  #ededed 0%, #f6f6f6 53%, #ffffff 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ededed), color-stop(53%,#f6f6f6), color-stop(100%,#ffffff)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #ededed 0%,#f6f6f6 53%,#ffffff 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #ededed 0%,#f6f6f6 53%,#ffffff 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #ededed 0%,#f6f6f6 53%,#ffffff 100%); /* IE10+ */
+background: linear-gradient(to bottom,  #ededed 0%,#f6f6f6 53%,#ffffff 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
+padding: 10px;	
 }
 .selectorblock > div {
-	height: 380px;
+	max-height: 380px;
 	position:relative;
 }
 
@@ -61,7 +124,6 @@ ul.selector li.hl {
 #langpanel 
 {
 	text-align:right;
-	margin-bottom: 2em;
 }
 
 
@@ -102,4 +164,7 @@ ul.selector li.hl {
 	margin: 10px auto 10px auto;
 }
 
+#qrblock {
+	padding:25px;
+}
 	

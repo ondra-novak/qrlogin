@@ -140,8 +140,10 @@ where <strong>idenity</strong> is unique idenity string for the autentificated u
 <script type="text/javascript">
 
 function doTest() {
-	var redirUrl = location.origin+location.pathname+"?test=1"
-	var qrloginUrl = location.origin+"/auth?redirect_uri="+encodeURIComponent(redirUrl);
+	var redirUrl = location.origin+location.pathname+"?test=1";
+	var logoUrl = location.origin+location.pathname+"img/servicelogo.png";
+	var qrloginUrl = location.origin+"/auth?redirect_uri="+encodeURIComponent(redirUrl)
+			+"&logo="+encodeURIComponent(logoUrl);
 	location.href=qrloginUrl;
 	document.getElementById("waitanim").style.visibility="visible";
 }

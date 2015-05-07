@@ -1,4 +1,4 @@
-function QRLogin(args, lang, qrcodeBox, restoreBox, downloadBox) {
+function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
 	
 //	var qrcodeBox = document.getElementById("qrcode");
 	var curcode = null;
@@ -6,14 +6,20 @@ function QRLogin(args, lang, qrcodeBox, restoreBox, downloadBox) {
 	var useEventSource = false;
 	var connection = null;
 	var eventSource = null;
-	var qrcode = new QRCode(qrcodeBox, {
-	    useSVG: true, correctLevel: 0
-	  });
 	var curmode = false;
 	var restpanel = false;
 	var downloadshown = false;	
 	
-	  
+	var qrcodeBox = controls["qr"];
+	var restoreBox = controls["restore"];
+	var downloadBox = controls["download"];
+	var serviceIdBox = controls["serviceId"];
+	var serviceLogoBox = controls["serviceLogo"];
+
+	var qrcode = new QRCode(qrcodeBox, {
+	    useSVG: true, correctLevel: 0
+	  });
+
 	var fileinput = restoreBox.getElementsByTagName("input")[0];
 
 	function base64EncodeUrl(str){
@@ -32,7 +38,15 @@ function QRLogin(args, lang, qrcodeBox, restoreBox, downloadBox) {
 		
 	} 
 	
-	var apikey = getDomainFromUrl(args.redirect_uri)
+	var apikey = getDomainFromUrl(args.redirect_uri);
+	if (args.logo) {
+		if (getDomainFromUrl(args.logo) == apikey) {
+			var img = document.createElement("img");
+			img.src = args.logo;
+			serviceLogoBox.appendChild(img);
+		}
+	} 
+	serviceIdBox.appendChild(document.createTextNode(apikey));
 
 
 	this.reload = function(manage) {
@@ -277,10 +291,13 @@ function start() {
 	var str_restorebackup = getBlockById("tab_restore");
 	var qrblock = getBlockById("qrblock");
 	var panel = getBlockById("langpanel");
-	var restorePanel = getBlockById("restoreform");
+	var restoreBox = getBlockById("restoreform");
 	var downloadBox = getBlockById("downloadask");
-	
-	window.qrlogin = new QRLogin(querystr, lang, qrblock, restorePanel,downloadBox);
+	var serviceId = getBlockById("serviceId");
+	var serviceLogo = getBlockById("serviceLogo");
+		
+	window.qrlogin = new QRLogin(querystr, lang, 
+			{qr:qrblock, restore:restoreBox,download:downloadBox,serviceId:serviceId,serviceLogo:serviceLogo});
 	window.qrlogin.reload(false);
 		
 	str_login.classList.add("hl");
