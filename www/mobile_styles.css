@@ -30,6 +30,7 @@ div.serviceid
 {
 	padding: 10px 0 10px 0;
 	font-weight:bold;
+	text-shadow: 3px 3px 5px black
 }
 
 label 
