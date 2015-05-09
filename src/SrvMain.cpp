@@ -93,8 +93,9 @@ natural SrvMain::onStartServer(BredyHttpSrv::IHttpMapper& httpMapper) {
 bool SrvMain::registerMonitor(StringA ident, WaitingResponse* response) {
 	Synchronized<FastLock> _(lock);
 	LS_LOG.progress("Registering identity: %1") << ident;
-	monRegs.replace(ident,response);
-	return true;
+	bool exists;
+	monRegs.insert(ident,response,&exists);
+	return !exists;
 }
 
 bool SrvMain::acceptLogin(StringA ident, StringA response, natural timestamp) {
