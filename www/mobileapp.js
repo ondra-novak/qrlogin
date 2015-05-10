@@ -39,20 +39,14 @@ function SignPage() {
     var spinner = getBlockById("spinner");
     var delivered_sect = getBlockById("delivered_sect");
     var failed_sect = getBlockById("failed_sect");
+    var chkdomain = getBlockById("checkdomain");
 
+    var attempt = localStorage.attempts ? JSON.parse(localStorage.attempts) : 0;
 
-
-
-    function showPwd(create) {
+    function showPwdForm() {
         password_form.show();
-        if (create)
-            create_button.show();
-        else
-            accept_button.show();
         password_input.focus();
-        if (password_input.prompt) password_input.prompt();
-        else password_input.click();
-  
+        if (password_input.prompt) password_input.prompt();        
     }
 
     function init() {
@@ -66,13 +60,15 @@ function SignPage() {
         //key exist?
         if (keyinfo) {
 
-            if (keyinfo.hasPwd) {
-                showPwd(false);
-            } else {
-                setTimeout(signAndPushRequest, 1);
+            if (keyinfo.hasPwd) showPwdForm();            
+            setTimeout(accept_button.show.bind(accept_button), 1000);
+            if (Math.sqrt(attempt) == Math.floor(Math.sqrt(attempt))) {
+                chkdomain.show();
             }
+            attempt++;
         } else {
-            showPwd(true);
+        showPwdForm();
+            create_button.show();
         }
         accept_button.addEventListener("click",signAndPushRequest);
         create_button.addEventListener("click",createKey);
@@ -87,6 +83,7 @@ function SignPage() {
         password_form.hide();
         create_button.hide();
         accept_button.hide();
+        chkdomain.hide();
         spinner.show();
         setTimeout(signAndPushRequest2, 10);
     }
@@ -136,14 +133,15 @@ function SignPage() {
         var connection = new XMLHttpRequest();	
 		connection.open("GET",url,true);
 		connection.onreadystatechange = function(request) {
-            if (connection.readyState == 4 ) {
-            	spinner.hide();
-                if (connection.status == 200) {
-                	delivered_sect.show();
-                } else {
-                	failed_sect.show();
-                }
-            }
+		    if (connection.readyState == 4) {
+		        spinner.hide();
+		        if (connection.status == 200) {
+		            delivered_sect.show();
+		            localStorage.attempts = JSON.stringify(attempt);
+		        } else {
+		            failed_sect.show();
+		        }
+		    }
 		}
 		connection.send();
 

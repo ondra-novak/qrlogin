@@ -14,6 +14,7 @@
     "chn_createbutton":"Create identity",
     "chn_delivered":"Succesfuly delivered",
     "chn_failed":"Failed to deliver, please try again",
+    "chn_checkdomain":"Always check the domain before the approval!",
     "man_noprofile":"There is no identity created for the current site",
     "man_backup_button":"Backup the key",
     "man_enablepwd_button":"Enable ask for password",

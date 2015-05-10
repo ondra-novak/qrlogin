@@ -160,3 +160,56 @@ label.always_blank
 	margin: 0px auto 0px auto;
 	height: 300px;
 }
+
+#checkdomain 
+{
+	display:none;
+}
+#checkdomain > div 
+{	
+	width: 128px;
+	height: 10;
+	margin-left: auto;
+	margin-right: auto;
+	background-image:url(img/wred.png);
+	position: relative;
+
+    -webkit-animation-name: warnanim;
+    -webkit-animation-duration: 0.5s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+
+    -moz-animation-name: warnanim;
+    -moz-animation-duration: 0.5s;
+    -moz-animation-timing-function: linear;
+    -moz-animation-iteration-count: infinite;
+
+    animation-name: warnanim;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+ }
+    
+ @-moz-keyframes warnanim {  
+    0% { top: 10px; }
+    50% { top: 0; }
+    100% {top: 10px; }
+}
+
+@-webkit-keyframes warnanim {  
+    0% { top: 10px; }
+    50% { top: 0; }
+    100% { top: 10px; }
+}
+
+@keyframes warnanim {  
+    0% { top: 10px; }
+    50% { top: 0; }
+    100% { top: 10px;}
+}
+
+#checkdomain > p 
+{
+	color: #F00;
+	font-style:italic;
+} 

@@ -14,6 +14,7 @@
     "chn_createbutton":"Vytvořit novou identitu",
     "chn_delivered":"Úspěšně doručeno",
     "chn_failed":"Nepodařilo se doručit, zkuste to znovu",
+    "chn_checkdomain":"Vždycky zkontrolujte doménu!",
     "man_noprofile":"Pro tuto stránku nebyla nalezena žádná identita",
     "man_backup_button":"Záloha klíče",
     "man_enablepwd_button":"Povolit dotaz na heslo",
