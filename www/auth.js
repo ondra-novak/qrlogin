@@ -13,8 +13,6 @@ function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
 	var qrcodeBox = controls["qr"];
 	var restoreBox = controls["restore"];
 	var downloadBox = controls["download"];
-	var serviceIdBox = controls["serviceId"];
-	var serviceLogoBox = controls["serviceLogo"];
 
 	var qrcode = new QRCode(qrcodeBox, {
 	    useSVG: true, correctLevel: 0
@@ -39,15 +37,7 @@ function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
 	} 
 	
 	var apikey = getDomainFromUrl(args.redirect_uri);
-	if (args.logo) {
-		if (getDomainFromUrl(args.logo) == apikey) {
-			var img = document.createElement("img");
-			img.src = args.logo;
-			serviceLogoBox.appendChild(img);
-		}
-	} 
-	serviceIdBox.appendChild(document.createTextNode(apikey));
-
+	
 
 	this.reload = function(manage) {
 	    curmode = manage;
@@ -293,11 +283,10 @@ function start() {
 	var panel = getBlockById("langpanel");
 	var restoreBox = getBlockById("restoreform");
 	var downloadBox = getBlockById("downloadask");
-	var serviceId = getBlockById("serviceId");
-	var serviceLogo = getBlockById("serviceLogo");
+
 		
 	window.qrlogin = new QRLogin(querystr, lang, 
-			{qr:qrblock, restore:restoreBox,download:downloadBox,serviceId:serviceId,serviceLogo:serviceLogo});
+			{qr:qrblock, restore:restoreBox,download:downloadBox});
 	window.qrlogin.reload(false);
 		
 	str_login.classList.add("hl");
