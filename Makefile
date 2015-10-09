@@ -13,7 +13,7 @@ LIBMAKE=libs/lightspeed/liblightspeed.a libs/jsonrpcserver/libjsonrpcserver.a
 
 all: $(APPNAME)
 
-include $(shell find -name .sources.mk)
+include $(shell find src -name .sources.mk)
 
 ifeq "$(MAKECMDGOALS)" "debug"
 	CXXFLAGS += -O0 -g3 -fPIC -Wall -Wextra -DDEBUG -D_DEBUG $(INCLUDES)
