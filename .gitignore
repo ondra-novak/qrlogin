@@ -34,7 +34,6 @@ log/rpclogfile
 /Build/
 /.deps/
 /bin/
-Makefile
 Makefile.in
 configure
 /autom4te.cache/
