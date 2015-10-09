@@ -11,7 +11,7 @@ LIBS= -ljsonrpcserver -llightspeed -lssl -lcrypto -lpthread
 LIBMAKE=libs/lightspeed/liblightspeed.a libs/jsonrpcserver/libjsonrpcserver.a
 
 
-all: $(APPNAME)
+all: bin/$(APPNAME)
 
 include $(shell find src -name .sources.mk)
 
@@ -33,7 +33,7 @@ clean_list += $(OBJS)  ${DEPS} $(APPNAME) cfg.debug cfg.release
 
 .PHONY: debug all clean compilelibs 
 
-debug: $(APPNAME) 
+debug: bin/$(APPNAME) 
 
 .INTERMEDIATE : deprun
 
@@ -57,8 +57,9 @@ $(CFGNAME):
 	@echo $(*F).cpp  
 	@$(CXX) $(CXXFLAGS) -o $@ -c $*.cpp
 
-$(APPNAME): $(OBJS) $(LIBMAKE)
+bin/$(APPNAME): $(OBJS) $(LIBMAKE)
 	@echo "Creating executable $@ ..."		
+	@mkdir -p bin
 	@$(CXX) $(CXXFLAGS) -o $@ $(LIBPATHS) $(OBJS) $(LIBS) 
 	
 print-%  : ; @echo "$* = $($*)"
