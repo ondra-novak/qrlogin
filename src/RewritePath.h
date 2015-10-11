@@ -20,7 +20,7 @@ public:
 	RewritePath(StringA targetPath, bool appendVPath = false);
 
 	virtual natural onRequest(IHttpRequest &request, ConstStrA vpath);
-	virtual natural onData(IHttpRequest &request) {return 0;}
+	virtual natural onData(IHttpRequest &) {return 0;}
 
 
 protected:

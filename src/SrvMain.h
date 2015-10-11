@@ -39,7 +39,7 @@ public:
 	public:
 		Response(SrvMain &owner):owner(owner) {}
 		virtual natural onRequest(IHttpRequest &request, ConstStrA vpath);
-		virtual natural onData(IHttpRequest &request) {return 0;}
+		virtual natural onData(IHttpRequest &) {return 0;}
 		SrvMain &owner;
 	};
 
@@ -47,7 +47,7 @@ public:
 	public:
 		LoginMonitor(SrvMain &owner):owner(owner) {}
 		virtual natural onRequest(IHttpRequest &request, ConstStrA vpath);
-		virtual natural onData(IHttpRequest &request) {return 0;}
+		virtual natural onData(IHttpRequest &) {return 0;}
 		SrvMain &owner;
 	};
 
@@ -72,7 +72,7 @@ public:
 		SrvMain &owner;
 
 		virtual natural onRequest(IHttpRequest &request, ConstStrA vpath);
-		virtual natural onData(IHttpRequest &request) {return 0;}
+		virtual natural onData(IHttpRequest &) {return 0;}
 	};
 
 	class GetIdentity: public IHttpHandler {
@@ -81,7 +81,7 @@ public:
 		SrvMain &owner;
 
 		virtual natural onRequest(IHttpRequest &request, ConstStrA vpath);
-		virtual natural onData(IHttpRequest &request) {return 0;}
+		virtual natural onData(IHttpRequest &) {return 0;}
 	};
 
 	class Backup: public IHttpHandler {
@@ -90,7 +90,7 @@ public:
 		Backup(SrvMain &owner):owner(owner) {}
 
 		virtual natural onRequest(IHttpRequest &request, ConstStrA vpath);
-		virtual natural onData(IHttpRequest &request) {return 0;}
+		virtual natural onData(IHttpRequest &) {return 0;}
 	};
 
 

@@ -51,7 +51,7 @@ SrvMain::SrvMain()
 
 }
 
-natural SrvMain::onInitServer(const Args& args, SeqFileOutput serr,
+natural SrvMain::onInitServer(const Args& , SeqFileOutput ,
 		const IniConfig& config) {
 
 	FilePath root (getAppPathname());
@@ -84,7 +84,7 @@ natural SrvMain::onStartServer(BredyHttpSrv::IHttpMapper& httpMapper) {
 	httpMapper.addSite("/k",&restoreKey);
 
 	IJobScheduler &scheduler = httpMapper.getIfc<IJobScheduler>();
-	scheduler.schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,&scheduler),30,ThreadMode::schedulerThread);
+	scheduler.schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,&scheduler),30);
 
 	return 0;
 }
@@ -338,7 +338,7 @@ void SrvMain::shiftBanksIfNeeded() {
 void SrvMain::scheduledPing(IJobScheduler* scheduler) {
 	pingActive();
 	shiftBanksIfNeeded();
-	scheduler->schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,scheduler),30,ThreadMode::schedulerThread);
+	scheduler->schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,scheduler),30);
 }
 
 bool SrvMain::receiveBackup( StringA chanId, StringA content, bool restore )
@@ -369,7 +369,7 @@ static natural sendOAuth2Error(IHttpRequest &request, ConstStrA error) {
 
 }
 
-natural SrvMain::Verify::onRequest(IHttpRequest& request, ConstStrA vpath) {
+natural SrvMain::Verify::onRequest(IHttpRequest& request, ConstStrA ) {
 
 	StringA code;
 	StringA apikey;
@@ -424,7 +424,7 @@ natural SrvMain::Verify::onRequest(IHttpRequest& request, ConstStrA vpath) {
 	return 0;
 }
 
-natural SrvMain::GetIdentity::onRequest(IHttpRequest& request,ConstStrA vpath) {
+natural SrvMain::GetIdentity::onRequest(IHttpRequest& request,ConstStrA ) {
 	HeaderValue auth = request.getHeaderField(IHttpRequest::fldAuthorization);
 	TextParser<char, SmallAlloc<256> > parser;
 	if (!parser(" Bearer %1 ",auth)) return stForbidden;
