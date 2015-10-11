@@ -22,36 +22,40 @@ endif
 
 ifeq "$(MAKECMDGOALS)" "debug"
 CXXFLAGS += -O0 -g3 -fPIC -Wall -Wextra -DDEBUG -D_DEBUG $(INCLUDES)
-CFGNAME := cfg.debug
+CFGNAME := tmp/cfg.debug
 -include $(CFGNAME)	
 else 
 CXXFLAGS += -O3 -g3 -fPIC -Wall -Wextra -DNDEBUG $(INCLUDES)
-CFGNAME := cfg.release
+CFGNAME := tmp/cfg.release
 ifeq "$(MAKECMDGOALS)" "all"
 -include $(CFGNAME)	
 endif
 endif
 
 
-OBJS += ${CPP_SRCS:.cpp=.o}
-DEPS := ${CPP_SRCS:.cpp=.deps}
+ROOT_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+OBJS += $(patsubst %,tmp/%,${CPP_SRCS:.cpp=.o})
+DEPS := $(patsubst %,tmp/%,${CPP_SRCS:.cpp=.deps})
 clean_list += $(OBJS)  ${DEPS} $(TARGETFILE) cfg.debug cfg.release $(CONFIG)
 
 
 .PHONY: debug all debug clean force-rebuild deps
 
 force-rebuild: 
-	@rm -f cfg.debug cfg.release $(TARGETFILE)
+	@echo $(PROGRESSPREFIX): Requested rebuild
+	@rm -f tmp/cfg.debug tmp/cfg.release $(TARGETFILE)
 
 $(CFGNAME):
 	@for X in $(NEEDLIBS); do $(MAKE) -C $$X force-rebuild; done
-	@rm -f cfg.debug cfg.release
+	@rm -f tmp/cfg.debug tmp/cfg.release
+	@mkdir -p tmp
 	@touch $@	
 	@echo $(PROGRESSPREFIX): Forced rebuild for CXXFLAGS=$(CXXFLAGS)
 
 
-%.o: %.cpp  $(CONFIG) $(CFGNAME)
+tmp/%.o: %.cpp  $(CONFIG) $(CFGNAME)
 	@set -e
+	@mkdir -p $(@D) 
 	@echo $(PROGRESSPREFIX): $(*F).cpp  
-	@$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $*.cpp -MMD -MF $*.deps
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ -c $*.cpp -MMD -MF tmp/$*.deps
 
