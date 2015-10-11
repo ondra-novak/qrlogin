@@ -33,28 +33,28 @@ deps: ${LIBDEPS}
 .ONESHELL: $(LIBDEPS) $(LIBFULLNAME)
 
 define genlibdeps
-	@set -e	
-	echo "$(LIBNAME): Updating library dependencies... "	
-	(		
-		echo "LDFLAGS+=-L$$PWD"
-		echo "LDLIBS:=-l$(LIBNAME) \$$(LDLIBS)"
-		echo "LIBPATHS+=$$PWD/$(LIBFULLNAME)" 
-		echo "INCLUDES+= -I$$PWD/$(LIBINCLUDES)" 
-		echo -n "$$PWD/$(LIBFULLNAME) : " 
-		@PWD=`pwd`;find $$PWD "(" -name "*.h" -or -name "*.tcc" ")" -and -printf "\\\\\\n\\t%p" 
-		for K in $(abspath $(CPP_SRCS)); do echo -n "\\\\\\n\\t $$K"; done
-		echo " \$$(CFGNAME)"
-		echo -n "\\t@flock $$PWD -c \"\$$(MAKE) -C $$PWD \$$(MAKECMDGOALS)\" \\n" 
-		echo "$$PWD/$(LIBFULLNAME).clean :"
-		echo -n "\\t@flock $$PWD -c \"\$$(MAKE) -C $$PWD clean\" \\n" 
-	) > $(LIBDEPS);	
+	set -e;\
+	echo "$(LIBNAME): Updating library dependencies... ";\
+	(\
+		echo "LDFLAGS+=-L$$PWD";\
+		echo "LDLIBS:=-l$(LIBNAME) \$$(LDLIBS)";\
+		echo "LIBPATHS+=$$PWD/$(LIBFULLNAME)";\
+		echo "INCLUDES+= -I$$PWD/$(LIBINCLUDES)" ;\
+		echo -n "$$PWD/$(LIBFULLNAME) : " ;\
+		PWD=`pwd`;find $$PWD "(" -name "*.h" -or -name "*.tcc" ")" -and -printf "\\\\\\n\\t%p" ;\
+		for K in $(abspath $(CPP_SRCS)); do echo -n "\\\\\\n\\t $$K"; done;\
+		echo " \$$(CFGNAME)";\
+		echo -n "\\t@flock $$PWD -c \"\$$(MAKE) -C $$PWD \$$(MAKECMDGOALS)\" \\n" ;\
+		echo "$$PWD/$(LIBFULLNAME).clean :";\
+		echo -n "\\t@flock $$PWD -c \"\$$(MAKE) -C $$PWD clean\" \\n" ;\
+	) > $(LIBDEPS) 
 endef
 
 $(LIBDEPS): $(CONFIG)
-	$(genlibdeps)
+	@$(genlibdeps)
 
 $(LIBFULLNAME): $(OBJS) $(LIBDEPS) 
-	$(genlibdeps)
+	@$(genlibdeps)
 	@echo "$(LIBNAME): Creating library ..."		
 	@$(AR) -r $@ $(OBJS)
 	
