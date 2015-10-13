@@ -5,7 +5,7 @@
 # CONFIG - optional name of configuration file. You can define rule to create this file
 # NEEDLIBS - list of libraries (path to lib root) that is needed by this library. They need to  
 #             implement same make-interface and generate ldeps.mk 
-# 
+# DONTREBUILDLIBS - if "1", force rebuild will not rebuild depend libraries
 #
 # goals
 #
@@ -53,10 +53,11 @@ endef
 $(LIBDEPS): $(CONFIG)
 	@$(genlibdeps)
 
-$(LIBFULLNAME): $(OBJS) $(LIBDEPS) 
+$(LIBFULLNAME): $(OBJS) $(LIBDEPS)
 	@$(genlibdeps)
 	@echo "$(LIBNAME): Creating library ..."		
 	@$(AR) -r $@ $(OBJS)
+	@touch tmp/stamp
 	
 clean: 
 	@echo $(LIBNAME): cleaning 

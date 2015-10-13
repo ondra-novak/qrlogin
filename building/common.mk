@@ -13,13 +13,6 @@ include $(shell find $(SOURCES) -name .sources.mk)
 libdeps%.mk:
 	flock $(@D) -c "$(MAKE) -C $(@D) deps"
 
-
-ifneq "$(MAKECMDGOALS)" "clean"
-NEEDLIBSDEPS=$(addsuffix /libdeps.mk,$(NEEDLIBS))
-include  $(NEEDLIBSDEPS)
-endif
-
-
 ifeq "$(MAKECMDGOALS)" "debug"
 CXXFLAGS += -O0 -g3 -fPIC -Wall -Wextra -DDEBUG -D_DEBUG $(INCLUDES)
 CFGNAME := tmp/cfg.debug
@@ -33,20 +26,26 @@ endif
 endif
 
 
+ifneq "$(MAKECMDGOALS)" "clean"
+NEEDLIBSDEPS=$(addsuffix /libdeps.mk,$(NEEDLIBS))
+include  $(NEEDLIBSDEPS)
+endif
+
+
+
+
 ROOT_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 OBJS += $(patsubst %,tmp/%,${CPP_SRCS:.cpp=.o})
 DEPS := $(patsubst %,tmp/%,${CPP_SRCS:.cpp=.deps})
-clean_list += $(OBJS)  ${DEPS} $(TARGETFILE) cfg.debug cfg.release $(CONFIG)
+clean_list += $(OBJS)  ${DEPS} $(TARGETFILE) tmp/cfg.debug tmp/cfg.release $(CONFIG) 
 
-
-.PHONY: debug all debug clean force-rebuild deps
+.PHONY: debug all debug clean force-rebuild deps 
 
 force-rebuild: 
 	@echo $(PROGRESSPREFIX): Requested rebuild
 	@rm -f tmp/cfg.debug tmp/cfg.release $(TARGETFILE)
-
+	
 $(CFGNAME):
-	@for X in $(NEEDLIBS); do $(MAKE) -C $$X force-rebuild; done
 	@rm -f tmp/cfg.debug tmp/cfg.release
 	@mkdir -p tmp
 	@touch $@	
