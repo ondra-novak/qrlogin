@@ -65,6 +65,7 @@ div.page h2 {
 	text-align: center;
 	padding: 20px;
 	font-size: larger;
+	position:relative;
 }
 
 .testwindow input {
@@ -167,3 +168,44 @@ dd {
 img {
 	border: 0;
 }
+
+#qrwin iframe {
+	border: 0;
+	opacity:1;
+	display:block;
+	margin-left: auto;
+	margin-right:auto;
+}
+
+#qrwin .lightboxwnd {
+	width: 500px;
+	height: 650px;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-left: -250px;
+	margin-top: -300px;
+	text-align:center;
+	background-color:white;
+	border: 1px solid;
+	box-shadow:rgba(0,0,0,0.2) 5px 5px;
+	padding: 10px;
+
+}
+
+#qrwin {
+	display: none;
+	width: 100vw;
+	height: 100vh;
+	left: 0;
+	top: 0;
+	position: fixed;
+}
+
+	#qrwin .lightboxbg {
+	opacity: 0.4;
+	width: 100vw;
+	height: 100vh;
+		background-color: #000;
+		position:absolute;
+	}

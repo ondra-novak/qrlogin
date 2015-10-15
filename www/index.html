@@ -43,11 +43,17 @@
 <div class="page" id="testit">
 <h2>Test it now!</h2>
 <div class="testwindow">
+    <div id="qrwin">
+        <div class="lightboxbg"></div>
+        <div class="lightboxwnd">
+            <iframe id="qriframe" width="450" height="600"></iframe>
+            <button id="closebutt">Close</button>
+        </div>
+    </div>
 <button id="testbutton" onclick="doTest();">Click button to uncover your ID on this site</button>
 <p>Your ID will appear below</p>
 <div class="waitanim" id="waitanim"><div></div></div>
 <input id="IDtarget" type="text">
-
 </div>
 </div>
 <div class="page" id="addsite">
@@ -140,12 +146,12 @@ where <strong>idenity</strong> is unique idenity string for the autentificated u
 <script type="text/javascript">
 
 function doTest() {
-	var redirUrl = location.origin+location.pathname+"?test=1";
-	var logoUrl = location.origin+location.pathname+"img/servicelogo.png";
-	var qrloginUrl = location.origin+"/auth?redirect_uri="+encodeURIComponent(redirUrl)
-			+"&logo="+encodeURIComponent(logoUrl);
-	location.href=qrloginUrl;
-	document.getElementById("waitanim").style.visibility="visible";
+    var redirUrl = location.origin + location.pathname;
+    var qrloginUrl = location.origin+"/auth#?redirect_uri="+encodeURIComponent(redirUrl)+"&js=true&rnd="+Math.random();
+    var box = document.getElementById("qrwin");
+    var iframe = document.getElementById("qriframe");
+    iframe.src = qrloginUrl;
+	box.style.display = "block";
 }
 
 function processResponse(response) {
@@ -208,6 +214,21 @@ var qs = getQueryString(location.search);
 if (qs.test) validateToken(qs.code);
 putUrl();
 
+window.addEventListener("hashchange", function () {
+    if (location.hash.substr(0, 7) == "#?code=") {
+        document.getElementById("waitanim").style.visibility = "visible";
+        var query = location.hash.substr(1);
+        var qs = getQueryString(query);;
+        validateToken(qs.code);
+        var box = document.getElementById("qrwin");
+        box.style.display = "none";
+
+
+    }
+})
+document.getElementById("closebutt").addEventListener("click", function () {
+    document.getElementById("qrwin").style.display = "none";
+});
 
 </script>
 </body>
