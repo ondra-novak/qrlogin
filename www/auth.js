@@ -1,4 +1,4 @@
-function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
+function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	
 //	var qrcodeBox = document.getElementById("qrcode");
 	var curcode = null;
@@ -9,8 +9,9 @@ function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
 	var curmode = false;
 	var restpanel = false;
 	var downloadshown = false;
-	var jsredir = false;
-	
+	var args = argss;
+	var closeIFrameButt = function () { };
+
 	var qrcodeBox = controls["qr"];
 	var restoreBox = controls["restore"];
 	var downloadBox = controls["download"];
@@ -37,13 +38,15 @@ function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
 		
 	} 
 	
-	var apikey = getDomainFromUrl(args.redirect_uri);
+	var apikey = null;
 	
-
 	this.reload = function(manage) {
+	    apikey = getDomainFromUrl(args.redirect_uri);
 	    curmode = manage;
 	    restoreBox.hide(); restpanel = false;
 	    downloadBox.hide(); downloadshown = false;
+	    closeIFrameButt();
+	    qrcodeBox.style.visibility = "visible";
 
 	    var bytes = secureRandom(20);
 	    curcode = base64EncodeUrl(Crypto.util.bytesToBase64(bytes));
@@ -88,36 +91,37 @@ function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
 	    qrcode.makeCode(challengeUrl)
 	}
 	
-	
+
 	qrcodeBox.addEventListener("click",function() {	
 
-		var target = qrcodeBox.parentElement;
-		target.style.position="relative";
-		var iframe = document.createElement("IFRAME");
-		iframe.style.width="100%";
-		iframe.style.height="100%";
-		iframe.style.border="0";
-		iframe.style.position="absolute";
-		iframe.style.backgroundColor="white";
-		iframe.style.left="0";
-		iframe.style.top="0";
-		iframe.src=challengeUrl;
-		target.appendChild(iframe);
-		var xbutton = document.createElement("BUTTON");
-		xbutton.style.width="20px";
-		xbutton.style.height="20px";
-		xbutton.style.border="0";
-		xbutton.appendChild(document.createTextNode("X"));
-		xbutton.style.position="absolute";
-		xbutton.style.top="5px";
-		xbutton.style.right="5px";
-		target.appendChild(xbutton);
-		xbutton.addEventListener("click",function() {
-			iframe.parentElement.removeChild(iframe);
-			xbutton.parentElement.removeChild(xbutton);
-		})
-	})
-
+	    var target = qrcodeBox.parentElement;
+	    target.style.position="relative";
+	    var iframe = document.createElement("IFRAME");
+	    iframe.style.width="100%";
+	    iframe.style.height="100%";
+	    iframe.style.border="0";
+	    iframe.style.position="absolute";
+	    iframe.style.backgroundColor="white";
+	    iframe.style.left="0";
+	    iframe.style.top="0";
+	    iframe.src=challengeUrl;
+	    target.appendChild(iframe);
+	    var xbutton = document.createElement("BUTTON");
+	    xbutton.style.width="20px";
+	    xbutton.style.height="20px";
+	    xbutton.style.border="0";
+	    xbutton.appendChild(document.createTextNode("X"));
+	    xbutton.style.position="absolute";
+	    xbutton.style.top="5px";
+	    xbutton.style.right="5px";
+	    target.appendChild(xbutton);
+	    closeIFrameButt = function() {
+	        iframe.parentElement.removeChild(iframe);
+	        xbutton.parentElement.removeChild(xbutton);
+	        closeIFrameButt = function () { };
+	    };
+	    xbutton.addEventListener("click", closeIFrameButt);
+	});
 
     
 
@@ -170,7 +174,7 @@ function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
 
 	    } else {
 	        redir = args.redirect_uri;
-	        if (jsredir) {
+	        if (args.js) {
 	            redir = redir + "#?";
 	        } else {
 	            var qmark = redir.indexOf('?');
@@ -192,10 +196,15 @@ function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
 	    else if (restpanel) restoreBox.show();
 	}
 
+	this.setNewArgs = function(argss) {
+	    args = argss;
+	}
+
 	this.restoreBackup = function() {
 	    var target = qrcodeBox.parentElement;
 	    target.style.position = "relative";
 	    target.appendChild(restoreBox);
+	    closeIFrameButt();
 	    restoreBox.show();
 	    fileinput.classList.remove("error");
 	    restpanel = true;
@@ -234,9 +243,8 @@ function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
 	    }
 	}
 
-	this.enableJSRedir = function (e) {
-	    jsredir = e;
-	}
+
+
 	
 	init.call(this);
 }
@@ -272,56 +280,83 @@ function LangPanel(panel,curlang, qrlogin) {
             
         }
     }
+    this.setLang = function(l) {
+        lang = l;
+        drawPanel();        
+        localStorage["default_lang"] = lang;
+    }    
+
     drawPanel();
 }
 
-function start() {
-	
-	var querystr = getQueryString(location.search);
-	var lang = querystr["lang"];
-	if (!lang) {
-	    if (localStorage) lang = localStorage["default_lang"];
-	    if (!lang)
-		    lang = "en";
-	}
-	loadLang(lang);
-	var js = querystr["js"];
-	if (!js) js = false;
-	
-	var str_login = getBlockById("tab_login");
-	var str_manage = getBlockById("tab_manage");
-	var str_restorebackup = getBlockById("tab_restore");
-	var qrblock = getBlockById("qrblock");
-	var panel = getBlockById("langpanel");
-	var restoreBox = getBlockById("restoreform");
-	var downloadBox = getBlockById("downloadask");
+function initObjects() {
+    var querystr = location.hash.substr(0, 2) == "#?" ? getQueryString(location.hash.substr(1)) : getQueryString(location.search);
+    var lang = querystr["lang"];
+    if (!lang) {
+        if (localStorage) lang = localStorage["default_lang"];
+        if (!lang)
+            lang = "en";
+    }
+    loadLang(lang);
 
-		
-	window.qrlogin = new QRLogin(querystr, lang, 
-			{qr:qrblock, restore:restoreBox,download:downloadBox});
-	window.qrlogin.reload(false);
-	window.qrlogin.enableJSRedir(js);
-		
-	str_login.classList.add("hl");
-	str_login.addEventListener("click",function() {
-		str_login.classList.add("hl");
-		str_manage.classList.remove("hl");
-		str_restorebackup.classList.remove("hl");		
-		qrlogin.reload(false);
-	});
-	str_manage.addEventListener("click",function() {
-		str_manage.classList.add("hl");
-		str_login.classList.remove("hl");
-		str_restorebackup.classList.remove("hl");
-		qrlogin.reload(true);
-	});
-	str_restorebackup.addEventListener("click",function() {
-		str_login.classList.remove("hl");
-		str_manage.classList.remove("hl");
-		str_restorebackup.classList.add("hl");		
-		qrlogin.restoreBackup();
-	});
-	
-	var langpanel = new LangPanel(panel,lang,qrlogin);
-	
+    var qrblock = getBlockById("qrblock");
+    var panel = getBlockById("langpanel");
+    var restoreBox = getBlockById("restoreform");
+    var downloadBox = getBlockById("downloadask");
+
+    window.qrlogin = new QRLogin(querystr, lang,
+			{ qr: qrblock, restore: restoreBox, download: downloadBox });
+    window.qrlogin.reload(false);
+
+    window.langpanel = new LangPanel(panel, lang, qrlogin);
+    window.selector = new Selector([
+        getBlockById("tab_login"),
+        getBlockById("tab_manage"),
+        getBlockById("tab_restore")], [
+            function () { window.qrlogin.reload(false); },
+            function () { window.qrlogin.reload(true); },
+            function () { qrlogin.restoreBackup();; }
+        ]);
+    window.selector.select(0);
+
 }
+
+
+var Selector = function (switches, actions) {
+
+
+
+    this.select = function (v1) {
+        for (var i = 0; i < switches.length; i++) {
+            if (i == v1) switches[i].classList.add("hl");
+            else switches[i].classList.remove("hl");
+        }
+    }
+    for (var i = 0; i < switches.length; i++) {
+        var fn = function (v) {
+            this.select(v);
+            actions[v]();
+        }.bind(this, i);
+        switches[i].addEventListener("click", fn);
+    }
+
+};
+
+
+function start() {
+    initObjects();	    
+}
+
+window.addEventListener("hashchange", function () {
+    if (location.hash.substr(0, 2) == "#?") {
+        var querystr = location.hash.substr(0, 2) == "#?" ? getQueryString(location.hash.substr(1)) : getQueryString(location.search);
+        var lang = querystr["lang"];
+        if (lang) {
+            window.langpanel.setLang(lang);
+            loadLang(lang);
+        }
+        window.qrlogin.setNewArgs(querystr);
+        window.qrlogin.reload(false);
+        window.selector.select(0);
+    }
+});
