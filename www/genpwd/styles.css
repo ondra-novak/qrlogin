@@ -1,0 +1,13 @@
+BODY
+{
+}
+
+.qrwindow iframe {
+	width: 450px;
+	height: 600px;
+	border: 0;
+}
+
+.qrwindow {
+	text-align: center;
+}

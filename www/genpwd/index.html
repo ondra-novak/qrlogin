@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" Content="Microsoft Visual Studio">
+<TITLE></TITLE>
+    <link type="text/css" rel="stylesheet" href="styles.css">
+</HEAD>
+<BODY>
+<script type="text/javascript" src="libs/common.js"></script>
+<script type="text/javascript" src="libs/bitcoinjs-min.js"></script>
+<script type="text/javascript" src="libs/bitcoinsig.js"></script>
+<div class="pwdarea">
+<label>Secret password</label>
+<input type="password" id="pwd">
+    <div class="qrwindow" id="qrwindow">
+        <iframe src="http://192.168.100.51:14526/auth?redirect_uri=http://localhost:14526/genpwd/index.html&amp;js=true"></iframe>
+        </iframe>
+    </div>
+</div>
+<div id="pwdgen" style="display:none">
+    <label>Domain</label>
+    <input type="text" id="domain" />
+    <label class="checkbox"><input type="checkbox" id="moresecure" /> Change password monthly</label>
+    <label>Generated passwords</label>
+    <div id="genpwds"></div>
+</div>
+
+
+<script type="text/javascript">
+    function getIdentity(code) {
+        var a = code.split(':');
+        var timestamp = parseInt(a[1], 16);
+        var nowtm = Date.now() / 1000 | 0;
+        if (nowtm - timestamp > 300 || timestamp - nowtm > 300) {
+            alert("Máte špatnì hodiny buï mobilu, nebo v poèítaèi, nebo se použil nìjaký starý podpis. Zkuste to znova");
+            return;
+        }
+        var msg = "login to "+location.host+", challenge is " + a[2] + ", timestamp " + timestamp;
+        var ident = verify_message(a[0], msg);
+        return ident;
+    }
+
+    window.addEventListener("hashchange", function () {
+        
+        var hash = location.hash;
+        if (hash.substr(0, 7) == "#?code=") {
+            var query = hash.substr(1);
+            var querydata = getQueryString(query);
+            var block = getBlockById("qrwindow");
+            block.hide();
+            var ident = getIdentity(decodeURIComponent(querydata["code"]));
+            var field = document.getElementById("pwd");
+            field.value = ident;
+            var block2 = getBlockById("pwdgen");
+            block2.show();
+            document.getElementById("domain").focus();
+            updatePasswords();
+        }
+
+    }, false);
+
+    var smallcaps = "abcdefghijkmnopqrstovwxyz";
+    var bigcaps = "ACDEFGHIJKLMNPQRTUVWXYZ";
+    var numbers = "12345679";
+    var symbols = "-:!@#%*()+/~";
+    var allchars = smallcaps+bigcaps+symbols+numbers;
+
+    function addTipping(pwd, rndbyte, charset) {
+        var idx = rndbyte % pwd.length;
+        return pwd.substr(0, idx) + charset[rndbyte % charset.length] + pwd.substr(idx + 1);
+    }
+    
+    function genPassword(adjsecret) {
+        var data = Crypto.SHA256("xxxx" + Crypto.SHA256(adjsecret) + "xxxx", { asBytes: true });
+        var result = "";
+        var i;
+        var hasnumber = false;
+        var hassymbol = false;
+        var hascap = false;
+        var hassmall = false;
+        for (i = 0; i < 20; i++) {
+            var idx = data[i] % allchars.length;
+            var c = allchars[idx];
+            result += c;
+            if (c >= 'a' && c <= 'z') hassmall = true;
+            else if (c >= 'A' && c <= 'Z') hascap = true;
+            else if (c >= '0' && c <= '9') hasnumber = true;
+            else hassymbol = true;
+        }
+        if (!hasnumber) result = addTipping(result, data[21], numbers);
+        if (!hassymbol) result = addTipping(result, data[22], symbols);
+        if (!hascap) result = addTipping(result, data[23], bigcaps);
+        if (!hassmall) result = addTipping(result, data[24], smallcaps);
+        return result;
+    }
+
+    function updatePasswords() {
+        var result = document.getElementById("genpwds");
+        result.innerHTML = "";
+        var output = "";
+        var moresecure = document.getElementById("moresecure").checked;
+        var domain = document.getElementById("domain").value;
+        if (domain.substr(0, 4) == "www.") domain = domain.substr(4);
+        domain = domain.toLowerCase();
+        var secret = document.getElementById("pwd").value;
+        if (secret == "" || domain == "") return;
+        if (moresecure) {
+            var now = new Date();            
+            var curmonth = now.getMonth();
+            var curyear = now.getFullYear();
+            for (var i = 0; i < 36; i++) {
+                var adjsecret = secret + "," + domain + "," + curmonth + "," + curyear;
+                var pwd = genPassword(adjsecret);
+                output += "<div class=\"row\"><div class=\"date\">" + curyear + "-" + curmonth + "</div><div class=\"password\">" + pwd + "</div></div>";
+                curmonth--;
+                if (curmonth < 1) { curyear--; curmonth += 12; }
+            }
+        } else {
+            for (var i = 0; i < 6; i++) {
+                var adjsecret = secret + "," + domain + "," + i;
+                var pwd = genPassword(adjsecret);
+                output += "<div class=\"row\"><div class=\"index\">" + (i + 1) + ".</div><div class=\"password\">" + pwd + "</div></div>";
+            }
+        }
+        result.innerHTML = output;
+
+    }
+
+    document.getElementById("domain").addEventListener("input", updatePasswords)
+    document.getElementById("moresecure").addEventListener("change", updatePasswords)
+</script>
+
+
+
+
+
+</BODY>
+</HTML>

@@ -119,6 +119,8 @@
   <ItemGroup>
     <None Include="conf\client.html" />
     <None Include="conf\qrpass.conf" />
+    <None Include="www\genpwd\index.html" />
+    <None Include="www\genpwd\styles.css" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="log\folder.txt" />
