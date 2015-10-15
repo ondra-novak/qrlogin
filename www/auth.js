@@ -7,6 +7,7 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	var connection = null;
 	var eventSource = null;
 	var curmode = false;
+	var channelid = null;
 	var restpanel = false;
 	var downloadshown = false;
 	var args = argss;
@@ -50,7 +51,8 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 
 	    var bytes = secureRandom(20);
 	    curcode = base64EncodeUrl(Crypto.util.bytesToBase64(bytes));
-	    var logurl = "l?c=" + Crypto.SHA256(curcode);
+	    channelid = Crypto.SHA256(curcode);;
+	    var logurl = "l?c=" + channelid;
 
 	    if (window.EventSource) {
 	        if (eventSource != null) eventSource.close();
@@ -94,33 +96,9 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 
 	qrcodeBox.addEventListener("click",function() {	
 
-	    var target = qrcodeBox.parentElement;
-	    target.style.position="relative";
-	    var iframe = document.createElement("IFRAME");
-	    iframe.style.width="100%";
-	    iframe.style.height="100%";
-	    iframe.style.border="0";
-	    iframe.style.position="absolute";
-	    iframe.style.backgroundColor="white";
-	    iframe.style.left="0";
-	    iframe.style.top="0";
-	    iframe.src=challengeUrl;
-	    target.appendChild(iframe);
-	    var xbutton = document.createElement("BUTTON");
-	    xbutton.style.width="20px";
-	    xbutton.style.height="20px";
-	    xbutton.style.border="0";
-	    xbutton.appendChild(document.createTextNode("X"));
-	    xbutton.style.position="absolute";
-	    xbutton.style.top="5px";
-	    xbutton.style.right="5px";
-	    target.appendChild(xbutton);
-	    closeIFrameButt = function() {
-	        iframe.parentElement.removeChild(iframe);
-	        xbutton.parentElement.removeChild(xbutton);
-	        closeIFrameButt = function () { };
-	    };
-	    xbutton.addEventListener("click", closeIFrameButt);
+	    closeIFrameButt();
+	    var win = window.open(challengeUrl, "_blank", "width=400,height=600,menubar=no,resizable=yes,status=no,location=no,toolbar=no,directories=no,top=150");
+	    closeIFrameButt = function () { if (win) win.close(); win = null;}
 	});
 
     
@@ -150,12 +128,12 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	}
 
 	function printKey() {
-	    window.open("print.html#" + lang + "," + apikey + "," + curcode);
+	    window.open("print.html#" + lang + "," + apikey + "," + channelid);
 	    this.reload(curmode);
 	}
 
 	function downloadKey() {
-	    location.href = "backup?c="+curcode;
+	    location.href = "backup?c="+channelid;
 	    this.reload(curmode);
 	}
 
