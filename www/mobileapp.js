@@ -129,7 +129,7 @@ function SignPage() {
             setTimeout(signAndPushRequest2, 1);
             return;
         }
-        var url = "r?c=" + c + "&r=" + encodeURIComponent(signature) + "&t=" + timestamp + "&q=1";
+        var url = "r?c=" +  Crypto.SHA256(c) + "&r=" + encodeURIComponent(signature) + "&t=" + timestamp + "&q=1";
         var connection = new XMLHttpRequest();	
 		connection.open("GET",url,true);
 		connection.onreadystatechange = function(request) {

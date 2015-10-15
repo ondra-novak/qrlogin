@@ -8,7 +8,8 @@ function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
 	var eventSource = null;
 	var curmode = false;
 	var restpanel = false;
-	var downloadshown = false;	
+	var downloadshown = false;
+	var jsredir = false;
 	
 	var qrcodeBox = controls["qr"];
 	var restoreBox = controls["restore"];
@@ -46,7 +47,7 @@ function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
 
 	    var bytes = secureRandom(20);
 	    curcode = base64EncodeUrl(Crypto.util.bytesToBase64(bytes));
-	    var logurl = "l?c=" + curcode
+	    var logurl = "l?c=" + Crypto.SHA256(curcode);
 
 	    if (window.EventSource) {
 	        if (eventSource != null) eventSource.close();
@@ -169,9 +170,14 @@ function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
 
 	    } else {
 	        redir = args.redirect_uri;
-	        var qmark = redir.indexOf('?');
-	        if (qmark == -1) redir = redir + "?"; else redir = redir + '&';
-	        redir = redir + "code=" + encodeURIComponent(r);
+	        if (jsredir) {
+	            redir = redir + "#?";
+	        } else {
+	            var qmark = redir.indexOf('?');
+	            if (qmark == -1) redir = redir + "?"; else redir = redir + '&';
+	        }
+	        var adjr = r + ":" + curcode;
+	        redir = redir + "code=" + encodeURIComponent(adjr);
 	        if (args.scope) redir = redir + "&scope=" + encodeURIComponent(args.scope);
 	        if (args.state) redir = redir + "&state=" + encodeURIComponent(args.state);
 	        window.top.location = redir;
@@ -227,6 +233,10 @@ function QRLogin(args, lang, controls  /* = qr,download,restore,header*/) {
 	        }
 	    }
 	}
+
+	this.enableJSRedir = function (e) {
+	    jsredir = e;
+	}
 	
 	init.call(this);
 }
@@ -275,6 +285,8 @@ function start() {
 		    lang = "en";
 	}
 	loadLang(lang);
+	var js = querystr["js"];
+	if (!js) js = false;
 	
 	var str_login = getBlockById("tab_login");
 	var str_manage = getBlockById("tab_manage");
@@ -288,6 +300,7 @@ function start() {
 	window.qrlogin = new QRLogin(querystr, lang, 
 			{qr:qrblock, restore:restoreBox,download:downloadBox});
 	window.qrlogin.reload(false);
+	window.qrlogin.enableJSRedir(js);
 		
 	str_login.classList.add("hl");
 	str_login.addEventListener("click",function() {

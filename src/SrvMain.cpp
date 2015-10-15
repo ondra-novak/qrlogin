@@ -173,7 +173,7 @@ natural SrvMain::LoginMonitor::onRequest(IHttpRequest& request,
 	if (owner.registerMonitor(ident,new WaitingResponse(ident.getMT(),
 				out.getMT(),owner,asEventStream))) {
 		request.sendHeaders();
-		return stOK;
+		return stContinue;
 	} else{
 		return 409;
 	}
@@ -188,7 +188,7 @@ SrvMain::WaitingResponse::WaitingResponse(StringA ident,
 
 void SrvMain::WaitingResponse::sendAcceptedResponse(ConstStrA response, natural timestamp) {
 
-	StringA code = response+ConstStrA(":")+ident+ConstStrA(":") + ToString<natural>(timestamp,16);
+	StringA code = response+ConstStrA(":")+ ToString<natural>(timestamp,16);
 
 	try {
 		if (asEventStream) {
@@ -374,6 +374,13 @@ natural SrvMain::Verify::onRequest(IHttpRequest& request, ConstStrA ) {
 	StringA code;
 	StringA apikey;
 
+	request.header(IHttpRequest::fldAccessControlAllowOrigin, "*");
+	request.header(IHttpRequest::fldAccessControlAllowMethods, "POST, OPTIONS");
+
+	if (request.getMethod() == "OPTIONS") {
+		return stOK;
+	}
+
 	if (request.getMethod() == "POST") {
 		AutoArrayStream<char> buff;
 		buff.write('?');
@@ -391,8 +398,8 @@ natural SrvMain::Verify::onRequest(IHttpRequest& request, ConstStrA ) {
 
 		StringA::SplitIterator iter = code.split(':');
 		ConstStrA sign = iter.getNext();
-		ConstStrA challenge = iter.getNext();
 		ConstStrA time = iter.getNext();
+		ConstStrA challenge = iter.getNext();
 		natural ntime = 0;
 		parseUnsignedNumber(time.getFwIter(),ntime,16);
 		if ((TimeStamp::now() - TimeStamp::fromUnix(ntime)).getMins() > 5)
@@ -436,7 +443,8 @@ natural SrvMain::GetIdentity::onRequest(IHttpRequest& request,ConstStrA ) {
 	if (ident.empty()) return stForbidden;
 
 	JSON::Builder json;
-	JSON::PNode response = json("identity",ident);
+	JSON::PNode response = json("identity", ident)("id", ident)
+		("email", StringA(ident + ConstStrA("@fakemail.") + request.getHeaderField(IHttpRequest::fldHost)));
 
 	request.sendHeaders();
 
