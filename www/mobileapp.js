@@ -62,7 +62,7 @@ function SignPage() {
         if (keyinfo) {
 
             if (keyinfo.hasPwd) showPwdForm();            
-            setTimeout(accept_button.show.bind(accept_button), 1000);
+            setTimeout(accept_button.show.bind(accept_button), 500);
             if (Math.sqrt(attempt) == Math.floor(Math.sqrt(attempt))) {
                 chkdomain.show();
             }
@@ -86,7 +86,7 @@ function SignPage() {
         accept_button.hide();
         chkdomain.hide();
         spinner.show();
-        setTimeout(signAndPushRequest2, 10);
+        setTimeout(signAndPushRequest2, 500);
     }
 
     function combineKeyAndPin(key, pwd) {
@@ -139,6 +139,7 @@ function SignPage() {
 		        if (connection.status == 200) {
 		            delivered_sect.show();
 		            localStorage.attempts = JSON.stringify(attempt);
+		            if (window.opener) window.close();
 		        } else if (connection.status == 410) {
 		            str_chn_timeerror.show();
 		        } else {
@@ -307,7 +308,7 @@ function ManagePage() {
 
 	                var enckey = GibberishAES.enc(JSON.stringify(keyfile), pwd);
 
-	                var url = "backup?c=" + c;
+	                var url = "backup?c=" + Crypto.SHA256(c);
 	                var connection = new XMLHttpRequest();
 	                connection.open("POST", url, true);
 	                connection.onreadystatechange = function(request) {
