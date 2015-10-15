@@ -36,6 +36,7 @@
     "rstr_import_key_button":"Import key",
     "rstr_import_ok":"Succesfuly imported",
     "prn_original_domain":"Domain:",
-    "prn_password":"Password / Hint:"
+    "prn_password":"Password / Hint:",
+    "chn_timeerror":"Invalid timestamp. Please check the clock and time zone settings on your handheld device."
     
 }

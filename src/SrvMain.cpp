@@ -132,6 +132,14 @@ natural SrvMain::Response::onRequest(IHttpRequest& request, ConstStrA vpath) {
 		if (qf.name == "r") response = qf.value;
 		if (qf.name == "t") {
 			if (!parseUnsignedNumber(qf.value.getFwIter(),timestamp,10)) return stNotFound;
+			int delta = abs((int)((TimeStamp::now() - TimeStamp::fromUnix(timestamp)).getMins()));
+			if (delta >= 5) {
+				request.status(410);
+				request.sendHeaders();
+				return 0;
+			}
+
+
 		}
 		if (qf.name == "q") {
 			quiet = qf.value == "1";
@@ -173,7 +181,7 @@ natural SrvMain::LoginMonitor::onRequest(IHttpRequest& request,
 	if (owner.registerMonitor(ident,new WaitingResponse(ident.getMT(),
 				out.getMT(),owner,asEventStream))) {
 		request.sendHeaders();
-		return stContinue;
+		return stOK;
 	} else{
 		return 409;
 	}

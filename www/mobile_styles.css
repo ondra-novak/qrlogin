@@ -93,7 +93,7 @@ label.always_blank
 	padding: 0.5em 0 0.5em 0;
 }
 
-#delivered_sect, #failed_sect {
+#delivered_sect, #failed_sect, #time_error {
 	display:none;
 }
 

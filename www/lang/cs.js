@@ -36,7 +36,8 @@
     "rstr_import_key_button":"Importovat",
     "rstr_import_ok":"Úspěšně uloženo",
     "prn_original_domain":"Doména:",
-    "prn_password":"Heslo / Nápověda:"
+    "prn_password":"Heslo / Nápověda:",
+    "chn_timeerror":"Na vašem zařízení jdou špatně hodiny. Prosím také zkontroluje, zda máte správně nastavenou časovou zónu."
 
     
 

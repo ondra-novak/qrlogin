@@ -40,6 +40,7 @@ function SignPage() {
     var delivered_sect = getBlockById("delivered_sect");
     var failed_sect = getBlockById("failed_sect");
     var chkdomain = getBlockById("checkdomain");
+    var str_chn_timeerror = getBlockById("time_error");
 
     var attempt = localStorage.attempts ? JSON.parse(localStorage.attempts) : 0;
 
@@ -138,6 +139,8 @@ function SignPage() {
 		        if (connection.status == 200) {
 		            delivered_sect.show();
 		            localStorage.attempts = JSON.stringify(attempt);
+		        } else if (connection.status == 410) {
+		            str_chn_timeerror.show();
 		        } else {
 		            failed_sect.show();
 		        }
