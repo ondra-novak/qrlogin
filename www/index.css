@@ -202,10 +202,38 @@ img {
 	position: fixed;
 }
 
-	#qrwin .lightboxbg {
-	opacity: 0.4;
-	width: 100vw;
-	height: 100vh;
-		background-color: #000;
-		position:absolute;
-	}
+#qrwin .lightboxbg {
+opacity: 0.4;
+width: 100vw;
+height: 100vh;
+	background-color: #000;
+	position:absolute;
+}
+	
+.testsignwindow {
+	text-align: center;
+}
+.testsignwindow textarea {
+	display:block;
+	width: 100%;
+}
+.testsignwindow input {
+	display:block;
+	width: 50%;
+	margin-left:auto;
+	margin-right:auto;
+	text-align: center;
+}
+
+#visualdigest {
+	font-size: 1.5em;
+	font-weight: bold;
+	background-color: #FFE;
+	border: 1px solid black;
+	border-radius: 5px;
+	width: 15em;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 10px;
+	box-shadow: rgba(0,0,0,0.2) 5px 5px;	
+}
