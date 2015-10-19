@@ -39,6 +39,7 @@ SrvMain::SrvMain()
 	,auth("/auth.html")
 	,manage("/manage.html")
 	,restoreKey("/restore.html")
+	,msign("/msign.html")
 	,response(*this)
 	,loginMonitor(*this)
 	,verify(*this)
@@ -82,6 +83,7 @@ natural SrvMain::onStartServer(BredyHttpSrv::IHttpMapper& httpMapper) {
 	httpMapper.addSite("/auth",&auth);
 	httpMapper.addSite("/backup",&rcvBackup);
 	httpMapper.addSite("/k",&restoreKey);
+	httpMapper.addSite("/s", &msign);
 
 	IJobScheduler &scheduler = httpMapper.getIfc<IJobScheduler>();
 	scheduler.schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,&scheduler),30);

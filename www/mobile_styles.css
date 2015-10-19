@@ -212,4 +212,48 @@ label.always_blank
 {
 	color: #F00;
 	font-style:italic;
-} 
+}
+
+#sign_message {
+	display:none;
+}
+
+#sign_message h1 {
+	font-size: 1em;
+	text-align: left;
+	margin: 0 0;
+	padding: 0.5em 1em;
+	border-bottom: 1px solid black;
+}
+
+#sign_message p {
+	margin: 0;
+	padding: 0.5em 1em;
+	text-align:left;
+	border-bottom: 1px solid black;
+	line-height: 1.5em;
+}
+
+#sign_hash {
+	display:none;
+}
+
+#sign_hash h1 {
+	font-size: 1em;
+	text-align: left;
+	margin: 0 0;
+	padding: 0.5em 1em;
+	border-bottom: 1px solid black;
+}
+
+#sign_hash p {
+	margin: 0;
+	padding: 0.5em 1em;
+	border-bottom: 1px solid black;
+	font-family:monospace;
+	font-weight:bold;	
+	line-height: 1.5em;
+}
+#no_key_exist {
+	display:none;
+

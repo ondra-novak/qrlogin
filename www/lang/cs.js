@@ -8,6 +8,7 @@
     "auth_savetofile":"Uložit do souboru",
     "auth_print":"Vytisknout jako QR",
     "auth_counter":"Zbývá čas: ",
+    "auth_sign":"Podepsat",
     "chn_enterpassword":"Heslo k identitě (volitelně)",
     "chn_disablepassword":"Přístě se na heslo neptat",
     "chn_loginbutton":"Přihlásit se",
@@ -37,7 +38,14 @@
     "rstr_import_ok":"Úspěšně uloženo",
     "prn_original_domain":"Doména:",
     "prn_password":"Heslo / Nápověda:",
-    "chn_timeerror":"Na vašem zařízení jdou špatně hodiny. Prosím také zkontroluje, zda máte správně nastavenou časovou zónu."
+    "chn_timeerror":"Na vašem zařízení jdou špatně hodiny. Prosím také zkontroluje, zda máte správně nastavenou časovou zónu.",
+    "sign_signmsg":"Podepsat tuto zprávu?",
+    "sign_signhash":"Porovnejte otisk dlouhé zprávy",
+    "sign_enterpassword":"Vložte heslo",
+    "sign_dosign":"Podepsat nyní",
+    "sign_signok":"Úspěšně podepsáno",
+    "sign_sigfailed":"Nezdařilo se to, zkuste znovu oskenovat QR kód",
+    "sign_no_key_exist":"V zařízení není žádný klíč k doméně, není čím podepsat"
 
     
 

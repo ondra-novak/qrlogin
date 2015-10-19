@@ -25,7 +25,7 @@ function eraseKey(domain) {
 
 }
 
-function SignPage() {
+function LoginPage() {
 
     var args = location.hash.substr(1).split(',');
     var lang = args[0];
@@ -177,8 +177,131 @@ function SignPage() {
 }
 
 
-function startSign() {
-    window.signPage = new SignPage;
+function startLogin() {
+    window.LoginPage = new LoginPage;
+
+}
+
+function SignPage() {
+    var args = location.hash.substr(1).split(',');
+    var lang = args[0];
+    var host = args[1];
+    var c = args[2];
+    var payload = args[3];
+    var nokeyexist = getBlockById("no_key_exist");
+    var sign_message = getBlockById("sign_message");
+    var sign_hash = getBlockById("sign_hash");
+    var ismsg = payload.substr(0,4) == "msg=";
+    var ishash = payload.substr(0,5) == "hash=";
+    var content = decodeURIComponent(payload.substr(ismsg ? 4 : 5));
+    var password_input = getBlockById("password_input");
+    var password_form = getBlockById("password_form");
+    var accept_button = getBlockById("accept_button");
+    var delivered_sect = getBlockById("delivered_sect");
+    var failed_sect = getBlockById("failed_sect");
+    var spinner = getBlockById("spinner");
+
+    function convertHash(c) {
+        var hex = Crypto.util.bytesToHex(Crypto.util.base64ToBytes(c));
+        var out = "";
+        for (var i = 0; i < hex.length ; i+=4) {
+            out += hex.substr(i, 4);
+            if (i % 16 == 12) out += "\n"; else out += " ";
+        }
+        out = out.substr(0, out.length - 1);
+        return out;
+    }
+
+    function init() {
+        loadLang(lang);
+        var serviceId = getBlockById("serviceId");
+        serviceId.appendChild(document.createTextNode(host));
+
+        //get key
+        var keyinfo = getKey(host);
+
+        //key exist?
+        if (keyinfo) {
+            var target;
+            var toshow;
+            var i;
+            if (ismsg) {
+                sign_message.show();
+                target = sign_message.getElementsByTagName("p")[0];
+                toshow = content;
+            } else {
+                sign_hash.show();
+                target = sign_hash.getElementsByTagName("p")[0];
+                toshow = convertHash(content);
+            }
+            toshow = toshow.split('\n');
+            for (i = 0; i < toshow.length; i++) {
+                if (toshow[i].length) {
+                    if (i) target.appendChild(document.createElement("br"));
+                    target.appendChild(document.createTextNode(toshow[i]));
+                }
+            }
+            accept_button.show();
+            if (keyinfo.hasPwd) {
+                password_form.show();
+            }
+            accept_button.addEventListener("click", doSign);
+
+        } else {
+            nokeyexist.show();
+        }
+    }
+
+    function processResponse(connection) {
+        if (connection.status == 200) {
+            delivered_sect.show();
+            localStorage.attempts = JSON.stringify(attempt);
+            if (window.opener) window.close();
+        } else {
+            failed_sect.show();
+        }
+
+    }
+
+    function doSign() {
+        password_form.hide();
+        accept_button.hide();
+        sign_hash.hide();
+        sign_message.hide();
+        spinner.show();
+        setTimeout(doSign2, 500);
+    }
+    function doSign2() {
+        var keyinfo = getKey(host);
+        var key;
+
+        if (keyinfo.hasPwd) {
+           var pin = password_input.value;
+           if (pin == "") key = keyinfo.prehash;
+           else key = combineKeyAndPin(keyinfo.secret, pin);
+        } else {
+            key = keyinfo.prehash;
+        }
+
+        var signsvc = new BitcoinSign;
+        var digest = ismsg ? signsvc.msg_digest(content) : signsvc.digestFromBase64(content);
+        var signature = signsvc.sign_message(new Bitcoin.ECKey(key), digest, false);
+        //if failed
+        if (signature === false) {
+            //schedule new try
+            setTimeout(signAndPushRequest2, 1);
+            return;
+        }
+        var url = "r?c=" + Crypto.SHA256(c) + "&r=" + encodeURIComponent(signature) + "&t=SIGNMSG&q=1";
+        httpGet(url, processResponse);
+    }
+
+    init.call(this);
+
+}
+
+function startSignature() {
+    window.SignPage = new SignPage;
 
 }
 

@@ -100,6 +100,7 @@ public:
 	RewritePath auth;
 	RewritePath manage;
 	RewritePath restoreKey;
+	RewritePath msign;
 	Response response;
 	LoginMonitor loginMonitor;
 	Verify verify;

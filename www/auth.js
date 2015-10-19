@@ -1,4 +1,4 @@
-function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
+function QRlogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	
 //	var qrcodeBox = document.getElementById("qrcode");
 	var curcode = null;
@@ -6,12 +6,14 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	var useEventSource = false;
 	var connection = null;
 	var eventSource = null;
-	var curmode = false;
+	var curmode = null;
 	var channelid = null;
 	var restpanel = false;
 	var downloadshown = false;
 	var args = argss;
+	var issign = args.signmsg || args.signhash;
 	var closeIFrameButt = function () { };
+	var me = this;
 
 	var qrcodeBox = controls["qr"];
 	var restoreBox = controls["restore"];
@@ -22,6 +24,9 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	  });
 
 	var fileinput = restoreBox.getElementsByTagName("input")[0];
+	var restoreBackup = null;
+	var processRespone = null;
+	var showDownloadBox = null;
 
 	function base64EncodeUrl(str){
 	    return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
@@ -41,9 +46,11 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	
 	var apikey = null;
 	
-	this.reload = function(manage) {
+	var reload = function (mode) {
+	    curmode = mode;
+	    if (mode == QRlogin.modeRestore) return restoreBackup();
+	    var manage = mode == QRlogin.modeManage;
 	    apikey = getDomainFromUrl(args.redirect_uri);
-	    curmode = manage;
 	    restoreBox.hide(); restpanel = false;
 	    downloadBox.hide(); downloadshown = false;
 	    closeIFrameButt();
@@ -59,7 +66,7 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	        eventSource = new EventSource(logurl);
 	        eventSource.addEventListener("message", function(event) {
 	            var response = event.data;
-	            this.processResponse(response);
+	            processResponse(response);
 	            eventSource.close();
 	        } .bind(this));
 	        eventSource.addEventListener("error", function(event) {
@@ -88,7 +95,13 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	    if (manage) {
 	        challengeUrl = getFullUrl("m#" + lang + "," + apikey + "," + curcode);
 	    } else {
-	        challengeUrl = getFullUrl("c#" + lang + "," + apikey + "," + curcode);
+	        var sfx = "";
+	        var pfx = "";
+	        if (args.signmsg) { pfx = "s"; sfx = ",msg=" + encodeURIComponent(args.signmsg); }
+	        else if (args.signhash) { pfx = "s"; sfx = ",hash=" + encodeURIComponent(args.signhash); }
+	        else { pfx = "c"; sfx = ""; }
+
+	        challengeUrl = getFullUrl(pfx + "#" + lang + "," + apikey + "," + curcode + sfx);
 	    }
 	    qrcode.makeCode(challengeUrl)
 	}
@@ -103,7 +116,7 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 
     
 
-	this.showDownloadBox = function() {
+	showDownloadBox = function() {
 
 	    downloadBox.show();
 	    downloadshown = true;
@@ -113,7 +126,7 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	        timer--;
 	        if (!downloadshown) return;
 	        if (timer == 0) {
-	            this.reload(curmode);
+	            reload(curmode);
 	        } else {
 
 	            var e = downloadBox.getElementsByTagName("span")[0];
@@ -129,26 +142,26 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 
 	function printKey() {
 	    window.open("print.html#" + lang + "," + apikey + "," + channelid);
-	    this.reload(curmode);
+	    reload(curmode);
 	}
 
 	function downloadKey() {
 	    location.href = "backup?c="+channelid;
-	    this.reload(curmode);
+	    reload(curmode);
 	}
 
 
-	this.processResponse = function(response) {
+	processResponse = function(response) {
 	    var r = response.trim();
 	    if (r == "") {
-	        this.reload(curmode);
+	        reload(curmode);
 	        return;
 	    }
 
 	    var redir;
 	    if (r.substr(0, 7) == "backup:") {
 
-	        this.showDownloadBox();
+	        showDownloadBox();
 
 	    } else {
 	        redir = args.redirect_uri;
@@ -165,12 +178,11 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	        window.top.location = redir;
 	    }
 
-
 	}
 
 	this.setLang = function(l) {
 	    lang = l;
-	    if (!restpanel && !downloadshown) this.reload(curmode);
+	    if (!restpanel && !downloadshown) reload(curmode);
 	    else if (restpanel) restoreBox.show();
 	}
 
@@ -178,7 +190,11 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	    args = argss;
 	}
 
-	this.restoreBackup = function() {
+	this.reload = function (args) {
+	    reload(args);
+	}
+
+	restoreBackup = function() {
 	    var target = qrcodeBox.parentElement;
 	    target.style.position = "relative";
 	    target.appendChild(restoreBox);
@@ -220,17 +236,16 @@ function QRLogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	        }
 	    }
 	}
-
-
-
-	
 	init.call(this);
 }
+QRlogin.prototype.modeLogin = 0;
+QRlogin.prototype.modeManage = 1;
+QRlogin.prototype.modeRestore = 2;
 
 
 
 
-function LangPanel(panel,curlang, qrlogin) {
+function LangPanel(panel,curlang, QRlogin) {
     var lang = curlang;
     var langlist = ["cs","en"];
     var i;
@@ -248,7 +263,7 @@ function LangPanel(panel,curlang, qrlogin) {
             
             img.src = "img/lang_"+langlist[i]+".gif";
             img.onclick = function(l) {
-                qrlogin.setLang(l);
+                QRlogin.setLang(l);
                 lang = l;
                 drawPanel();
                 loadLang(lang);
@@ -267,6 +282,31 @@ function LangPanel(panel,curlang, qrlogin) {
     drawPanel();
 }
 
+var Selector = function (panels) {
+
+
+
+    this.select = function (v1) {
+        for (var i = 0; i < panels.length; i++) {
+            if (i == v1) panels[i].element.classList.add("hl");
+            else panels[i].element.classList.remove("hl");
+        }
+    }
+    for (var i = 0; i < panels.length; i++) {
+        var action = panels[i].action;
+        var fn = function (v, action) {
+            this.select(v);
+            action();
+        }.bind(this, i, action);
+        panels[i].element.addEventListener("click", fn);
+    }
+    this.setVisibility = function (v, visible) {
+        if (visible) panels[v].element.style.display = "table-cell";
+        else panels[v].element.style.display = "none";
+    }
+
+};
+
 function initObjects() {
     var querystr = location.hash.substr(0, 2) == "#?" ? getQueryString(location.hash.substr(1)) : getQueryString(location.search);
     var lang = querystr["lang"];
@@ -282,43 +322,27 @@ function initObjects() {
     var restoreBox = getBlockById("restoreform");
     var downloadBox = getBlockById("downloadask");
 
-    window.qrlogin = new QRLogin(querystr, lang,
+    window.QRlogin = new QRlogin(querystr, lang,
 			{ qr: qrblock, restore: restoreBox, download: downloadBox });
-    window.qrlogin.reload(false);
+    window.QRlogin.reload(false);
 
-    window.langpanel = new LangPanel(panel, lang, qrlogin);
+    window.langpanel = new LangPanel(panel, lang, QRlogin);    
+
     window.selector = new Selector([
-        getBlockById("tab_login"),
-        getBlockById("tab_manage"),
-        getBlockById("tab_restore")], [
-            function () { window.qrlogin.reload(false); },
-            function () { window.qrlogin.reload(true); },
-            function () { qrlogin.restoreBackup();; }
+        {element:getBlockById("tab_login"),action:function () { QRlogin.reload(QRlogin.modeLogin); }},
+        { element: getBlockById("tab_manage"), action: function () { QRlogin.reload(QRlogin.modeManage); } },
+        { element: getBlockById("tab_restore"), action: function () { QRlogin.reload(QRlogin.modeRestore); } }
         ]);
+    if (querystr["signmsg"] || querystr["signhash"]) {
+        getBlockById("tab_login").classList.add("str_auth_sign");
+    } else {
+        getBlockById("tab_login").classList.add("str_auth_login");
+    }
     window.selector.select(0);
 
 }
 
 
-var Selector = function (switches, actions) {
-
-
-
-    this.select = function (v1) {
-        for (var i = 0; i < switches.length; i++) {
-            if (i == v1) switches[i].classList.add("hl");
-            else switches[i].classList.remove("hl");
-        }
-    }
-    for (var i = 0; i < switches.length; i++) {
-        var fn = function (v) {
-            this.select(v);
-            actions[v]();
-        }.bind(this, i);
-        switches[i].addEventListener("click", fn);
-    }
-
-};
 
 
 function start() {
@@ -333,8 +357,8 @@ window.addEventListener("hashchange", function () {
             window.langpanel.setLang(lang);
             loadLang(lang);
         }
-        window.qrlogin.setNewArgs(querystr);
-        window.qrlogin.reload(false);
+        window.QRlogin.setNewArgs(querystr);
+        window.QRlogin.reload(false);
         window.selector.select(0);
     }
 });

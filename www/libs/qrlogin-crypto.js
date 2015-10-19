@@ -133,7 +133,7 @@ function sign_message(private_key, message_digest, compressed, addrtype) {
             nV += 4;
         sequence[0] = nV;
         var sig = Crypto.util.bytesToBase64(sequence);
-        if (verify_message(sig, message, addrtype) == address)
+        if (verify_message(sig, message_digest, addrtype) == address)
             return sig;
     }
 
@@ -206,16 +206,4 @@ function QRlogin_decodeSignature(code, client_id) {
 	var message = "login to " + client_id + ", challenge is " + challenge + ", timestamp " + timestamp;
 	var sign = new window.BitcoinSign();
 	return sign.verify_message(signature,sign.msg_digest(message),0);
-}
-
-function QRlogin_createvisualdigest(msg) {
-	var sign = new window.BitcoinSign();
-	var digest = sign.digestToBase64(sign.msg_digest(msg));
-	var d="";
-	var i;
-	for (i = 0; i < 3; i++) {
-		d+=digest.substr(i*12,4)+"   "+digest.substr(i*12+4,4)+"   "+digest.substr(i*12+8,4)+"\n";
-	}
-	return d;
-	
 }

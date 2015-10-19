@@ -119,6 +119,7 @@
   <ItemGroup>
     <None Include="conf\client.html" />
     <None Include="conf\qrpass.conf" />
+    <None Include="www\sign.html" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="log\folder.txt" />

@@ -8,6 +8,7 @@
     "auth_savetofile":"Store as file",
     "auth_print":"Print as QR",
     "auth_counter":"Time left: ",
+    "auth_sign":"Sign",
     "chn_enterpassword":"Enter password (optional)",
     "chn_disablepassword":"Don't ask password again",
     "chn_loginbutton":"Login",
@@ -37,6 +38,14 @@
     "rstr_import_ok":"Succesfuly imported",
     "prn_original_domain":"Domain:",
     "prn_password":"Password / Hint:",
-    "chn_timeerror":"Invalid timestamp. Please check the clock and time zone settings on your handheld device."
+    "chn_timeerror":"Invalid timestamp. Please check the clock and time zone settings on your handheld device.",
+    "sign_signmsg":"Sign this message?",
+    "sign_signhash":"Please compare hash of a long message.",
+    "sign_enterpassword":"Enter password",
+    "sign_dosign":"Make signature",
+    "sign_signok":"Successfuly signed",
+    "sign_sigfailed":"Please try again",
+    "sign_no_key_exist":"There is no key for the current domain"
+
     
 }
