@@ -193,7 +193,7 @@ function SignPage() {
     var sign_hash = getBlockById("sign_hash");
     var ismsg = payload.substr(0,4) == "msg=";
     var ishash = payload.substr(0,5) == "hash=";
-    var content = decodeURIComponent(payload.substr(ismsg ? 4 : 5));
+    var content = decodeURIComponentPlus(payload.substr(ismsg ? 4 : 5));
     var password_input = getBlockById("password_input");
     var password_form = getBlockById("password_form");
     var accept_button = getBlockById("accept_button");
@@ -253,6 +253,7 @@ function SignPage() {
     }
 
     function processResponse(connection) {
+        spinner.hide();
         if (connection.status == 200) {
             delivered_sect.show();
             localStorage.attempts = JSON.stringify(attempt);
@@ -292,7 +293,7 @@ function SignPage() {
             setTimeout(signAndPushRequest2, 1);
             return;
         }
-        var url = "r?c=" + Crypto.SHA256(c) + "&r=" + encodeURIComponent(signature) + "&t=SIGNMSG&q=1";
+        var url = "sign?c=" + Crypto.SHA256(c) + "&s=" + encodeURIComponent(signature) ;
         httpGet(url, processResponse);
     }
 

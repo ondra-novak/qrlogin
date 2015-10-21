@@ -37,7 +37,7 @@ function getQueryString(qs) {
         if (p.length == 1)
             b[p[0]] = "";
         else
-            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+            b[p[0]] = decodeURIComponentPlus(p[1]);
     }
     return b;
 }
@@ -93,4 +93,14 @@ function httpPost(url,data, cb) {
         }
     } .bind(this);
     connection.send(data);
+}
+
+function encodeURIComponentPlus(x) {
+    var z = encodeURI(x);
+    return z.replace(/=/g, "%3D").replace(/&/g, "%26").replace(/\+/g, "%2B").replace(/%20/g, "+")
+                .replace(/:/g, "%3A").replace(/%0D%0A/g, "*").replace(/%0A/g, "*")
+}
+function decodeURIComponentPlus(x) {
+    var z = x.replace(/\+/g, "%20").replace(/\*/g,"%0A");
+    return decodeURIComponent(z);
 }

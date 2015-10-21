@@ -97,8 +97,11 @@ function QRlogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	    } else {
 	        var sfx = "";
 	        var pfx = "";
-	        if (args.signmsg) { pfx = "s"; sfx = ",msg=" + encodeURIComponent(args.signmsg); }
-	        else if (args.signhash) { pfx = "s"; sfx = ",hash=" + encodeURIComponent(args.signhash); }
+	        if (args.signmsg) { pfx = "s"; sfx = ",msg=" + encodeURIComponentPlus(args.signmsg); }
+	        else if (args.signhash) {
+	            pfx = "s"; sfx = ",hash=" + encodeURIComponentPlus(
+                    Crypto.util.bytesToBase64(Crypto.util.hexToBytes(args.signhash)));
+	        }
 	        else { pfx = "c"; sfx = ""; }
 
 	        challengeUrl = getFullUrl(pfx + "#" + lang + "," + apikey + "," + curcode + sfx);
@@ -171,7 +174,13 @@ function QRlogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	            var qmark = redir.indexOf('?');
 	            if (qmark == -1) redir = redir + "?"; else redir = redir + '&';
 	        }
-	        var adjr = r + ":" + curcode;
+	        var adjr;
+	        if (args.signhash) adjr = r + ':' + args.signhash;
+	        else if (args.signmsg) {
+	            adjr = r + ':' + Crypto.util.bytesToHex((new BitcoinSign).msg_digest(args.signmsg));
+	        } else {
+	            adjr = r + ":" + curcode;
+	        }
 	        redir = redir + "code=" + encodeURIComponent(adjr);
 	        if (args.scope) redir = redir + "&scope=" + encodeURIComponent(args.scope);
 	        if (args.state) redir = redir + "&state=" + encodeURIComponent(args.state);

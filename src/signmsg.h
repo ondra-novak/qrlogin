@@ -17,6 +17,8 @@ using namespace LightSpeed;
 
 bool verifyMessage(ConstStrA currency, ConstStrA address, ConstStrA message, ConstStrA signature);
 StringA generateAddressFromSignature(natural addrVersion, ConstStrA prefix, ConstStrA message, ConstStrA signature);
+StringA generateAddressFromSignatureAndHash(natural addrVersion, ConstStrA hash, ConstStrA signature);
+
 
 }
 

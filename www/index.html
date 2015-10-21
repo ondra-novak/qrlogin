@@ -179,7 +179,7 @@ function showError() {
 
 function validateToken(token) {
 	
-	var identity = QRlogin_decodeSignature(token,location.host);
+	var identity = QRlogin_decodeLoginSignature(token,location.host);
 	var out = document.getElementById("IDtarget");
 	out.value = identity;
 }

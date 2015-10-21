@@ -14,6 +14,7 @@
 #include "coinClasses/uchar_vector.h"
 #include "coinClasses/CoinKey.h"
 #include "coinClasses/Base58Check.h"
+#include "lightspeed/utils/base64.h"
 
 
 
@@ -52,6 +53,27 @@ StringA generateAddressFromSignature(natural addrVersion, ConstStrA prefix, Cons
 	sigkey.setVersionBytes(addrVersion,0);
 
 	if (!sigkey.setCompactSignature(digest,binsig)) return StringA();
+	return StringA(sigkey.getAddress().c_str());
+}
+
+StringA generateAddressFromSignatureAndHash(natural addrVersion, ConstStrA hash, ConstStrA signature) {
+	
+
+	uchar_vector digest;
+	digest.reserve(32);
+	Filter<HexDecoder<> >::Read<ConstStrA::Iterator> rd2(hash.getFwIter());
+	while (rd2.hasItems()) digest.push_back(rd2.getNext());
+
+	uchar_vector binsig;
+	binsig.reserve(65);
+	Filter<Base64Decoder>::Read<ConstStrA::Iterator> rd(signature.getFwIter());
+	while (rd.hasItems()) binsig.push_back(rd.getNext());
+
+	CoinKey sigkey;
+
+	sigkey.setVersionBytes(addrVersion, 0);
+
+	if (!sigkey.setCompactSignature(digest, binsig)) return StringA();
 	return StringA(sigkey.getAddress().c_str());
 }
 bool verifyMessage(ConstStrA prefix, ConstStrA address, ConstStrA message, ConstStrA signature) {

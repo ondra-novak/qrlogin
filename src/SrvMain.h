@@ -75,6 +75,16 @@ public:
 		virtual natural onData(IHttpRequest &) {return 0;}
 	};
 
+	class VerifySignature : public IHttpHandler {
+	public:
+		VerifySignature(SrvMain &owner) :owner(owner) {}
+		SrvMain &owner;
+
+		virtual natural onRequest(IHttpRequest &request, ConstStrA vpath);
+		virtual natural onData(IHttpRequest &) { return 0; }
+	};
+
+
 	class GetIdentity: public IHttpHandler {
 	public:
 		GetIdentity(SrvMain &owner):owner(owner) {}
@@ -93,6 +103,14 @@ public:
 		virtual natural onData(IHttpRequest &) {return 0;}
 	};
 
+	class ReceiveSign : public IHttpHandler {
+	public:
+		SrvMain &owner;
+		ReceiveSign(SrvMain &owner) :owner(owner) {}
+		virtual natural onRequest(IHttpRequest &request, ConstStrA vpath);
+		virtual natural onData(IHttpRequest &) { return 0; }
+	};
+
 
 	RewritePath challenge;
 	RewritePath identReset;
@@ -106,6 +124,9 @@ public:
 	Verify verify;
 	GetIdentity getIdent;
 	Backup rcvBackup;
+	ReceiveSign rcvSign;
+	VerifySignature verifySignature;
+		
 
 	FilePath apikeys;
 
@@ -137,6 +158,7 @@ public:
 	bool receiveBackup(StringA chanId, StringA content, bool restore);
 	StringA getBackupFile(StringA ident);
 	StringA getBackupFile_lk(StringA ident);
+	bool receiveSignatue(StringA chanId, StringA content);
 };
 
 } /* namespace qrpass */

@@ -31,6 +31,11 @@
 
 
 <script>
+    if (!window.location.origin) {
+        window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+    }
+
+
     var qrbox = getBlockById("qrbox");
     var qriframe = getBlockById("qriframe");
     var signature = getBlockById("signature");
@@ -38,7 +43,7 @@
         var s = new BitcoinSign;
         var msg = e.target.value.trim();
         document.getElementById("msghash").value = Crypto.util.bytesToHex(s.msg_digest(msg));
-        document.getElementById("charcount").value = encodeURIComponent(msg).length;
+        document.getElementById("charcount").value = encodeURIComponentPlus(msg).length;
         qrbox.hide();
         signature.value = "";
             });
@@ -47,12 +52,23 @@
         qrbox.show();
         var s = new BitcoinSign;
         var msg = document.getElementById("msgtosign").value.trim();
-        var msghash = s.digestToBase64(s.msg_digest(msg));
-        msg = encodeURIComponent(msg);
+        var msghash = Crypto.util.bytesToHex(s.msg_digest(msg));
+        msg = encodeURIComponentPlus(msg);
         var cmd=msg.length<160?"&signmsg="+msg:"&signhash="+msghash;
-        qriframe.src = "auth#?redirect_uri="+document.location.href+"&js=true" + cmd;
+        qriframe.src = "auth#?redirect_uri="+document.location.origin+document.location.pathname+"&js=true" + cmd;
     });
-
+    window.addEventListener("hashchange", function () {
+        if (location.hash.substr(0, 7) == "#?code=") {
+            var query = location.hash.substr(1);
+            var qs = getQueryString(query);;
+            var res = QRlogin_decodeMsgSignature(qs.code);
+            var sign = document.getElementById("signature");
+            var ident = document.getElementById("identity");
+            sign.value = res[0];
+            ident.value = res[1];
+            qrbox.hide();
+        }
+    })
 
 </script>
 </BODY>

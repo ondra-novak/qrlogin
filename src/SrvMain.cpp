@@ -45,6 +45,8 @@ SrvMain::SrvMain()
 	,verify(*this)
 	,getIdent(*this)
 	,rcvBackup(*this)
+	,rcvSign(*this)
+	,verifySignature(*this)
 	,lastTokenShiftTime(integer(0))
 	,lastBackupShiftTime(integer(0))
 
@@ -75,7 +77,6 @@ natural SrvMain::onStartServer(BredyHttpSrv::IHttpMapper& httpMapper) {
 	httpMapper.addSite("/m",&manage);
 	httpMapper.addSite("/r",&response);
 	httpMapper.addSite("/l",&loginMonitor);
-	httpMapper.addSite("/verify",&verify);
 	httpMapper.addSite("/token",&verify);
 	httpMapper.addSite("/ident",&getIdent); //<obsolete
 	httpMapper.addSite("/e",&identReset);
@@ -84,6 +85,8 @@ natural SrvMain::onStartServer(BredyHttpSrv::IHttpMapper& httpMapper) {
 	httpMapper.addSite("/backup",&rcvBackup);
 	httpMapper.addSite("/k",&restoreKey);
 	httpMapper.addSite("/s", &msign);
+	httpMapper.addSite("/sign", &rcvSign);
+	httpMapper.addSite("/verify", &verifySignature);
 
 	IJobScheduler &scheduler = httpMapper.getIfc<IJobScheduler>();
 	scheduler.schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,&scheduler),30);
@@ -351,23 +354,36 @@ void SrvMain::scheduledPing(IJobScheduler* scheduler) {
 	scheduler->schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,scheduler),30);
 }
 
-bool SrvMain::receiveBackup( StringA chanId, StringA content, bool restore )
+bool SrvMain::receiveSignatue( StringA chanId, StringA content )
+{
+	LS_LOGOBJ(lg);
+	bool result =  acceptLogin(chanId,content,0);
+	
+	lg.progress("Received signature: channel=%1, signature=%2, result=%3")
+		<< chanId << content << result;
+
+	return result;
+	
+}
+
+bool SrvMain::receiveBackup(StringA chanId, StringA content, bool restore)
 {
 	LS_LOGOBJ(lg);
 	{
 		Synchronized<FastLock> _(tokenMapLock);
 		bool exist = false;
-		backupMap[0].insert(chanId,content,&exist);
+		backupMap[0].insert(chanId, content, &exist);
 		if (exist) return false;
 	}
-	bool result =  restore || acceptLogin(chanId,"backup",0);
-	
+	bool result = restore || acceptLogin(chanId, "backup", 0);
+
 	lg.progress("Received key backup: channel=%1, restore=%2, result=%3")
 		<< chanId << restore << result;
 
 	return result;
-	
+
 }
+
 
 static natural sendOAuth2Error(IHttpRequest &request, ConstStrA error) {
 	JSON::Builder json;
@@ -496,6 +512,71 @@ LightSpeed::natural SrvMain::Backup::onRequest( IHttpRequest &request, ConstStrA
 	}
 }
 
+
+LightSpeed::natural SrvMain::ReceiveSign::onRequest(IHttpRequest &request, ConstStrA vpath)
+{
+	StringA c;
+	StringA s;
+	QueryParser qp(vpath);
+	bool restore = false;
+	while (qp.hasItems()) {
+		const QueryField &qf = qp.getNext();
+		if (qf.name == "c") c = qf.value;
+		if (qf.name == "s") s = qf.value;
+	}
+
+	if (c.empty()) return stNotFound;
+	return owner.receiveSignatue(c, s) ? stOK : 409;
+}
+
+LightSpeed::natural SrvMain::VerifySignature::onRequest(IHttpRequest &request, ConstStrA vpath)
+{
+	StringA code;
+
+	request.header(IHttpRequest::fldAccessControlAllowOrigin, "*");
+	request.header(IHttpRequest::fldAccessControlAllowMethods, "GET, OPTIONS");
+
+	if (request.getMethod() == "OPTIONS") {
+		return stOK;
+	}
+
+	if (request.getMethod() == "GET") {
+
+		request.header(IHttpRequest::fldContentType, "application/json");
+
+		QueryParser qp(vpath);
+		while (qp.hasItems()) {
+			const QueryField &qf = qp.getNext();
+			if (qf.name == "code") code = qf.value;
+		}
+
+		StringA::SplitIterator iter = code.split(':');
+		ConstStrA sign = iter.getNext();
+		ConstStrA time = iter.getNext();
+		ConstStrA challenge = iter.getNext();
+		natural ntime = 0;
+		parseUnsignedNumber(time.getFwIter(), ntime, 16);
+		if (ntime != 0) return 403;
+		StringA address = coinstock::generateAddressFromSignatureAndHash(0, challenge, sign);
+
+
+		JSON::Builder json;
+		JSON::PNode response = json("signature", sign)
+			("identity", address);
+
+		if (address.empty()) return stForbidden;
+		request.sendHeaders();
+
+		SeqFileOutput out(&request);
+		JSON::toStream(response, out, false);
+
+		LS_LOG.info("message: %1 - signature: %2 - address: %3") << challenge << sign << address;
+		return 0;
+
+	}
+
+	return 0;
+}
 
 } /* namespace qrpass */
 

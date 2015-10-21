@@ -195,7 +195,7 @@ secureRandom.randomUint8Array = function(byteCount) {
 }
 
 
-function QRlogin_decodeSignature(code, client_id) {
+function QRlogin_decodeLoginSignature(code, client_id) {
 	var parts = code.split(':');
 	var challenge = parts[2];
 	var timestamp = parseInt(parts[1],16);
@@ -207,3 +207,14 @@ function QRlogin_decodeSignature(code, client_id) {
 	var sign = new window.BitcoinSign();
 	return sign.verify_message(signature,sign.msg_digest(message),0);
 }
+
+function QRlogin_decodeMsgSignature(code) {
+    var parts = code.split(':');
+    var digest = parts[2];
+    var timestamp = parseInt(parts[1], 16);
+    var signature = parts[0];
+    if (timestamp != 0) return false;
+    var sign = new window.BitcoinSign();
+    return [signature, sign.verify_message(signature, Crypto.util.hexToBytes(digest))];
+}
+
