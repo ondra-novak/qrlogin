@@ -2,7 +2,23 @@ body {
 	background-color: white;
 	margin: 0;
 	font-family: sans-serif;
+	font-size: 17px;
 }
+
+input, textarea {
+	border: none;
+	border-bottom: 2px solid;
+	background-color:#EEE;
+	font-size: 17px;
+}
+
+input:focus, textarea:focus {
+	border: none;
+	border-bottom: 2px solid blue;
+	background-color:white;
+	font-size: 17px;
+}
+
 
 a {
 	text-decoration:none;	
@@ -47,9 +63,9 @@ ul.menu li {
 }
 
 div.content {
-	max-width: 800px;
 	margin-left: auto;
 	margin-right: auto;
+	max-width: 800px;
 }
 
 div.page {
@@ -61,7 +77,14 @@ div.page h2 {
 	text-align: center;
 }
 
+.testarea {
+	text-align: center;
+}
 .testwindow {
+	text-align:center;
+}
+
+.testwindow .test {
 	text-align: center;
 	padding: 20px;
 	font-size: larger;
@@ -107,37 +130,6 @@ pre {
 	padding-left: 0;
 }
 
-/* Standard syntax */
-@keyframes waitanimkeys {
-    0%   {margin-left:-10px;width: 0px;margin-right: 110px}
-    50%  {margin-left:-10px;width: 110px;margin-right: -10px}
-    100% {margin-left:110px;width: 0px;margin-right: -10px}
-}
-
-@-webkit-keyframes waitanimkeys {
-    0%   {margin-left:-10px;width: 0px;margin-right: 110px}
-    50%  {margin-left:-10px;width: 110px;margin-right: -10px}
-    100% {margin-left:110px;width: 0px;margin-right: -10px}
-}
-
-.waitanim > div {
-	animation-name: waitanimkeys;
-    animation-duration: 1s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-play-state: running;    
-	-webkit-animation-name: waitanimkeys;
-    -webkit-animation-duration: 1s;
-    -webkit-animation-timing-function: linear;
-    -webkit-animation-iteration-count: infinite;
-    -webkit-animation-play-state: running;    
-    width: 20px;
-    height: 15px;
-    background-color: #888;
-    border-radius: 10px;
-    margin-right: auto;
-}
-
 #addsitedetail {
 	display:none;
 }
@@ -181,9 +173,8 @@ img {
 	width: 500px;
 	height: 650px;
 	position: absolute;
-	left: 50%;
-	top: 50%;
-	margin-left: -250px;
+	left: 5%;
+	top: 50%;	
 	margin-top: -300px;
 	text-align:center;
 	background-color:white;
@@ -202,7 +193,7 @@ img {
 	position: fixed;
 }
 
-#qrwin .lightboxbg {
+.lightboxbg {
 opacity: 0.4;
 width: 100vw;
 height: 100vh;
@@ -210,9 +201,6 @@ height: 100vh;
 	position:absolute;
 }
 	
-.testsignwindow {
-	text-align: center;
-}
 .testsignwindow textarea {
 	display:block;
 	width: 100%;
@@ -225,15 +213,43 @@ height: 100vh;
 	text-align: center;
 }
 
-#visualdigest {
-	font-size: 1.5em;
-	font-weight: bold;
-	background-color: #FFE;
-	border: 1px solid black;
-	border-radius: 5px;
-	width: 15em;
-	margin-left: auto;
-	margin-right: auto;
+.testsignwindow {
+	width: 700px;
+	position: absolute;
+	right: 10%;
+	top: 50%;
+	margin-top: -300px;
+	text-align: center;
+	background-color: white;
+	border: 1px solid;
+	box-shadow: rgba(0,0,0,0.2) 5px 5px;
 	padding: 10px;
-	box-shadow: rgba(0,0,0,0.2) 5px 5px;	
+}	
+
+#testsignwindow {
+	display: none;
+	width: 100vw;
+	height: 100vh;
+	left: 0;
+	top: 0;
+	position: fixed;
 }
+
+#msgdigest {
+	font-size: smaller;
+	margin: 0px 40px;
+	display:none;
+}
+
+	#msgdigest p {
+		color: #930303;
+	}
+
+	#msgdigest pre {
+		border: 1px solid;
+		background-color: #FFD;
+		font-weight: bold;
+		width: 14em;
+		float:right;
+		margin: 0 10px 0 10px;
+	}

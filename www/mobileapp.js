@@ -201,17 +201,7 @@ function SignPage() {
     var failed_sect = getBlockById("failed_sect");
     var spinner = getBlockById("spinner");
 
-    function convertHash(c) {
-        var hex = Crypto.util.bytesToHex(Crypto.util.base64ToBytes(c));
-        var out = "";
-        for (var i = 0; i < hex.length ; i+=4) {
-            out += hex.substr(i, 4);
-            if (i % 16 == 12) out += "\n"; else out += " ";
-        }
-        out = out.substr(0, out.length - 1);
-        return out;
-    }
-
+ 
     function init() {
         loadLang(lang);
         var serviceId = getBlockById("serviceId");
@@ -232,7 +222,7 @@ function SignPage() {
             } else {
                 sign_hash.show();
                 target = sign_hash.getElementsByTagName("p")[0];
-                toshow = convertHash(content);
+                toshow = QRlogin_decorateFingerprint(Crypto.util.base64ToBytes(content));
             }
             toshow = toshow.split('\n');
             for (i = 0; i < toshow.length; i++) {

@@ -119,6 +119,9 @@
   <ItemGroup>
     <None Include="conf\client.html" />
     <None Include="conf\qrpass.conf" />
+    <None Include="www\spinnerpage.html" />
+    <None Include="www\index.css" />
+    <None Include="www\index.html" />
     <None Include="www\sign.html" />
   </ItemGroup>
   <ItemGroup>

@@ -208,13 +208,35 @@ function QRlogin_decodeLoginSignature(code, client_id) {
 	return sign.verify_message(signature,sign.msg_digest(message),0);
 }
 
-function QRlogin_decodeMsgSignature(code) {
+function QRlogin_decodeMsgSignature(code, msg) {
     var parts = code.split(':');
     var digest = parts[2];
     var timestamp = parseInt(parts[1], 16);
     var signature = parts[0];
     if (timestamp != 0) return false;
     var sign = new window.BitcoinSign();
-    return [signature, sign.verify_message(signature, Crypto.util.hexToBytes(digest))];
+    return [signature, sign.verify_message(signature, sign.msg_digest(msg))];
 }
 
+function QRlogin_decorateFingerprint(c) {
+    var hex = Crypto.util.bytesToHex(c);
+    var out = "";
+    for (var i = 0; i < hex.length ; i += 4) {
+        out += hex.substr(i, 4);
+        if (i % 16 == 12) out += "\n"; else out += " ";
+    }
+    out = out.substr(0, out.length - 1);
+    return out;
+}
+
+function QRlogin_fingerprintToElement(fp, el) {
+    el.innerHTML = "";
+    var toshow = fp.split('\n');
+    for (i = 0; i < toshow.length; i++) {
+        if (toshow[i].length) {
+            if (i) el.appendChild(document.createElement("br"));
+            el.appendChild(document.createTextNode(toshow[i]));
+        }
+    }
+
+}

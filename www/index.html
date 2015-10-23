@@ -1,115 +1,113 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>QRlogin</title>
-<link rel="stylesheet" href="index.css" type="text/css" />
-<link rel="image_src" href="img/qrlogofb.png" />
-<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
-<script type="text/javascript" src="libs/common.js"></script>
-<script type="text/javascript" src="libs/qrlogin-crypto.js"></script>
+    <title>QRlogin</title>
+    <link rel="stylesheet" href="index.css" type="text/css" />
+    <link rel="image_src" href="img/qrlogofb.png" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <script type="text/javascript" src="libs/common.js"></script>
+    <script type="text/javascript" src="libs/qrlogin-crypto.js"></script>
 </head>
 <body>
-<h1><img src="img/qrlogo-sw.png" alt="QRlogin"></h1>
-<ul class="menu">
-<li><a href="#whatis">What is QRlogin</a></li>
-<li><a href="#howork">How does it work?</a></li>
-<li><a href="#testit">Test it now!</a></li>
-<li><a href="#addsite">Add to your site</a></li>
-<li><a href="#sourcecode">Source code</a></li>
-<li><a href="#author">About the author</a></li>
-</ul>
-<div class="content">
-<div class="page" id="whatis">
-<h2>What is QRlogin</h2>
-<img src="img/qrlogin.png">
-<h3>Features</h3>
-<ul>
-<li><strong>No extra app needed</strong> - just QR Scanner and standard browser
-<li><strong>Fast and Easy</strong> - scan QR code and you are logged in. 
-<li><strong>Privacy</strong> - different identity for each site
-<li><strong>Security</strong> - uses ECDSA to transfer your identity
-<li><strong>Easy integration</strong> - OAuth 2.0 protocol
-<li><strong>Open source</strong> - <a href="#sourcecode">Sources are available</a> 
- 
-
-
-
-
-</ul>
-</div>
-<div class="page" id="howork">
-<h2>How does it work?</h2>
-<img src="img/howitworks.png">
-</div>
-<div class="page" id="testit">
-<h2>Test login</h2>
-<div class="testwindow">
-    <div id="qrwin">
-        <div class="lightboxbg"></div>
-        <div class="lightboxwnd">
-            <iframe id="qriframe" width="450" height="600"></iframe>
-            <button id="closebutt">Close</button>
+    <h1><img src="img/qrlogo-sw.png" alt="QRlogin"></h1>
+    <ul class="menu">
+        <li><a href="#whatis">What is QRlogin</a></li>
+        <li><a href="#howork">How does it work?</a></li>
+        <li><a href="#testit">Online demo</a></li>
+        <li><a href="#addsite">Add to your site</a></li>
+        <li><a href="#sourcecode">Source code</a></li>
+        <li><a href="#author">About the author</a></li>
+    </ul>
+    <div class="content">
+        <div class="page" id="whatis">
+            <h2>What is QRlogin</h2>
+            <img src="img/qrlogin.png">
+            <h3>Features</h3>
+            <ul>
+                <li><strong>No extra app needed</strong> - just QR Scanner and standard browser
+                <li><strong>Fast and Easy</strong> - scan QR code and you are logged in.
+                <li><strong>Privacy</strong> - different identity for each site
+                <li><strong>Security</strong> - uses ECDSA to transfer your identity
+                <li><strong>Easy integration</strong> - OAuth 2.0 protocol
+                <li><strong>Open source</strong> - <a href="#sourcecode">Sources are available</a>
+            </ul>
         </div>
-    </div>
-<button id="testbutton" onclick="doTest();">Click button to uncover your ID on this site</button>
-<p>Your ID will appear below</p>
-<input id="IDtarget" type="text">
-</div>
-<hr>
-<div class="testsignwindow">
-<h2>Sign a message</h2>
-<textarea id="MessageToSign"></textarea>
-<p>Visual digest</p>
-<pre id="visualdigest">
-qweg  qwe5  e23w
-swer  deqe  e321
-23we  e44+  q212
-</pre>
-
-
-<button id="testsign" onclick="doSign();">Sign this message</button>
-<p>Signature:</p>
-<input id="outsignature" type="text">
-<p>Identity calculated from the signature:</p>
-<input id="outsignatureID" type="text">
-</div>
-</div>
-<div class="page" id="addsite">
-<h2>Add to your site</h2>
-<h3>Using OAuth 2.0</h3>
-<dl>
-<dt>Authorization endpoint:</dt>
-<dd><strong><span class="putorigin"></span>auth</strong> (redirect)</dd>
-<dt>Token endpoint:</dt>
-<dd><strong><span class="putorigin"></span>token</strong> (POST)</dd>
-<dt>Identity endpoint:</dt>
-<dd><strong><span class="putorigin"></span>ident</strong> (GET, Authorization: Bearer)</dd>
-<dt>Client identification:</dt>
-<dd>The <strong>client_secret</strong> is ignored. The <strong>client_id</strong> must be equal to redirect_uri's  domain (including port if specified). The <strong>scope</strong> is ignored </dd>
-<dt>Interface language:</dt>
-<dd>Include <strong>&lang=XX</strong> into the <em>Authorization endpoint</em> url. Currently supported languages are: en, cs
-</dl>
-<hr>
-<a href="#addsite" onclick="uncoverDetails(this,'addsitedetail');return false;" id="hidedetail">More &gt;&gt; </a>
-<div id="addsitedetail">
-<a href="#addsite" onclick="uncoverDetails(this.parentElement,'hidedetail');return false;" >Less &lt;&lt;</a>
-<ol>
-<li>Redirect the user-agent to the "auth" page:<pre>
-	<strong><span class="putorigin"></span>auth?redirect_uri=&lt;url&gt;&amp;state=&lt;state&gt;</strong>
+        <div class="page" id="howork">
+            <h2>How does it work?</h2>
+            <img src="img/howitworks.png">
+        </div>
+        <div class="page" id="testit">
+            <div class="testarea">
+                <div class="testwindow">
+                    <h2>Demo login</h2>
+                    <p>Every device can store an <strong>unique identifier</strong>. This identifier can be bound with an user account. This demonstration will uncover the unique identifier of your device for this site.</p>
+                    <button id="testbutton" onclick="doTest();">Click button to uncover your <strong>unique identifier</strong> for this site</button>
+                    <p>Your unique identifier will appear below</p>
+                    <input id="IDtarget" type="text">
+                    <p><a href="#testit"  onclick="openSignWindow();">&gt;&gt; More demos - sign a message &lt;&lt;</a></p>
+                </div>                
+                <div id="testsignwindow">
+                    <div class="lightboxbg"></div>
+                    <div class="testsignwindow">
+                        <h2>Sign a message</h2>
+                        <p>
+                            QRlogin can be used to sign a message as well. This could be useful when application need to authorize
+                            a command or an operation (for example: a money transfer). Type a message below and try to generate a digital signature
+                        </p>
+                        <textarea id="MessageToSign" oninput="msgDigestPreview(this)"></textarea>
+                        <div id="msgdigest">
+                            <pre></pre>
+                            <p>Because a long  message cannot be sent through the QR code, the message's fingerprint will be used</p>
+                        </div>
+                        <button id="testsign" onclick="doSign();">Sign this message</button><button id="closebutt" onclick="closeSignWindow()">Close</button>
+                        <p>Signature:</p>
+                        <textarea id="outsignature" readonly="readonly"></textarea>
+                        <p><strong>The unique identifier</strong> of the signer calculated from the signature:<br />(must be equal to your UID)</p>
+                        <input id="outsignatureID" type="text" readonly="readonly">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page" id="addsite">
+            <h2>Add to your site</h2>
+            <h3>Using OAuth 2.0</h3>
+            <dl>
+                <dt>Authorization endpoint:</dt>
+                <dd><strong><span class="putorigin"></span>auth</strong> (redirect)</dd>
+                <dt>Token endpoint:</dt>
+                <dd><strong><span class="putorigin"></span>token</strong> (POST)</dd>
+                <dt>Identity endpoint:</dt>
+                <dd><strong><span class="putorigin"></span>ident</strong> (GET, Authorization: Bearer)</dd>
+                <dt>Client identification:</dt>
+                <dd>The <strong>client_secret</strong> is ignored. The <strong>client_id</strong> must be equal to redirect_uri's  domain (including port if specified). The <strong>scope</strong> is ignored </dd>
+                <dt>Interface language:</dt>
+                <dd>Include <strong>&lang=XX</strong> into the <em>Authorization endpoint</em> url. Currently supported languages are: en, cs
+            </dl>
+            <hr>
+            <a href="#addsite" onclick="uncoverDetails(this,'addsitedetail');return false;" id="hidedetail">More &gt;&gt; </a>
+            <div id="addsitedetail">
+                <a href="#addsite" onclick="uncoverDetails(this.parentElement,'hidedetail');return false;">Less &lt;&lt;</a>
+                <ol>
+                    <li>
+                        Redirect the user-agent to the "auth" page:<pre>
+                        <strong><span class="putorigin"></span>auth?redirect_uri=&lt;url&gt;&amp;state=&lt;state&gt;</strong>
 	</pre>
-<ul>
-<li><strong>url</strong> - url of a page to redirect the user-agent after the autentification.
-<li><strong>state</strong> - CSRF token (a random string generated by your site)
-<li>After redirection, read the <strong>code</strong> and check the <strong>state</strong>
-</ul>
-<li>Receive the identity - let your site validates the returned token<pre>
+                        <ul>
+                            <li><strong>url</strong> - url of a page to redirect the user-agent after the autentification.
+                            <li><strong>state</strong> - CSRF token (a random string generated by your site)
+                            <li>After redirection, read the <strong>code</strong> and check the <strong>state</strong>
+                        </ul>
+                    <li>
+                        Receive the identity - let your site validates the returned token<pre>
 	POST <strong><span class="putorigin"></span>token</strong>
 	DATA code=&lt;code&gt;&amp;client_id=&lt;domain&gt;
 	</pre>
-<ul>
-<li><strong>code</strong> - the string retrieved from the previous step
-<li><strong>domain</strong> - whole domain name (including the port, if specified) must match the domain name of the redirect_uri
-<li>The response should look like:<pre>
+                        <ul>
+                            <li><strong>code</strong> - the string retrieved from the previous step
+                            <li><strong>domain</strong> - whole domain name (including the port, if specified) must match the domain name of the redirect_uri
+                            <li>
+                                The response should look like:<pre>
 	{
 	"access_token":"xxxxx...xxxx",
 	 "expires_in":3600,
@@ -117,115 +115,185 @@ swer  deqe  e321
 	 "token_type":"Bearer"
 	 }
 </pre>
-where <strong>idenity</strong> is unique idenity string for the autentificated user.
-</li>
-<li><strong>NOTE:</strong> This request invalidates the "code". If you need to retrieve the identity
- later, use the <strong>access_token</strong> in the following step.
-</ul>
-<li>(optional) Receive the identity with the access_token:<pre>
+                                where <strong>idenity</strong> is unique idenity string for the autentificated user.
+                            </li>
+                            <li>
+                                <strong>NOTE:</strong> This request invalidates the "code". If you need to retrieve the identity
+                                later, use the <strong>access_token</strong> in the following step.
+                        </ul>
+                    <li>
+                        (optional) Receive the identity with the access_token:<pre>
 	GET <strong><span class="putorigin"></span>ident</strong>
 	Autorization: Bearer <strong>&lt;access_token&gt;</strong> 
 	</pre>
-	<ul>
-<li><strong>access_token</strong> - the token retrieved from the previous step</li>
-<li>The response should look like:<pre>
+                        <ul>
+                            <li><strong>access_token</strong> - the token retrieved from the previous step</li>
+                            <li>
+                                The response should look like:<pre>
 	{
 	 "identity":"yyyy...yyyy",
 	 }
 </pre>
-where <strong>idenity</strong> is unique idenity string for the autentificated user.
-</ul>
-</ol>
-</div>
-</div>
-<div class="page" id="sourcecode">
-<h2>Sources available at:</h2>
-<div class="sources" id="sources">
-    <div><a href="https://github.com/ondra-novak/qrlogin" target="_blank"><img src="img/GitHub-Mark-120px-plus.png" /></a></div>
-    <div><a href="https://github.com/ondra-novak/qrlogin" target="_blank">https://github.com/ondra-novak/qrlogin</a></div>
-</div>
-</div>
-<div class="page" id="author">
-<h2>About the author</h2>
-<div class="author">
-<div><img src="img/author.jpg"></div>
-<div><h3>Ondřej Novák</h3>
-	<ul>
-	<li><b>Facebook: </b><a href="https://www.facebook.com/ondra.novacisko.cz">www.facebook.com/ondra.novacisko.cz</a>
-	<li><b>Twitter: </b><a href="https://twitter.com/novacisko">@novacisko</a>
-	<li><b>GitHub: </b><a href="https://github.com/ondra-novak">ondra-novak</a>
-	<li><b>E-mail: </b>nov.ondrej@gmail.com</a>
-	</ul>
-</div>
-</div>
-</div>
-</div>
+                                where <strong>idenity</strong> is unique idenity string for the autentificated user.
+                        </ul>
+                </ol>
+            </div>
+        </div>
+        <div class="page" id="sourcecode">
+            <h2>Sources available at:</h2>
+            <div class="sources" id="sources">
+                <div><a href="https://github.com/ondra-novak/qrlogin" target="_blank"><img src="img/GitHub-Mark-120px-plus.png" /></a></div>
+                <div><a href="https://github.com/ondra-novak/qrlogin" target="_blank">https://github.com/ondra-novak/qrlogin</a></div>
+            </div>
+        </div>
+        <div class="page" id="author">
+            <h2>About the author</h2>
+            <div class="author">
+                <div><img src="img/author.jpg"></div>
+                <div>
+                    <h3>Ondřej Novák</h3>
+                    <ul>
+                        <li><b>Facebook: </b><a href="https://www.facebook.com/ondra.novacisko.cz">www.facebook.com/ondra.novacisko.cz</a>
+                        <li><b>Twitter: </b><a href="https://twitter.com/novacisko">@novacisko</a>
+                        <li><b>GitHub: </b><a href="https://github.com/ondra-novak">ondra-novak</a>
+                        <li><b>E-mail: </b>nov.ondrej@gmail.com</a>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="qrwin">
+        <div class="lightboxbg"></div>
+        <div class="lightboxwnd">
+            <iframe id="qriframe" width="450" height="600" src="spinnerpage.html"></iframe>
+            <button onclick="closeQR();">Close</button>
+        </div>
+    </div>
 
-<script type="text/javascript">
+    <script type="text/javascript">
+        
+        function closeQR() {
+            var iframe = document.getElementById("qriframe");
+            iframe.src = "spinnerpage.html";
+            var box = document.getElementById("qrwin");
+            box.style.display = "none";
+        }
 
-function doTest() {
-    var redirUrl = location.origin + location.pathname;
-    var qrloginUrl = location.origin+"/auth#?redirect_uri="+encodeURIComponent(redirUrl)+"&js=true&rnd="+Math.random();
-    var box = document.getElementById("qrwin");
-    var iframe = document.getElementById("qriframe");
-    iframe.src = qrloginUrl;
-	box.style.display = "block";
-}
+        function openQR(qrloginUrl) {
+            var box = document.getElementById("qrwin");
+            var iframe = document.getElementById("qriframe");
+            //wait for while to show spinner before we start to load
+            setTimeout(function () { iframe.src = qrloginUrl }, 100);
+            box.style.display = "block";
+        }
 
-function showError() {
-	var out = document.getElementById("IDtarget");
-	out.value = "<token is not valid>";
-}
+        function doTest() {
+            var redirUrl = location.origin + location.pathname;
+            var qrloginUrl = location.origin + "/auth#?redirect_uri=" + encodeURIComponent(redirUrl) + "&js=true&rnd=" + Math.random();
+            openQR(qrloginUrl);
+        }
 
-function validateToken(token) {
-	
-	var identity = QRlogin_decodeLoginSignature(token,location.host);
-	var out = document.getElementById("IDtarget");
-	out.value = identity;
-}
+        function showError() {
+            var out = document.getElementById("IDtarget");
+            out.value = "<token is not valid>";
+        }
 
-if (!window.location.origin) {
-    window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
-}
+        function validateToken(token) {
 
-function putUrl() {
-	var items = document.getElementsByClassName("putorigin");
-	for (var i = 0; i < items.length; i++) {
-		var x = items[i];
-		x.appendChild(document.createTextNode(location.origin+location.pathname));
-	}
-}
-
-function uncoverDetails(tohide, toshow) {
-	var toshowel = document.getElementById(toshow);
-	tohide.style.display = "none";
-	toshowel.style.display = "block";
-}
-
-var qs = getQueryString(location.search);
-if (qs.test) validateToken(qs.code);
-putUrl();
-
-window.addEventListener("hashchange", function () {
-    if (location.hash.substr(0, 7) == "#?code=") {
-        var query = location.hash.substr(1);
-        var qs = getQueryString(query);;
-        validateToken(qs.code);
-        var box = document.getElementById("qrwin");
-        box.style.display = "none";
+            var identity = QRlogin_decodeLoginSignature(token, location.host);
+            if (identity === false) {
+                var itm = document.getElementById("MessageToSign");
+                var msgsign = QRlogin_decodeMsgSignature(token,itm.value);
+                if (msgsign !== false) {
+                    document.getElementById("outsignature").value = msgsign[0];
+                    document.getElementById("outsignatureID").value = msgsign[1];
+                    return;
+                }
+            }
+            var out = document.getElementById("IDtarget");
+            out.value = identity;
+        }
 
 
-    }
-})
-document.getElementById("closebutt").addEventListener("click", function () {
-    document.getElementById("qrwin").style.display = "none";
-});
+        if (!window.location.origin) {
+            window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
+        }
 
-document.getElementById("MessageToSign").addEventListener("input", function(e){
-	document.getElementById("visualdigest").innerHTML = QRlogin_createvisualdigest(e.target.value);
-})
+        function putUrl() {
+            var items = document.getElementsByClassName("putorigin");
+            for (var i = 0; i < items.length; i++) {
+                var x = items[i];
+                x.appendChild(document.createTextNode(location.origin + location.pathname));
+            }
+        }
 
-</script>
+        function uncoverDetails(tohide, toshow) {
+            var toshowel = document.getElementById(toshow);
+            tohide.style.display = "none";
+            toshowel.style.display = "block";
+        }
+
+        var qs = getQueryString(location.search);
+        if (qs.test) validateToken(qs.code);
+        putUrl();
+
+        window.addEventListener("hashchange", function () {
+            if (location.hash.substr(0, 7) == "#?code=") {
+                var query = location.hash.substr(1);
+                var qs = getQueryString(query);;
+                validateToken(qs.code);
+                closeQR();
+
+            }
+        })
+
+
+        function openSignWindow() {
+            document.getElementById("testsignwindow").style.display = "block";
+            setTimeout(function () { document.getElementById("MessageToSign").focus() }, 300);
+        }
+        function closeSignWindow() {
+            document.getElementById("testsignwindow").style.display = "none";
+        }
+        function calculateMsgHash(msg) {
+            var hash = Crypto.util.bytesToHex(s.msg_digest(msg));
+        }
+
+        function msgDigestPreview(itm) {
+            var digestBox = getBlockById("msgdigest");
+            var digestPrev = digestBox.getElementsByTagName("pre")[0]
+            if (encodeURIComponentPlus(itm.value).length>160) {
+                digestBox.show();
+                var s = new BitcoinSign;
+                var toshow = QRlogin_decorateFingerprint(s.msg_digest(itm.value));
+                QRlogin_fingerprintToElement(toshow, digestPrev);
+
+            } else {
+                digestBox.hide();
+            }
+        }
+        function doSign() {
+            document.getElementById("outsignature").value = "";
+            document.getElementById("outsignatureID").value = "";
+            var redirUrl = location.origin + location.pathname;
+            var qrloginUrl = location.origin + "/auth#?redirect_uri=" + encodeURIComponent(redirUrl) + "&js=true&rnd=" + Math.random();
+            var itm = document.getElementById("MessageToSign");
+            var msg = encodeURIComponentPlus(itm.value);
+            if (msg.length == 0) {
+                alert("Can't sign an empty message");
+            } else {
+                if (msg.length > 160) {
+                    var s = new BitcoinSign;
+                    var digest = Crypto.util.bytesToHex(s.msg_digest(itm.value));
+                    qrloginUrl += "&signhash=" + digest;
+                } else {
+                    qrloginUrl += "&signmsg=" + msg;
+                }
+                openQR(qrloginUrl);
+            }
+
+        }
+
+    </script>
 </body>
 </html>
-
