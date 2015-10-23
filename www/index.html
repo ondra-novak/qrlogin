@@ -215,7 +215,7 @@
             var identity = QRlogin.decodeLoginSignature(token, location.host);
             if (identity === false) {
                 var itm = document.getElementById("MessageToSign");
-                var msgsign = QRlogin.decodeMsgSignature(token,itm.value);
+                var msgsign = QRlogin.decodeMsgSignature(token,QRlogin.getMsgDigest(itm.value));
                 if (msgsign !== false) {
                     document.getElementById("outsignature").value = msgsign[0];
                     document.getElementById("outsignatureID").value = msgsign[1];
@@ -272,7 +272,7 @@
             var digestBox = getBlockById("msgdigest");
             var signature = getBlockById("outsignature");
             var digestPrev = digestBox.getElementsByTagName("pre")[0]
-            if (QRlogin.decodeURIMessage(itm.value).length>160) {
+            if (QRlogin.encodeURIMessage(itm.value).length>160) {
                 digestBox.show();
                 var toshow = QRlogin.formatDigestForUser(QRlogin.getMsgDigest(itm.value));
                 QRlogin.formatedDigestToElement(toshow, digestPrev);

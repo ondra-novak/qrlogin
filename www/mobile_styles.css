@@ -106,7 +106,7 @@ label.always_blank
 #panel {
 	display:none;
 }
-#noprofile, #alreadyprofile,#transfer{
+#noprofile, #alreadyprofile,#transfer,#differentkey{
 	display: none;
 }
 

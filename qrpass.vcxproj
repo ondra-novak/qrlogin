@@ -122,19 +122,28 @@
     <None Include="www\auth.css" />
     <None Include="www\auth.html" />
     <None Include="www\auth.js" />
+    <None Include="www\challenge.html" />
     <None Include="www\libs\aes.js" />
     <None Include="www\libs\common.js" />
     <None Include="www\libs\qrcode.js" />
     <None Include="www\libs\qrlogin-crypto.js" />
     <None Include="www\libs\sha256.js" />
+    <None Include="www\manage.html" />
     <None Include="www\mobileapp.js" />
+    <None Include="www\mobile_styles.css" />
+    <None Include="www\msign.html" />
+    <None Include="www\print.css" />
+    <None Include="www\print.html" />
+    <None Include="www\restore.html" />
     <None Include="www\spinnerpage.html" />
     <None Include="www\index.css" />
     <None Include="www\index.html" />
-    <None Include="www\sign.html" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="log\folder.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="www\favicon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

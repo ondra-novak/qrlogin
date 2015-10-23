@@ -193,7 +193,7 @@ function SignPage() {
     var sign_hash = getBlockById("sign_hash");
     var ismsg = payload.substr(0,4) == "msg=";
     var ishash = payload.substr(0,5) == "hash=";
-    var content = decodeURIComponentPlus(payload.substr(ismsg ? 4 : 5));
+    var content = QRlogin.decodeURIMessage(payload.substr(ismsg ? 4 : 5));
     var password_input = getBlockById("password_input");
     var password_form = getBlockById("password_form");
     var accept_button = getBlockById("accept_button");
@@ -222,15 +222,9 @@ function SignPage() {
             } else {
                 sign_hash.show();
                 target = sign_hash.getElementsByTagName("p")[0];
-                toshow = QRlogin_decorateFingerprint(Crypto.util.base64ToBytes(content));
+                toshow = QRlogin.formatDigestForUser(QRlogin.base64ToBytes(content));
             }
-            toshow = toshow.split('\n');
-            for (i = 0; i < toshow.length; i++) {
-                if (toshow[i].length) {
-                    if (i) target.appendChild(document.createElement("br"));
-                    target.appendChild(document.createTextNode(toshow[i]));
-                }
-            }
+            QRlogin.formatedDigestToElement(toshow, target);
             accept_button.show();
             if (keyinfo.hasPwd) {
                 password_form.show();
@@ -246,7 +240,6 @@ function SignPage() {
         spinner.hide();
         if (connection.status == 200) {
             delivered_sect.show();
-            localStorage.attempts = JSON.stringify(attempt);
             if (window.opener) window.close();
         } else {
             failed_sect.show();
@@ -472,9 +465,11 @@ function RestorePage() {
 
 
     var alreadyprofile = getBlockById("alreadyprofile");
+    var differentkey = getBlockById("differentkey");
     var passphrase_panel = getBlockById("passphrase_panel");
     var passphrase = getBlockById("passphrase");
     var restore_key_button = getBlockById("restore_key_button");
+    var check_key_button = getBlockById("check_key_button");
     var spinner = getBlockById("spinner");
     var progressbar = getBlockById("progressbar");
     var done_sect = getBlockById("done_sect");
@@ -485,11 +480,14 @@ function RestorePage() {
         serviceId.appendChild(document.createTextNode(host));
         loadLang(lang);
 
+        passphrase_panel.show();
+        restore_key_button.addEventListener("click", importKey);
+        check_key_button.addEventListener("click", importKey);
+
         if (getKey(host)) {
-            alreadyprofile.show();
+            restore_key_button.hide();
         } else {
-            passphrase_panel.show();
-            restore_key_button.addEventListener("click", importKey);
+            check_key_button.hide();
         }
     }
 
@@ -514,15 +512,28 @@ function RestorePage() {
                     var secret = parseBase58Check(keyfile.wif)[1];
                     var hasPwd = keyfile.hasPwd;
                     var keyinfo = {
-                        secret:secret,
-                        hasPwd:hasPwd,
-                        prehash:Crypto.SHA256(secret, { asBytes: true })
+                        secret: secret,
+                        hasPwd: hasPwd,
+                        prehash: Crypto.SHA256(secret, { asBytes: true })
                     };
+                    var curkey = getKey(host);
+                    if (curkey) {
+                        if ((curkey.secret.length == keyinfo.secret.length) && curkey.secret.every(function (element, index) {
+                            return element === keyinfo.secret[index];
+                            }))
+                        {
+                            alreadyprofile.show();
+                        } else {
+                            differentkey.show();
+                        }
+                    } else {
 
-                    setKey(host, keyinfo);
-                    done_sect.show();
+                        setKey(host, keyinfo);
+                        done_sect.show();
+                    }
                 } else {
                     passphrase_panel.show();
+
                 }
             } catch (e) {
                 passphrase_panel.show();

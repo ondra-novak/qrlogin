@@ -2,7 +2,7 @@
 <head>
     <title>QRlogin</title>
     <link rel="stylesheet" href="mobile_styles.css" type="text/css" />
-    <script src="libs/bitcoinjs-min.js" type="text/javascript"></script>
+    <script src="libs/qrlogin-crypto.js" type="text/javascript"></script>
     <script src="libs/common.js" type="text/javascript"></script>
     <script src="libs/aes.js" type="text/javascript"></script>
     <script src="libs/sha256.js" type="text/javascript"></script>
@@ -16,14 +16,21 @@
             <span id="serviceId"></span>
         </div>
     </div>
-    <div id="alreadyprofile" class="str_rstr_alreadyprofile">You already have a key active for this site. First, you have to backup and erase
-        this key through the Manage Keys page!</div>
+    <div id="alreadyprofile">
+        <p class="str_rstr_alreadyprofile">Keys match</p>
+        <img src="img/success.png" />
+    </div>
+    <div id="differentkey">
+        <p class="str_rstr_differentkey">The device already has a different key</p>
+        <img src="img/failed.png" />
+    </div>
     <div class="password" id="passphrase_panel">
         <label>
             <span class="str_rstr_enterpassphrase">Enter passphrase</span>
             <input type="text" class="password" id="passphrase" />
         </label>
         <button id="restore_key_button" class="str_rstr_import_key_button">Import key</button>
+        <button id="check_key_button" class="str_rstr_check_key_button">Check key</button>
     </div>
     <div class="spinner" id="spinner">
         <img src="img/spinner.gif"></div>

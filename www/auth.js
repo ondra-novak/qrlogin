@@ -98,10 +98,10 @@ function QRloginAuth(argss, lang, controls  /* = qr,download,restore,header*/) {
 	        var sfx = "";
 	        var pfx = "";
 	        if (args.signmsg) {
-	            pfx = "s"; sfx = ",msg=" + QRlogin.encodeURIComponent(args.signmsg);
+	            pfx = "s"; sfx = ",msg=" + QRlogin.encodeURIMessage(args.signmsg);
 	        }
 	        else if (args.signhash) {
-	            pfx = "s"; sfx = ",hash=" + QRlogin.encodeURIComponent(
+	            pfx = "s"; sfx = ",hash=" + QRlogin.encodeURIMessage(
                     QRlogin.hexToBase64(args.signhash));
 	        }
 	        else { pfx = "c"; sfx = ""; }
