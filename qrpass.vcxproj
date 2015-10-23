@@ -119,6 +119,15 @@
   <ItemGroup>
     <None Include="conf\client.html" />
     <None Include="conf\qrpass.conf" />
+    <None Include="www\auth.css" />
+    <None Include="www\auth.html" />
+    <None Include="www\auth.js" />
+    <None Include="www\libs\aes.js" />
+    <None Include="www\libs\common.js" />
+    <None Include="www\libs\qrcode.js" />
+    <None Include="www\libs\qrlogin-crypto.js" />
+    <None Include="www\libs\sha256.js" />
+    <None Include="www\mobileapp.js" />
     <None Include="www\spinnerpage.html" />
     <None Include="www\index.css" />
     <None Include="www\index.html" />

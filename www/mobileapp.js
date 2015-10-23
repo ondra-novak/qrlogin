@@ -96,7 +96,7 @@ function LoginPage() {
     }
 
     function signRequest(c, key) {
-        return sign_message(new Bitcoin.ECKey(key), c, false);
+        return QRlogin.signMessage(new Bitcoin.ECKey(key), QRlogin.getMsgDigest(c), false);
     }
 
 
@@ -274,9 +274,8 @@ function SignPage() {
             key = keyinfo.prehash;
         }
 
-        var signsvc = new BitcoinSign;
-        var digest = ismsg ? signsvc.msg_digest(content) : signsvc.digestFromBase64(content);
-        var signature = signsvc.sign_message(new Bitcoin.ECKey(key), digest, false);
+        var digest = ismsg ? QRlogin.getMsgDigest(content) : QRlogin.base64ToBytes(content);
+        var signature = QRlogin.signMessage(new Bitcoin.ECKey(key), digest, false);
         //if failed
         if (signature === false) {
             //schedule new try

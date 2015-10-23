@@ -200,10 +200,10 @@
 
         function validateToken(token) {
 
-            var identity = QRlogin_decodeLoginSignature(token, location.host);
+            var identity = QRlogin.decodeLoginSignature(token, location.host);
             if (identity === false) {
                 var itm = document.getElementById("MessageToSign");
-                var msgsign = QRlogin_decodeMsgSignature(token,itm.value);
+                var msgsign = QRlogin.decodeMsgSignature(token,itm.value);
                 if (msgsign !== false) {
                     document.getElementById("outsignature").value = msgsign[0];
                     document.getElementById("outsignatureID").value = msgsign[1];
@@ -255,18 +255,14 @@
         function closeSignWindow() {
             document.getElementById("testsignwindow").style.display = "none";
         }
-        function calculateMsgHash(msg) {
-            var hash = Crypto.util.bytesToHex(s.msg_digest(msg));
-        }
 
         function msgDigestPreview(itm) {
             var digestBox = getBlockById("msgdigest");
             var digestPrev = digestBox.getElementsByTagName("pre")[0]
-            if (encodeURIComponentPlus(itm.value).length>160) {
+            if (QRlogin.decodeURIMessage(itm.value).length>160) {
                 digestBox.show();
-                var s = new BitcoinSign;
-                var toshow = QRlogin_decorateFingerprint(s.msg_digest(itm.value));
-                QRlogin_fingerprintToElement(toshow, digestPrev);
+                var toshow = QRlogin.formatDigestForUser(QRlogin.getMsgDigest(itm.value));
+                QRlogin.formatedDigestToElement(toshow, digestPrev);
 
             } else {
                 digestBox.hide();
@@ -278,13 +274,12 @@
             var redirUrl = location.origin + location.pathname;
             var qrloginUrl = location.origin + "/auth#?redirect_uri=" + encodeURIComponent(redirUrl) + "&js=true&rnd=" + Math.random();
             var itm = document.getElementById("MessageToSign");
-            var msg = encodeURIComponentPlus(itm.value);
+            var msg = QRlogin.encodeURIMessage(itm.value);
             if (msg.length == 0) {
                 alert("Can't sign an empty message");
             } else {
                 if (msg.length > 160) {
-                    var s = new BitcoinSign;
-                    var digest = Crypto.util.bytesToHex(s.msg_digest(itm.value));
+                    var digest = QRlogin.bytesToHex(QRlogin.getMsgDigest(itm.value));
                     qrloginUrl += "&signhash=" + digest;
                 } else {
                     qrloginUrl += "&signmsg=" + msg;

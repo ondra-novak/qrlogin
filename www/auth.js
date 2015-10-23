@@ -1,4 +1,4 @@
-function QRlogin(argss, lang, controls  /* = qr,download,restore,header*/) {
+function QRloginAuth(argss, lang, controls  /* = qr,download,restore,header*/) {
 	
 //	var qrcodeBox = document.getElementById("qrcode");
 	var curcode = null;
@@ -48,8 +48,8 @@ function QRlogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	
 	var reload = function (mode) {
 	    curmode = mode;
-	    if (mode == QRlogin.modeRestore) return restoreBackup();
-	    var manage = mode == QRlogin.modeManage;
+	    if (mode == QRloginAuth.modeRestore) return restoreBackup();
+	    var manage = mode == QRloginAuth.modeManage;
 	    apikey = getDomainFromUrl(args.redirect_uri);
 	    restoreBox.hide(); restpanel = false;
 	    downloadBox.hide(); downloadshown = false;
@@ -57,7 +57,7 @@ function QRlogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	    qrcodeBox.style.visibility = "visible";
 
 	    var bytes = secureRandom(20);
-	    curcode = base64EncodeUrl(Crypto.util.bytesToBase64(bytes));
+	    curcode = base64EncodeUrl(QRlogin.bytesToBase64(bytes));
 	    channelid = Crypto.SHA256(curcode);;
 	    var logurl = "l?c=" + channelid;
 
@@ -97,10 +97,12 @@ function QRlogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	    } else {
 	        var sfx = "";
 	        var pfx = "";
-	        if (args.signmsg) { pfx = "s"; sfx = ",msg=" + encodeURIComponentPlus(args.signmsg); }
+	        if (args.signmsg) {
+	            pfx = "s"; sfx = ",msg=" + QRlogin.encodeURIComponent(args.signmsg);
+	        }
 	        else if (args.signhash) {
-	            pfx = "s"; sfx = ",hash=" + encodeURIComponentPlus(
-                    Crypto.util.bytesToBase64(Crypto.util.hexToBytes(args.signhash)));
+	            pfx = "s"; sfx = ",hash=" + QRlogin.encodeURIComponent(
+                    QRlogin.hexToBase64(args.signhash));
 	        }
 	        else { pfx = "c"; sfx = ""; }
 
@@ -175,9 +177,9 @@ function QRlogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	            if (qmark == -1) redir = redir + "?"; else redir = redir + '&';
 	        }
 	        var adjr;
-	        if (args.signhash) adjr = r + ':' + args.signhash;
+	        if (args.signhash) adjr = r;
 	        else if (args.signmsg) {
-	            adjr = r + ':' + Crypto.util.bytesToHex((new BitcoinSign).msg_digest(args.signmsg));
+	            adjr = r
 	        } else {
 	            adjr = r + ":" + curcode;
 	        }
@@ -247,14 +249,14 @@ function QRlogin(argss, lang, controls  /* = qr,download,restore,header*/) {
 	}
 	init.call(this);
 }
-QRlogin.prototype.modeLogin = 0;
-QRlogin.prototype.modeManage = 1;
-QRlogin.prototype.modeRestore = 2;
+QRloginAuth.prototype.modeLogin = 0;
+QRloginAuth.prototype.modeManage = 1;
+QRloginAuth.prototype.modeRestore = 2;
 
 
 
 
-function LangPanel(panel,curlang, QRlogin) {
+function LangPanel(panel,curlang, QRloginAuth) {
     var lang = curlang;
     var langlist = ["cs","en"];
     var i;
@@ -272,7 +274,7 @@ function LangPanel(panel,curlang, QRlogin) {
             
             img.src = "img/lang_"+langlist[i]+".gif";
             img.onclick = function(l) {
-                QRlogin.setLang(l);
+                QRloginAuth.setLang(l);
                 lang = l;
                 drawPanel();
                 loadLang(lang);
@@ -331,16 +333,16 @@ function initObjects() {
     var restoreBox = getBlockById("restoreform");
     var downloadBox = getBlockById("downloadask");
 
-    window.QRlogin = new QRlogin(querystr, lang,
+    window.QRloginAuth = new QRloginAuth(querystr, lang,
 			{ qr: qrblock, restore: restoreBox, download: downloadBox });
-    window.QRlogin.reload(false);
+    window.QRloginAuth.reload(false);
 
-    window.langpanel = new LangPanel(panel, lang, QRlogin);    
+    window.langpanel = new LangPanel(panel, lang, QRloginAuth);    
 
     window.selector = new Selector([
-        {element:getBlockById("tab_login"),action:function () { QRlogin.reload(QRlogin.modeLogin); }},
-        { element: getBlockById("tab_manage"), action: function () { QRlogin.reload(QRlogin.modeManage); } },
-        { element: getBlockById("tab_restore"), action: function () { QRlogin.reload(QRlogin.modeRestore); } }
+        {element:getBlockById("tab_login"),action:function () { QRloginAuth.reload(QRloginAuth.modeLogin); }},
+        { element: getBlockById("tab_manage"), action: function () { QRloginAuth.reload(QRloginAuth.modeManage); } },
+        { element: getBlockById("tab_restore"), action: function () { QRloginAuth.reload(QRloginAuth.modeRestore); } }
         ]);
     if (querystr["signmsg"] || querystr["signhash"]) {
         getBlockById("tab_login").classList.add("str_auth_sign");
@@ -360,14 +362,16 @@ function start() {
 
 window.addEventListener("hashchange", function () {
     if (location.hash.substr(0, 2) == "#?") {
-        var querystr = location.hash.substr(0, 2) == "#?" ? getQueryString(location.hash.substr(1)) : getQueryString(location.search);
+        var querystr = location.hash.substr(0, 2) == "#?"
+            ? getQueryString(location.hash.substr(1), QRlogin.decodeURIMessage)
+            : getQueryString(location.search, QRlogin.decodeURIMessage);
         var lang = querystr["lang"];
         if (lang) {
             window.langpanel.setLang(lang);
             loadLang(lang);
         }
-        window.QRlogin.setNewArgs(querystr);
-        window.QRlogin.reload(false);
+        window.QRloginAuth.setNewArgs(querystr);
+        window.QRloginAuth.reload(false);
         window.selector.select(0);
     }
 });

@@ -26,217 +26,278 @@ Bitcoin.ECKey=function(){var e=Bitcoin.ECDSA,t=getSECCurveByName("secp256k1"),n=
 (function(){var e=Bitcoin.Script,t=Bitcoin.Transaction=function(e){this.version=1,this.lock_time=0,this.ins=[],this.outs=[],this.timestamp=null,this.block=null;if(e){e.hash&&(this.hash=e.hash),e.version&&(this.version=e.version),e.lock_time&&(this.lock_time=e.lock_time);if(e.ins&&e.ins.length)for(var t=0;t<e.ins.length;t++)this.addInput(new u(e.ins[t]));if(e.outs&&e.outs.length)for(var t=0;t<e.outs.length;t++)this.addOutput(new a(e.outs[t]));e.timestamp&&(this.timestamp=e.timestamp),e.block&&(this.block=e.block)}};t.objectify=function(e){var n=[];for(var r=0;r<e.length;r++)n.push(new t(e[r]));return n},t.prototype.addInput=function(e,t){arguments[0]instanceof u?this.ins.push(arguments[0]):this.ins.push(new u({outpoint:{hash:e.hash,index:t},script:new Bitcoin.Script,sequence:4294967295}))},t.prototype.addOutput=function(t,n){if(arguments[0]instanceof a)this.outs.push(arguments[0]);else{if(n instanceof BigInteger){n=n.toByteArrayUnsigned().reverse();while(n.length<8)n.push(0)}else Bitcoin.Util.isArray(n);this.outs.push(new a({value:n,script:e.createOutputScript(t)}))}},t.prototype.serialize=function(){var e=[];e=e.concat(Crypto.util.wordsToBytes([parseInt(this.version)]).reverse()),e=e.concat(Bitcoin.Util.numToVarInt(this.ins.length));for(var t=0;t<this.ins.length;t++){var n=this.ins[t];e=e.concat(Crypto.util.base64ToBytes(n.outpoint.hash)),e=e.concat(Crypto.util.wordsToBytes([parseInt(n.outpoint.index)]).reverse());var r=n.script.buffer;e=e.concat(Bitcoin.Util.numToVarInt(r.length)),e=e.concat(r),e=e.concat(Crypto.util.wordsToBytes([parseInt(n.sequence)]).reverse())}e=e.concat(Bitcoin.Util.numToVarInt(this.outs.length));for(var t=0;t<this.outs.length;t++){var i=this.outs[t];e=e.concat(i.value);var r=i.script.buffer;e=e.concat(Bitcoin.Util.numToVarInt(r.length)),e=e.concat(r)}return e=e.concat(Crypto.util.wordsToBytes([parseInt(this.lock_time)]).reverse()),e};var n=171,r=1,i=2,s=3,o=80;t.prototype.hashTransactionForSignature=function(t,n,r){var u=this.clone();for(var a=0;a<u.ins.length;a++)u.ins[a].script=new e;u.ins[n].script=t;if((r&31)==i){u.outs=[];for(var a=0;a<u.ins.length;a++)a!=n&&(u.ins[a].sequence=0)}else(r&31)==s;r&o&&(u.ins=[u.ins[n]]);var f=u.serialize();f=f.concat(Crypto.util.wordsToBytes([parseInt(r)]).reverse());var l=Crypto.SHA256(f,{asBytes:!0});return Crypto.SHA256(l,{asBytes:!0})},t.prototype.getHash=function(){var e=this.serialize();return Crypto.SHA256(Crypto.SHA256(e,{asBytes:!0}),{asBytes:!0})},t.prototype.clone=function(){var e=new t;e.version=this.version,e.lock_time=this.lock_time;for(var n=0;n<this.ins.length;n++){var r=this.ins[n].clone();e.addInput(r)}for(var n=0;n<this.outs.length;n++){var i=this.outs[n].clone();e.addOutput(i)}return e},t.prototype.analyze=function(e){if(e instanceof Bitcoin.Wallet){var t=!0,n=!0,r=null,i=null,s=null;for(var o=this.outs.length-1;o>=0;o--){var u=this.outs[o],a=u.script.simpleOutPubKeyHash();e.hasHash(a)?i=a:n=!1,r=a}for(var o=this.ins.length-1;o>=0;o--){var f=this.ins[o];s=f.script.simpleInPubKeyHash();if(!e.hasHash(s)){t=!1;break}}var l=this.calcImpact(e),c={};return c.impact=l,l.sign>0&&l.value.compareTo(BigInteger.ZERO)>0?(c.type="recv",c.addr=new Bitcoin.Address(i)):t&&n?c.type="self":t?(c.type="sent",c.addr=new Bitcoin.Address(r)):c.type="other",c}return null},t.prototype.getDescription=function(e){var t=this.analyze(e);if(!t)return"";switch(t.type){case"recv":return"Received with "+t.addr;case"sent":return"Payment to "+t.addr;case"self":return"Payment to yourself";case"other":default:return""}},t.prototype.getTotalOutValue=function(){var e=BigInteger.ZERO;for(var t=0;t<this.outs.length;t++){var n=this.outs[t];e=e.add(Bitcoin.Util.valueToBigInt(n.value))}return e},t.prototype.getTotalValue=t.prototype.getTotalOutValue,t.prototype.calcImpact=function(e){if(e instanceof Bitcoin.Wallet){var t=BigInteger.ZERO;for(var n=0;n<this.outs.length;n++){var r=this.outs[n],i=Crypto.util.bytesToBase64(r.script.simpleOutPubKeyHash());e.hasHash(i)&&(t=t.add(Bitcoin.Util.valueToBigInt(r.value)))}var s=BigInteger.ZERO;for(var n=0;n<this.ins.length;n++){var o=this.ins[n],i=Crypto.util.bytesToBase64(o.script.simpleInPubKeyHash());if(e.hasHash(i)){var u=e.txIndex[o.outpoint.hash];u&&(s=s.add(Bitcoin.Util.valueToBigInt(u.outs[o.outpoint.index].value)))}}return t.compareTo(s)>=0?{sign:1,value:t.subtract(s)}:{sign:-1,value:s.subtract(t)}}return BigInteger.ZERO};var u=Bitcoin.TransactionIn=function(t){this.outpoint=t.outpoint,t.script instanceof e?this.script=t.script:this.script=new e(t.script),this.sequence=t.sequence};u.prototype.clone=function(){var e=new u({outpoint:{hash:this.outpoint.hash,index:this.outpoint.index},script:this.script.clone(),sequence:this.sequence});return e};var a=Bitcoin.TransactionOut=function(t){t.script instanceof e?this.script=t.script:this.script=new e(t.script);if(Bitcoin.Util.isArray(t.value))this.value=t.value;else if("string"==typeof t.value){var n=(new BigInteger(t.value,10)).toString(16);while(n.length<16)n="0"+n;this.value=Crypto.util.hexToBytes(n)}};a.prototype.clone=function(){var e=new a({script:this.script.clone(),value:this.value.slice(0)});return e}})();
 Bitcoin.Wallet=function(){var e=Bitcoin.Script,t=Bitcoin.TransactionIn,n=Bitcoin.TransactionOut,r=function(){var e=[];this.addressHashes=[],this.txIndex={},this.unspentOuts=[],this.addressPointer=0,this.addKey=function(t,n){t instanceof Bitcoin.ECKey||(t=new Bitcoin.ECKey(t)),e.push(t),n&&("string"==typeof n&&(n=Crypto.util.base64ToBytes(n)),t.setPub(n)),this.addressHashes.push(t.getBitcoinAddress().getHashBase64())},this.addKeys=function(e,t){"string"==typeof e&&(e=e.split(",")),"string"==typeof t&&(t=t.split(","));var n;if(Array.isArray(t)&&e.length==t.length)for(n=0;n<e.length;n++)this.addKey(e[n],t[n]);else for(n=0;n<e.length;n++)this.addKey(e[n])},this.getKeys=function(){var t=[];for(var n=0;n<e.length;n++)t.push(e[n].toString("base64"));return t},this.getPubKeys=function(){var t=[];for(var n=0;n<e.length;n++)t.push(Crypto.util.bytesToBase64(e[n].getPub()));return t},this.clear=function(){e=[]},this.getLength=function(){return e.length},this.getAllAddresses=function(){var t=[];for(var n=0;n<e.length;n++)t.push(e[n].getBitcoinAddress());return t},this.getCurAddress=function(){return e[this.addressPointer]?e[this.addressPointer].getBitcoinAddress():null},this.getNextAddress=function(){return this.addressPointer++,e[this.addressPointer]||this.generateAddress(),e[this.addressPointer].getBitcoinAddress()},this.signWithKey=function(t,n){t=Crypto.util.bytesToBase64(t);for(var r=0;r<this.addressHashes.length;r++)if(this.addressHashes[r]==t)return e[r].sign(n);throw new Error("Missing key for signature")},this.getPubKeyFromHash=function(t){t=Crypto.util.bytesToBase64(t);for(var n=0;n<this.addressHashes.length;n++)if(this.addressHashes[n]==t)return e[n].getPub();throw new Error("Hash unknown")}};return r.prototype.generateAddress=function(){this.addKey(new Bitcoin.ECKey)},r.prototype.process=function(e){if(this.txIndex[e.hash])return;var r,i,s;for(r=0;r<e.outs.length;r++){var o=new n(e.outs[r]);s=Crypto.util.bytesToBase64(o.script.simpleOutPubKeyHash());for(i=0;i<this.addressHashes.length;i++)if(this.addressHashes[i]===s){this.unspentOuts.push({tx:e,index:r,out:o});break}}for(r=0;r<e.ins.length;r++){var u=new t(e.ins[r]),a=u.script.simpleInPubKey();s=Crypto.util.bytesToBase64(Bitcoin.Util.sha256ripe160(a));for(i=0;i<this.addressHashes.length;i++)if(this.addressHashes[i]===s){for(var f=0;f<this.unspentOuts.length;f++)u.outpoint.hash==this.unspentOuts[f].tx.hash&&u.outpoint.index==this.unspentOuts[f].index&&this.unspentOuts.splice(f,1);break}}this.txIndex[e.hash]=e},r.prototype.getBalance=function(){var e=BigInteger.valueOf(0);for(var t=0;t<this.unspentOuts.length;t++){var n=this.unspentOuts[t].out;e=e.add(Bitcoin.Util.valueToBigInt(n.value))}return e},r.prototype.createSend=function(t,n,r){var i=[],s=n.add(r),o=BigInteger.ZERO,u;for(u=0;u<this.unspentOuts.length;u++){i.push(this.unspentOuts[u]),o=o.add(Bitcoin.Util.valueToBigInt(this.unspentOuts[u].out.value));if(o.compareTo(s)>=0)break}if(o.compareTo(s)<0)throw new Error("Insufficient funds.");var a=o.subtract(s),f=new Bitcoin.Transaction;for(u=0;u<i.length;u++)f.addInput(i[u].tx,i[u].index);f.addOutput(t,n),a.compareTo(BigInteger.ZERO)>0&&f.addOutput(this.getNextAddress(),a);var l=1;for(u=0;u<f.ins.length;u++){var c=f.hashTransactionForSignature(i[u].out.script,u,l),h=i[u].out.script.simpleOutPubKeyHash(),p=this.signWithKey(h,c);p.push(parseInt(l,10)),f.ins[u].script=e.createInputScript(p,this.getPubKeyFromHash(h))}return f},r.prototype.clearTransactions=function(){this.txIndex={},this.unspentOuts=[]},r.prototype.hasHash=function(e){Bitcoin.Util.isArray(e)&&(e=Crypto.util.bytesToBase64(e));for(var t=0;t<this.addressHashes.length;t++)if(this.addressHashes[t]===e)return!0;return!1},r}();
 var TransactionDatabase=function(){this.txs=[],this.txIndex={}};EventEmitter.augment(TransactionDatabase.prototype),TransactionDatabase.prototype.addTransaction=function(e){this.addTransactionNoUpdate(e),$(this).trigger("update")},TransactionDatabase.prototype.addTransactionNoUpdate=function(e){if(this.txIndex[e.hash])return;this.txs.push(new Bitcoin.Transaction(e)),this.txIndex[e.hash]=e},TransactionDatabase.prototype.removeTransaction=function(e){this.removeTransactionNoUpdate(e),$(this).trigger("update")},TransactionDatabase.prototype.removeTransactionNoUpdate=function(e){var t=this.txIndex[e];if(!t)return;for(var n=0,r=this.txs.length;n<r;n++)if(this.txs[n].hash==e){this.txs.splice(n,1);break}delete this.txIndex[e]},TransactionDatabase.prototype.loadTransactions=function(e){for(var t=0;t<e.length;t++)this.addTransactionNoUpdate(e[t]);$(this).trigger("update")},TransactionDatabase.prototype.getTransactions=function(){return this.txs},TransactionDatabase.prototype.clear=function(){this.txs=[],this.txIndex={},$(this).trigger("update")}
-/*
-    bitcoinsig.js - sign and verify messages with bitcoin address (public domain)
-*/
 
-window.BitcoinSign = function()
-{
-	
-	function msg_numToVarInt(i) {
-    if (i < 0xfd) {
-      return [i];
-    } else if (i <= 0xffff) {
-      // can't use numToVarInt from bitcoinjs, BitcoinQT wants big endian here (!)
-      return [0xfd, i & 255, i >>> 8];
-    } else {
-        throw ("message too large");
-    }
-}
+QRlogin = {
+    ///Create digest (hash) from the message
+    /** It is actually the digest being signed, not whole message. You need to
+    calculate digest from the message */
+    getMsgDigest : function (msg) {
 
-function msg_bytes(message) {
-    var b = Crypto.charenc.UTF8.stringToBytes(message);
-    return msg_numToVarInt(b.length).concat(b);
-}
+        function msg_numToVarInt(i) {
+            if (i < 0xfd) {
+                return [i];
+            } else if (i <= 0xffff) {
+                // can't use numToVarInt from bitcoinjs, BitcoinQT wants big endian here (!)
+                return [0xfd, i & 255, i >>> 8];
+            } else {
+                throw ("message too large");
+            }
+        }
+      
+        function msg_bytes(message) {
+            var b = Crypto.charenc.UTF8.stringToBytes(message);
+            return msg_numToVarInt(b.length).concat(b);
+        }
+        
+        var b = msg_bytes("Bitcoin Signed Message:\n").concat(msg_bytes(msg));
+       return Crypto.SHA256(Crypto.SHA256(b, {asBytes:true}), {asBytes:true});
+    },
 
-function msg_digest(message) {
-    var b = msg_bytes("Bitcoin Signed Message:\n").concat(msg_bytes(message));
-    return Crypto.SHA256(Crypto.SHA256(b, {asBytes:true}), {asBytes:true});
-}
+    ///Converts argument from bytes to hex
+    bytesToHex: function (b) {
+        return Crypto.util.bytesToHex(b);
+    },
+    
+    ///Converts argument from bytes to base64
+    bytesToBase64: function (b) {
+        return Crypto.util.bytesToBase64(b);
+    },
 
-function digestFromBase64(base64digest) {
-	return Crypto.util.base64ToBytes(base64digest);
-}
+    ///Converts hex argument to bytes
+    hexToBytes: function (b) {
+        return Crypto.util.hexToBytes(b);
+    },
 
-function digestToBase64(digest) {
-	return Crypto.util.bytesToBase64(digest);
-}
+    ///Converts base64 argument to bytes
+    base64ToBytes: function (b) {
+        return Crypto.util.base64ToBytes(b);
+    },
+    ///Converts hex argument to base64
+    hexToBase64: function (b) {
+        return Crypto.util.bytesToBase64(Crypto.util.hexToBytes(b));
+    },
+    ///Converts base64 argument to hex
+    base64ToHex: function (b) {
+        return Crypto.util.bytesToHex(Crypto.util.base64ToBytes(b));
+    },
+    
+    ///verifies message
+    /** @param signature signature in base64
+        @param message_digest digest calculated from message 
+        @param addrtype for Bitcoin should be zero, optional
+        @return address (identity) of the signer. You should compare return
+        value with desired signer to consider whether message was signed by the
+        desired signer.
+        */
+    verifyMessage: function (signature, message_digest, addrtype) {
+        try {
+            var sig = Crypto.util.base64ToBytes(signature);
+        } catch (err) {
+            return false;
+        }
 
-function verify_message(signature, message_digest, addrtype) {
-    try {
-        var sig = Crypto.util.base64ToBytes(signature);
-    } catch(err) {
+        if (sig.length != 65)
+            return false;
+
+        // extract r,s from signature
+        var r = BigInteger.fromByteArrayUnsigned(sig.slice(1, 1 + 32));
+        var s = BigInteger.fromByteArrayUnsigned(sig.slice(33, 33 + 32));
+
+        // get recid
+        var compressed = false;
+        var nV = sig[0];
+        if (nV < 27 || nV >= 35)
+            return false;
+        if (nV >= 31) {
+            compressed = true;
+            nV -= 4;
+        }
+        var recid = BigInteger.valueOf(nV - 27);
+
+        var ecparams = getSECCurveByName("secp256k1");
+        var curve = ecparams.getCurve();
+        var a = curve.getA().toBigInteger();
+        var b = curve.getB().toBigInteger();
+        var p = curve.getQ();
+        var G = ecparams.getG();
+        var order = ecparams.getN();
+
+        var x = r.add(order.multiply(recid.divide(BigInteger.valueOf(2))));
+        var alpha = x.multiply(x).multiply(x).add(a.multiply(x)).add(b).mod(p);
+        var beta = alpha.modPow(p.add(BigInteger.ONE).divide(BigInteger.valueOf(4)), p);
+        var y = beta.subtract(recid).isEven() ? beta : p.subtract(beta);
+
+        var R = new ECPointFp(curve, curve.fromBigInteger(x), curve.fromBigInteger(y));
+        var e = BigInteger.fromByteArrayUnsigned(message_digest);
+        var minus_e = e.negate().mod(order);
+        var inv_r = r.modInverse(order);
+        var Q = (R.multiply(s).add(G.multiply(minus_e))).multiply(inv_r);
+
+        var public_key = Q.getEncoded(compressed);
+        var addr = new Bitcoin.Address(Bitcoin.Util.sha256ripe160(public_key));
+
+        addr.version = addrtype ? addrtype : 0;
+        return addr.toString();
+    },
+
+    ///Create signature
+    /* @param private_key ECKey contains the private key
+       @param message_digest digest of the message to sign
+       @param compressed false for QRlogin - optional
+       @param addrtype zero for QRlogin - optional
+     */
+    signMessage:function (private_key, message_digest, compressed, addrtype) {
+        if (!private_key)
+            return false;
+
+        var signature = private_key.sign(message_digest);
+        var address = new Bitcoin.Address(private_key.getPubKeyHash());
+        address.version = addrtype ? addrtype : 0;
+
+        //convert ASN.1-serialized signature to bitcoin-qt format
+        var obj = Bitcoin.ECDSA.parseSig(signature);
+        var sequence = [0];
+        sequence = sequence.concat(obj.r.toByteArrayUnsigned());
+        sequence = sequence.concat(obj.s.toByteArrayUnsigned());
+
+        for (var i = 0; i < 4; i++) {
+            var nV = 27 + i;
+            if (compressed)
+                nV += 4;
+            sequence[0] = nV;
+            var sig = Crypto.util.bytesToBase64(sequence);
+            if (this.verifyMessage(sig, message_digest, addrtype) == address)
+                return sig;
+        }
+
         return false;
+    },
+
+    ///Decodes signature code returned by the login service
+    /**
+      @param code code/token received from QRlogin portal after user authorized itsefl
+       using the QR code and the device. The "code" argument.
+       @param client_id client_id exact the same string passed as client_id argument to
+        the auth portal. It should be equal to "Host" of the domain where user is being
+        logged
+      @return identity of the user, or "false" when code/token is not valid      
+      */
+    decodeLoginSignature : function(code, client_id) {
+	    var parts = code.split(':');
+	    var challenge = parts[2];
+	    var timestamp = parseInt(parts[1],16);
+	    var signature = parts[0];
+	    var unixtm = Date.now() / 1000 | 0;
+	    var clockskew = Math.abs(unixtm - timestamp);
+	    if (clockskew > 300) return false;
+	    var message = "login to " + client_id + ", challenge is " + challenge + ", timestamp " + timestamp;	   
+	    return this.verifyMessage(signature,this.getMsgDigest(message),0);
+    },
+
+    ///Decodes signature code returned from the code returned by the sign service
+    /**
+      @param code code/token received from QRlogin portal after user perform the sign message
+      action. The "code" argument
+      @param msg_digest digest of message being signed
+      @return [signature, idenity], false if failure
+
+      @note function is propsed to convert "code" to signature and verify, that
+      signature is correct. If you need to calculate identity directly from the signature,
+      use verify_message 
+      */
+
+    decodeMsgSignature: function (code, msg_digest) {
+        var parts = code.split(':');
+        var timestamp = parseInt(parts[1], 16);
+        var signature = parts[0];
+        if (timestamp != 0) return false;
+        return [signature, this.verifyMessage(signature, msg_digest)];
+    },
+
+    ///Splits message digest  to the four lines grouped to four columns
+    formatDigestForUser:function (c) {
+        var hex = Crypto.util.bytesToHex(c);
+        var out = "";
+        for (var i = 0; i < hex.length ; i += 4) {
+            out += hex.substr(i, 4);
+            if (i % 16 == 12) out += "\n"; else out += " ";
+        }
+        out = out.substr(0, out.length - 1);
+        return out;
+    },    
+
+    ///puts formated digest fp to the elemnt el
+    formatedDigestToElement: function (fp, el) {
+        el.innerHTML = "";
+        var toshow = fp.split('\n');
+        for (i = 0; i < toshow.length; i++) {
+            if (toshow[i].length) {
+                if (i) el.appendChild(document.createElement("br"));
+                el.appendChild(document.createTextNode(toshow[i]));
+            }
+        }
+    },
+    ///converts message to URI component. It uses some special characters with different meaning.
+    /** It puts + instead space and * instead new line. Note that  only NL is treated as new line
+    */
+    encodeURIMessage: function (msg) {
+        var z = encodeURI(msg);
+        return z.replace(/=/g, "%3D").replace(/&/g, "%26").replace(/\+/g, "%2B").replace(/%20/g, "+")
+                    .replace(/:/g, "%3A").replace(/%0A/g, "*");
+    },
+    ///reverse operation to decodeURIMessage
+    decodeURIMessage: function (msg) {
+        var z = msg.replace(/\+/g, "%20").replace(/\*/g, "%0A");
+        return decodeURIComponent(z);
     }
+    
 
-    if (sig.length != 65)
-        return false;
-
-    // extract r,s from signature
-    var r = BigInteger.fromByteArrayUnsigned(sig.slice(1,1+32));
-    var s = BigInteger.fromByteArrayUnsigned(sig.slice(33,33+32));
-
-    // get recid
-    var compressed = false;
-    var nV = sig[0];
-    if (nV < 27 || nV >= 35)
-        return false;
-    if (nV >= 31) {
-        compressed = true;
-        nV -= 4;
-    }
-    var recid = BigInteger.valueOf(nV - 27);
-
-    var ecparams = getSECCurveByName("secp256k1");
-    var curve = ecparams.getCurve();
-    var a = curve.getA().toBigInteger();
-    var b = curve.getB().toBigInteger();
-    var p = curve.getQ();
-    var G = ecparams.getG();
-    var order = ecparams.getN();
-
-    var x = r.add(order.multiply(recid.divide(BigInteger.valueOf(2))));
-    var alpha = x.multiply(x).multiply(x).add(a.multiply(x)).add(b).mod(p);
-    var beta = alpha.modPow(p.add(BigInteger.ONE).divide(BigInteger.valueOf(4)), p);
-    var y = beta.subtract(recid).isEven() ? beta : p.subtract(beta);
-
-    var R = new ECPointFp(curve, curve.fromBigInteger(x), curve.fromBigInteger(y));
-    var e = BigInteger.fromByteArrayUnsigned(message_digest);
-    var minus_e = e.negate().mod(order);
-    var inv_r = r.modInverse(order);
-    var Q = (R.multiply(s).add(G.multiply(minus_e))).multiply(inv_r);
-
-    var public_key = Q.getEncoded(compressed);
-    var addr = new Bitcoin.Address(Bitcoin.Util.sha256ripe160(public_key));
-
-    addr.version = addrtype ? addrtype : 0;
-    return addr.toString();
 }
 
-function sign_message(private_key, message_digest, compressed, addrtype) {
-    if (!private_key)
-        return false;
 
-    var signature = private_key.sign(message_digest);
-    var address = new Bitcoin.Address(private_key.getPubKeyHash());
-    address.version = addrtype ? addrtype : 0;
-
-    //convert ASN.1-serialized signature to bitcoin-qt format
-    var obj = Bitcoin.ECDSA.parseSig(signature);
-    var sequence = [0];
-    sequence = sequence.concat(obj.r.toByteArrayUnsigned());
-    sequence = sequence.concat(obj.s.toByteArrayUnsigned());
-
-    for (var i = 0; i < 4; i++) {
-        var nV = 27 + i;
-        if (compressed)
-            nV += 4;
-        sequence[0] = nV;
-        var sig = Crypto.util.bytesToBase64(sequence);
-        if (verify_message(sig, message_digest, addrtype) == address)
-            return sig;
-    }
-
-    return false;
-}
-
-this.sign_message = sign_message;
-this.verify_message = verify_message;
-this.msg_digest = msg_digest;
-this.digestFromBase64 = digestFromBase64
-this.digestToBase64 = digestToBase64; 
-
-}
 //options.type is the only valid option
 function secureRandom(count, options) {
-  options = options || {type: 'Array'}
-   var crypto = window.crypto || window.msCrypto
-   if (!crypto) {
-    	return fallbackRandom(count, options)
-   } else
-    	return browserRandom(count, options)
+    options = options || { type: 'Array' }
+    var crypto = window.crypto || window.msCrypto
+    if (!crypto) {
+        return fallbackRandom(count, options)
+    } else
+        return browserRandom(count, options)
 }
 
 function browserRandom(count, options) {
-  var nativeArr = new Uint8Array(count)
-  var crypto = window.crypto || window.msCrypto
-  crypto.getRandomValues(nativeArr)
+    var nativeArr = new Uint8Array(count)
+    var crypto = window.crypto || window.msCrypto
+    crypto.getRandomValues(nativeArr)
 
-  switch (options.type) {
-    case 'Array':
-      return [].slice.call(nativeArr)
-    case 'Uint8Array':
-      return nativeArr
-    default:
-      throw new Error(options.type + " is unsupported.")
-  }
+    switch (options.type) {
+        case 'Array':
+            return [].slice.call(nativeArr)
+        case 'Uint8Array':
+            return nativeArr
+        default:
+            throw new Error(options.type + " is unsupported.")
+    }
 }
 
 function fallbackRandom(count, options) {
-	  var nativeArr = new Uint8Array(count)
-	  for (var i = 0; i < count; i++) nativeArr[i] = Math.floor(Math.random()*256);
+    var nativeArr = new Uint8Array(count)
+    for (var i = 0; i < count; i++) nativeArr[i] = Math.floor(Math.random() * 256);
 
-	  switch (options.type) {
-	    case 'Array':
-	      return [].slice.call(nativeArr)
-	    case 'Uint8Array':
-	      return nativeArr
-	    default:
-	      throw new Error(options.type + " is unsupported.")
-	  }
-}
-
-secureRandom.randomArray = function(byteCount) {
-  return secureRandom(byteCount, {type: 'Array'})
-}
-
-secureRandom.randomUint8Array = function(byteCount) {
-  return secureRandom(byteCount, {type: 'Uint8Array'})
-}
-
-
-function QRlogin_decodeLoginSignature(code, client_id) {
-	var parts = code.split(':');
-	var challenge = parts[2];
-	var timestamp = parseInt(parts[1],16);
-	var signature = parts[0];
-	var unixtm = Date.now() / 1000 | 0;
-	var clockskew = Math.abs(unixtm - timestamp);
-	if (clockskew > 300) return false;
-	var message = "login to " + client_id + ", challenge is " + challenge + ", timestamp " + timestamp;
-	var sign = new window.BitcoinSign();
-	return sign.verify_message(signature,sign.msg_digest(message),0);
-}
-
-function QRlogin_decodeMsgSignature(code, msg) {
-    var parts = code.split(':');
-    var digest = parts[2];
-    var timestamp = parseInt(parts[1], 16);
-    var signature = parts[0];
-    if (timestamp != 0) return false;
-    var sign = new window.BitcoinSign();
-    return [signature, sign.verify_message(signature, sign.msg_digest(msg))];
-}
-
-function QRlogin_decorateFingerprint(c) {
-    var hex = Crypto.util.bytesToHex(c);
-    var out = "";
-    for (var i = 0; i < hex.length ; i += 4) {
-        out += hex.substr(i, 4);
-        if (i % 16 == 12) out += "\n"; else out += " ";
+    switch (options.type) {
+        case 'Array':
+            return [].slice.call(nativeArr)
+        case 'Uint8Array':
+            return nativeArr
+        default:
+            throw new Error(options.type + " is unsupported.")
     }
-    out = out.substr(0, out.length - 1);
-    return out;
 }
 
-function QRlogin_fingerprintToElement(fp, el) {
-    el.innerHTML = "";
-    var toshow = fp.split('\n');
-    for (i = 0; i < toshow.length; i++) {
-        if (toshow[i].length) {
-            if (i) el.appendChild(document.createElement("br"));
-            el.appendChild(document.createTextNode(toshow[i]));
-        }
-    }
+secureRandom.randomArray = function (byteCount) {
+    return secureRandom(byteCount, { type: 'Array' })
+}
 
+secureRandom.randomUint8Array = function (byteCount) {
+    return secureRandom(byteCount, { type: 'Uint8Array' })
 }
