@@ -30,7 +30,7 @@ Build scripts don't include the building steps for the OpenSSL. You have to buil
 
 **Prerequisites**
 
- * g++ 4.8
+ * clang++ or g++ 4.8
  * libssl-dev
  * autotools, libtool, automake, make, etc...
 
@@ -39,9 +39,16 @@ Build scripts don't include the building steps for the OpenSSL. You have to buil
  ```
  $ git clone --recurse-submodules git@github.com:ondra-novak/qrlogin.git
  $ cd qrlogin
- $ sh bootstrap.sh
- $ make -j4
+ $ make all  
  ```
+ 
+ for g++
+ ```
+ $ git clone --recurse-submodules git@github.com:ondra-novak/qrlogin.git
+ $ cd qrlogin
+ $ make all CXX=g++
+ ```
+ 
 
 **Installation**
  ```
@@ -70,7 +77,7 @@ It is strongly recommended to run service behind a reverse proxy, for example be
 
 ### Linux - Eclipse
 
- You should be able to import project to Eclipe CDT with GIT module. Just import repository to Eclipse and checkout all projects. You will need to perform autoreconf/configure similar to previous section.
+ You should be able to import project to Eclipe CDT with GIT module. Just import repository to Eclipse and checkout all projects.
 
  
 
