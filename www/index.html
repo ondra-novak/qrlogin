@@ -24,13 +24,16 @@
             <img src="img/qrlogin.png">
             <h3>Features</h3>
             <ul>
-                <li><strong>No extra app needed</strong> - just QR Scanner and standard browser
-                <li><strong>Fast and Easy</strong> - scan QR code and you are logged in.
+                <li><strong>No extra app needed</strong> - just a QR scanner and a standard browser
+                <li><strong>Fast and Easy</strong> - scan the QR code and ... you are logged in.
                 <li><strong>Privacy</strong> - different identity for each site
-                <li><strong>Security</strong> - uses ECDSA to transfer your identity
-                <li><strong>Easy integration</strong> - OAuth 2.0 protocol
+                <li><strong>Security</strong> - no more weak passwords. Uses ECDSA to transfer your identity
+                <li><strong>Easy integration</strong> - OAuth 2.0 protocol, javascript only possible
+                <li><strong>Features</strong> - Authentication and digital signing.
+                <li><strong>Compatibility</strong> - Bitcoin digital signature, OAuth 2.0
                 <li><strong>Open source</strong> - <a href="#sourcecode">Sources are available</a>
             </ul>
+            <a href="#testit">See online demo</a>
         </div>
         <div class="page" id="howork">
             <h2>How does it work?</h2>
@@ -40,15 +43,17 @@
             <div class="testarea">
                 <div class="testwindow">
                     <h2>Demo login</h2>
-                    <p>Every device can store an <strong>unique identifier</strong>. This identifier can be bound with an user account. This demonstration will uncover the unique identifier of your device for this site.</p>
+                    <p>Each device can store an <strong>unique identifier</strong>. This identifier can be bound with an user account. This demonstration will uncover the unique identifier of your device for this site.</p>
                     <button id="testbutton" onclick="doTest();">Click button to uncover your <strong>unique identifier</strong> for this site</button>
                     <p>Your unique identifier will appear below</p>
                     <input id="IDtarget" type="text">
+                    <p id="IDprev">Previous attempt: <span></span></p>
                     <p><a href="#testit"  onclick="openSignWindow();">&gt;&gt; More demos - sign a message &lt;&lt;</a></p>
                 </div>                
                 <div id="testsignwindow">
                     <div class="lightboxbg"></div>
                     <div class="testsignwindow">
+                    	<button  onclick="closeSignWindow()" class="xbutton">X</button>
                         <h2>Sign a message</h2>
                         <p>
                             QRlogin can be used to sign a message as well. This could be useful when application need to authorize
@@ -82,7 +87,7 @@
                 <dt>Client identification:</dt>
                 <dd>The <strong>client_secret</strong> is ignored. The <strong>client_id</strong> must be equal to redirect_uri's  domain (including port if specified). The <strong>scope</strong> is ignored </dd>
                 <dt>Interface language:</dt>
-                <dd>Include <strong>&lang=XX</strong> into the <em>Authorization endpoint</em> url. Currently supported languages are: en, cs
+                <dd>Include <strong>&amp;lang=XX</strong> into the <em>Authorization endpoint</em> url. Currently supported languages are: en, cs
             </dl>
             <hr>
             <a href="#addsite" onclick="uncoverDetails(this,'addsitedetail');return false;" id="hidedetail">More &gt;&gt; </a>
@@ -188,6 +193,13 @@
         }
 
         function doTest() {
+            var prev = getBlockById("IDprev");
+            var out = document.getElementById("IDtarget");
+            if (out.value.length) {
+            	prev.getElementsByTagName("span")[0].innerHTML = out.value;
+            	prev.show();
+            }
+            out.value = "";            
             var redirUrl = location.origin + location.pathname;
             var qrloginUrl = location.origin + "/auth#?redirect_uri=" + encodeURIComponent(redirUrl) + "&js=true&rnd=" + Math.random();
             openQR(qrloginUrl);
@@ -211,7 +223,7 @@
                 }
             }
             var out = document.getElementById("IDtarget");
-            out.value = identity;
+            out.value = identity;            
         }
 
 
@@ -261,6 +273,7 @@
 
         function msgDigestPreview(itm) {
             var digestBox = getBlockById("msgdigest");
+            var signature = getBlockById("outsignature");
             var digestPrev = digestBox.getElementsByTagName("pre")[0]
             if (encodeURIComponentPlus(itm.value).length>160) {
                 digestBox.show();
@@ -271,6 +284,7 @@
             } else {
                 digestBox.hide();
             }
+            signature.value="";
         }
         function doSign() {
             document.getElementById("outsignature").value = "";

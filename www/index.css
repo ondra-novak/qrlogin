@@ -253,3 +253,16 @@ height: 100vh;
 		float:right;
 		margin: 0 10px 0 10px;
 	}
+	
+#IDprev {
+	font-size: smaller;
+	font-style: italic;
+	display:none;
+}
+
+.xbutton {
+	position: absolute;
+	top:0;
+	right: 0;
+	width: 2em;	
+}
