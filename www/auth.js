@@ -342,7 +342,8 @@ function initObjects() {
     window.selector = new Selector([
         {element:getBlockById("tab_login"),action:function () { QRloginAuth.reload(QRloginAuth.modeLogin); }},
         { element: getBlockById("tab_manage"), action: function () { QRloginAuth.reload(QRloginAuth.modeManage); } },
-        { element: getBlockById("tab_restore"), action: function () { QRloginAuth.reload(QRloginAuth.modeRestore); } }
+        { element: getBlockById("tab_restore"), action: function () { QRloginAuth.reload(QRloginAuth.modeRestore); } },
+        { element: getBlockById("tab_trezor"), action: function () { trezorLogin(); } }
         ]);
     if (querystr["signmsg"] || querystr["signhash"]) {
         getBlockById("tab_login").classList.add("str_auth_sign");
@@ -351,6 +352,24 @@ function initObjects() {
     }
     window.selector.select(0);
 
+}
+
+
+function trytrezor() {
+
+    function enableTrezor() {
+        getBlockById("tab_trezor").show();
+    }
+
+    //try trezor bridge
+    httpGet("https://localback.net:21324", function (e) {
+        if (e.status == 200) {
+            enableTrezor();
+        }
+    });
+
+
+    
 }
 
 

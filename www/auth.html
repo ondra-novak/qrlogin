@@ -5,6 +5,8 @@
     <script src="libs/common.js" type="text/javascript"></script>
     <script src="libs/qrcode.js" type="text/javascript"></script>
     <script src="libs/qrlogin-crypto.js" type="text/javascript"></script>
+    <script src="https://raw.githubusercontent.com/trezor/trezor.js/master/dist/trezor.js" async type="text/javascript" onload="trytrezor()"></script>
+    <script src="https://trezor.github.io/connect/login.js" async type="text/javascript"></script>
     <script src="auth.js" type="text/javascript"></script>
     <meta name="viewport" content="width=700" />
     <link rel="stylesheet" href="auth.css" type="text/css" />
@@ -26,7 +28,9 @@
     <ul class="selector">
         <li id="tab_login">Login</li>
         <li class="str_auth_manage" id="tab_manage">Manage</li>
-        <li class="str_auth_restorebackup" id="tab_restore">Restore backup</li></ul>
+        <li class="str_auth_restorebackup" id="tab_restore">Restore backup</li>
+        <li class="str_auth_trezor" id="tab_trezor"><img src="img/trezor.png" style="vertical-align:middle;"/></li>
+      </ul>
     <div class="selectorblock">
         <div>
             <div id="qrblock">

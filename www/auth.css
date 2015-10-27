@@ -171,4 +171,8 @@ padding: 10px;
 #qrblock {
 	padding:25px;
 }
-	
+
+
+#tab_trezor {
+	display: none;
+}
