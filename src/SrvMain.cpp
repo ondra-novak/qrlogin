@@ -47,6 +47,7 @@ SrvMain::SrvMain()
 	,rcvBackup(*this)
 	,rcvSign(*this)
 	,verifySignature(*this)
+	,bitid(*this)
 	,lastTokenShiftTime(integer(0))
 	,lastBackupShiftTime(integer(0))
 
@@ -87,6 +88,7 @@ natural SrvMain::onStartServer(BredyHttpSrv::IHttpMapper& httpMapper) {
 	httpMapper.addSite("/s", &msign);
 	httpMapper.addSite("/sign", &rcvSign);
 	httpMapper.addSite("/verify", &verifySignature);
+	httpMapper.addSite("/callback", &bitid);
 
 	IJobScheduler &scheduler = httpMapper.getIfc<IJobScheduler>();
 	scheduler.schedule(ThreadFunction::create(this,&SrvMain::scheduledPing,&scheduler),30);
@@ -395,6 +397,9 @@ static natural sendOAuth2Error(IHttpRequest &request, ConstStrA error) {
 
 }
 
+static const char *bitcoinprefix = "Bitcoin Signed Message:\n";
+
+
 natural SrvMain::Verify::onRequest(IHttpRequest& request, ConstStrA ) {
 
 	StringA code;
@@ -430,8 +435,29 @@ natural SrvMain::Verify::onRequest(IHttpRequest& request, ConstStrA ) {
 		parseUnsignedNumber(time.getFwIter(),ntime,16);
 		if ((TimeStamp::now() - TimeStamp::fromUnix(ntime)).getMins() > 5)
 				return sendOAuth2Error(request,"invalid_grant");
-		StringA msg = ConstStrA("login to ")+apikey+ConstStrA(", challenge is ") + challenge + ConstStrA(", timestamp ") + ToString<natural>(ntime);
-		StringA address = generateAddressFromSignature(0, "Bitcoin Signed Message:\n", msg, sign);
+
+		StringA address;
+		StringA msg;
+
+		if (challenge.head(5) == ConstStrA("bitid") && iter.hasItems()) {
+			//bitid verification;
+			challenge = code.offset(challenge.data() - code.data());
+			ConstStrA host = challenge.offset(6);
+			if (host.head(2) == ConstStrA("//")) host = host.offset(2);
+			natural sep = host.find('/');
+			if (sep == naturalNull) {
+				return sendOAuth2Error(request, "invalid_code");
+			}
+			host = host.head(sep);
+			if (host != apikey) {
+				return sendOAuth2Error(request, "invalid_grant");
+			}
+			msg = challenge;
+		}
+		else {
+			msg = ConstStrA("login to ") + apikey + ConstStrA(", challenge is ") + challenge + ConstStrA(", timestamp ") + ToString<natural>(ntime);
+		}
+		address = generateAddressFromSignature(0, bitcoinprefix, msg, sign);
 
 		StringA token = owner.createToken(code,address);
 		if (token.empty())
@@ -576,6 +602,65 @@ LightSpeed::natural SrvMain::VerifySignature::onRequest(IHttpRequest &request, C
 	}
 
 	return 0;
+}
+
+LightSpeed::natural SrvMain::BitID::onRequest(IHttpRequest &request, ConstStrA vpath)
+{
+	if (request.getMethod() != "POST") {
+		request.header(IHttpRequest::fldAllow, "POST");
+		return stMethodNotAllowed;
+	}
+
+	SeqFileInput stream(&request);
+	SeqTextInA textstream(stream);
+	JSON::Value data = JSON::parseFast(textstream);
+
+	/*{"address":"1Lx2vH4s7FCLmyU1pjPX2VVwPM3VpU9o7K",
+	   "signature":"H9DSVrhIN1ZFSjvkeOflu/15RBv49kCHE8q4hr0CpqK3AYYdLueXiKvx5hUdmU68oREKAmUSM+wPOyzLBX02PrY=",
+	   "uri":"bitid://192.168.100.244:14526/callback?x=jo_fSjWNhi3pddgJyP9ATelJbYKwAzBWAAAAAA&u=1"*/
+
+	ConstStrA signature = data["signature"]->getStringUtf8();
+	ConstStrA uri = data["uri"]->getStringUtf8();
+	ConstStrA address = data["address"]->getStringUtf8();
+
+	LS_LOG.progress("BitID login: address: %1 - signature: %2 - uri: %3") << address << signature << uri;
+
+	QueryParser qp(uri);
+	StringA x;
+	while (qp.hasItems()) {
+		QueryField qf = qp.getNext();
+		if (qf.name == "x") x = qf.value;
+	}
+
+	StringB bin = convertString(Base64Decoder(), ConstStrA(x));
+	ConstBin timebin = bin.tail(8);
+	lnatural timet = timebin[7];
+	timet = timet << 8 | timebin[6];
+	timet = timet << 8 | timebin[5];
+	timet = timet << 8 | timebin[4];
+	timet = timet << 8 | timebin[3];
+	timet = timet << 8 | timebin[2];
+	timet = timet << 8 | timebin[1];
+	timet = timet << 8 | timebin[0];
+
+	CArray<byte, 32> sha256bin;
+
+	SHA256(reinterpret_cast<const unsigned char *>(x.data()), x.length(), sha256bin.data());
+
+	StringA channId = convertString(HexEncoder<>(), ConstBin(sha256bin));
+
+	if (owner.acceptLogin(channId, signature, (natural)timet)) return stOK;
+	else {
+		request.status(410, "Gone");
+		request.header(IHttpRequest::fldContentType, "text/plain");
+		SeqFileOutput out(&request);
+		PrintTextA print(out);
+		print("This QR is no longer valid. Please try again.");
+	}
+
+
+
+	return stOK;
 }
 
 } /* namespace qrpass */

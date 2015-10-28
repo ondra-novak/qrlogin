@@ -190,7 +190,17 @@ QRlogin = {
 	    var unixtm = Date.now() / 1000 | 0;
 	    var clockskew = Math.abs(unixtm - timestamp);
 	    if (clockskew > 300) return false;
-	    var message = "login to " + client_id + ", challenge is " + challenge + ", timestamp " + timestamp;	   
+	    var message;
+	    if (challenge == "bitid" && parts[3]) {
+	        var uri = parts.slice(2).join(':');
+	        var host = parts.slice(3).join(':');
+	        if (host.substr(0, 2) == "//") host = host.substr(2);
+	        host = host.split('/', 2)[0];
+	        if (host != client_id) return false;
+	        message = uri;
+	    } else {
+	        message = "login to " + client_id + ", challenge is " + challenge + ", timestamp " + timestamp;
+	    }
 	    return this.verifyMessage(signature,this.getMsgDigest(message),0);
     },
 

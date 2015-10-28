@@ -171,4 +171,7 @@ padding: 10px;
 #qrblock {
 	padding:25px;
 }
-	
+
+#tab_bitid {
+	display: none;
+}

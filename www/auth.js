@@ -45,7 +45,21 @@ function QRloginAuth(argss, lang, controls  /* = qr,download,restore,header*/) {
 	} 
 	
 	var apikey = null;
-	
+
+	var numberToBytes = function (/*long*/long) {
+	    var byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
+
+	    long = long | 0;
+
+	    for (var index = 0; index < byteArray.length; index++) {
+	        var byte = long & 0xff;
+	        byteArray[index] = byte;
+	        long = (long - byte) / 256;
+	    }
+
+	    return byteArray;
+	};
+
 	var reload = function (mode) {
 	    curmode = mode;
 	    if (mode == QRloginAuth.modeRestore) return restoreBackup();
@@ -57,6 +71,9 @@ function QRloginAuth(argss, lang, controls  /* = qr,download,restore,header*/) {
 	    qrcodeBox.style.visibility = "visible";
 
 	    var bytes = secureRandom(20);
+	    if (mode == QRloginAuth.modeBitid) {
+	        bytes = bytes.concat(numberToBytes(Date.now() / 1000));
+	    }
 	    curcode = base64EncodeUrl(QRlogin.bytesToBase64(bytes));
 	    channelid = Crypto.SHA256(curcode);;
 	    var logurl = "l?c=" + channelid;
@@ -94,6 +111,9 @@ function QRloginAuth(argss, lang, controls  /* = qr,download,restore,header*/) {
 
 	    if (manage) {
 	        challengeUrl = getFullUrl("m#" + lang + "," + apikey + "," + curcode);
+	    } else if (mode == QRloginAuth.modeBitid) {
+	        challengeUrl = "bitid://" + apikey + "/callback?x=" + curcode;
+	        if (args.bitid == "unsecure") challengeUrl += "&u=1";
 	    } else {
 	        var sfx = "";
 	        var pfx = "";
@@ -180,6 +200,8 @@ function QRloginAuth(argss, lang, controls  /* = qr,download,restore,header*/) {
 	        if (args.signhash) adjr = r;
 	        else if (args.signmsg) {
 	            adjr = r
+	        } else if (curmode == QRloginAuth.modeBitid) {
+	            adjr = r + ":" + challengeUrl;
 	        } else {
 	            adjr = r + ":" + curcode;
 	        }
@@ -252,6 +274,7 @@ function QRloginAuth(argss, lang, controls  /* = qr,download,restore,header*/) {
 QRloginAuth.prototype.modeLogin = 0;
 QRloginAuth.prototype.modeManage = 1;
 QRloginAuth.prototype.modeRestore = 2;
+QRloginAuth.prototype.modeBitid = 3;
 
 
 
@@ -342,13 +365,17 @@ function initObjects() {
     window.selector = new Selector([
         {element:getBlockById("tab_login"),action:function () { QRloginAuth.reload(QRloginAuth.modeLogin); }},
         { element: getBlockById("tab_manage"), action: function () { QRloginAuth.reload(QRloginAuth.modeManage); } },
-        { element: getBlockById("tab_restore"), action: function () { QRloginAuth.reload(QRloginAuth.modeRestore); } }
-        ]);
+        { element: getBlockById("tab_restore"), action: function () { QRloginAuth.reload(QRloginAuth.modeRestore); } },
+        { element: getBlockById("tab_bitid"), action: function () { QRloginAuth.reload(QRloginAuth.modeBitid); } }
+    ]);
     if (querystr["signmsg"] || querystr["signhash"]) {
         getBlockById("tab_login").classList.add("str_auth_sign");
     } else {
         getBlockById("tab_login").classList.add("str_auth_login");
-    }
+        if (querystr["bitid"]) {
+            getBlockById("tab_bitid").show();
+        }
+    } 
     window.selector.select(0);
 
 }

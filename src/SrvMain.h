@@ -111,6 +111,13 @@ public:
 		virtual natural onData(IHttpRequest &) { return 0; }
 	};
 
+	class BitID : public IHttpHandler {
+	public:
+		SrvMain &owner;
+		BitID(SrvMain &owner) :owner(owner) {}
+		virtual natural onRequest(IHttpRequest &request, ConstStrA vpath);
+		virtual natural onData(IHttpRequest &) { return 0; }
+	};
 
 	RewritePath challenge;
 	RewritePath identReset;
@@ -126,6 +133,7 @@ public:
 	Backup rcvBackup;
 	ReceiveSign rcvSign;
 	VerifySignature verifySignature;
+	BitID bitid;
 		
 
 	FilePath apikeys;
