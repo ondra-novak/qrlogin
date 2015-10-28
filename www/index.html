@@ -202,7 +202,7 @@
             out.value = "";            
             var redirUrl = location.origin + location.pathname;
             var qrloginUrl = location.origin + "/auth#?redirect_uri=" + encodeURIComponent(redirUrl) + "&js=true&rnd=" + Math.random()
-                + "&bitid="+(location.protocol=="https"?"secure":"unsecure");
+                + "&bitid="+(location.protocol=="https:"?"secure":"unsecure");
             openQR(qrloginUrl);
         }
 
