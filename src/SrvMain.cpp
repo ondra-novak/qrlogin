@@ -20,6 +20,7 @@
 #include "lightspeed/utils/base64.h"
 
 #include "lightspeed/base/debug/dbglog.h"
+#include "lightspeed/base/text/textstream.tcc"
 using BredyHttpSrv::QueryParser;
 using coinstock::generateAddressFromSignature;
 using LightSpeed::UrlEncoder;
