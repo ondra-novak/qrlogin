@@ -13,8 +13,8 @@
 #include "signmsg.h"
 #include <lightspeed/utils/configParser.tcc>
 #include <lightspeed/utils/urlencode.h>
-#include <lightspeed/base/containers/convertString.h>
-#include <lightspeed/utils/json/jsonfast.h>
+#include <lightspeed/base/containers/convertString.tcc>
+#include <lightspeed/utils/json/jsonfast.tcc>
 #include "lightspeed/utils/md5iter.h"
 #include <openssl/sha.h>
 #include "lightspeed/utils/base64.h"
