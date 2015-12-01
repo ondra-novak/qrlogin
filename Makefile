@@ -6,3 +6,9 @@ SOURCES=src
 CXX=clang++
 
 include building/build_app.mk
+
+install: bin/qrlogind
+	$(SHELL) ./install.sh
+	
+uninstall:
+	$(SHELL) ./uninstall.sh

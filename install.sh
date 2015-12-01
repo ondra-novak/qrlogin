@@ -17,7 +17,7 @@ INITSCRIPT="$1/etc/init.d/qrlogin"
 
 echo "#!/bin/sh" > $INITSCRIPT
 echo "" >> $INITSCRIPT
-echo "/usr/lib/qrlogin/bin/qrpass /run/qrlogin.pid \$1" >> $INITSCRIPT
+echo "/usr/lib/qrlogin/bin/qrlogind /run/qrlogin.pid \$1" >> $INITSCRIPT
 
 chmod +x $INITSCRIPT
 
@@ -42,7 +42,7 @@ echo "}" >> $LOGROTATE
 
 update-rc.d qrlogin defaults
 
-USERGROUP=`grep -E "^setusergroup=.*$" "$1/usr/lib/qrlogin/conf/qrpass.conf" | cut -d= -f 2`
+USERGROUP=`grep -E "^setusergroup=.*$" "$1/usr/lib/qrlogin/conf/qrlogind.conf" | cut -d= -f 2`
 
 if [ "$USERGROUP" != "" ]; then
 
