@@ -342,7 +342,7 @@ var Selector = function (panels) {
 };
 
 function initObjects() {
-    var querystr = location.hash.substr(0, 2) == "#?" ? getQueryString(location.hash.substr(1)) : getQueryString(location.search);
+    var querystr = location.hash.substr(0, 2) == "#?" ? getQueryString(location.hash.substr(1),QRlogin.decodeURIMessage) : getQueryString(location.search,QRlogin.decodeURIMessage);
     var lang = querystr["lang"];
     if (!lang) {
         if (localStorage) lang = localStorage["default_lang"];
