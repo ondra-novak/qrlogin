@@ -9,6 +9,7 @@ function QRloginAuth(argss, lang, controls  /* = qr,download,restore,header*/) {
 	var curmode = null;
 	var channelid = null;
 	var restpanel = false;
+	var useEventSource = true;
 	var downloadshown = false;
 	var args = argss;
 	var issign = args.signmsg || args.signhash;
@@ -27,6 +28,7 @@ function QRloginAuth(argss, lang, controls  /* = qr,download,restore,header*/) {
 	var restoreBackup = null;
 	var processRespone = null;
 	var showDownloadBox = null;
+	var willAbort = false;
 
 	function base64EncodeUrl(str){
 	    return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
@@ -78,8 +80,8 @@ function QRloginAuth(argss, lang, controls  /* = qr,download,restore,header*/) {
 	    channelid = Crypto.SHA256(curcode);;
 	    var logurl = "l?c=" + channelid;
 
-	    if (window.EventSource) {
-	        if (eventSource != null) eventSource.close();
+	    if (window.EventSource && useEventSource) {
+	        if (eventSource != null) {willAbort = true;eventSource.close();willAbort=false;}
 	        eventSource = new EventSource(logurl);
 	        eventSource.addEventListener("message", function(event) {
 	            var response = event.data;
@@ -89,19 +91,21 @@ function QRloginAuth(argss, lang, controls  /* = qr,download,restore,header*/) {
 	        eventSource.addEventListener("error", function(event) {
 	            if (eventSource.readyState == 2) {
 	                qrcodeBox.style.visibility = "hidden";
+			useEventSource=false; //event source failed, fallback to XMLHttpRequest
+			if (!willAbort) me.reload(mode);
 	            }
 	        } .bind(this))
 	    } else {
-	        if (connection != null) connection.abort();
+	        if (connection != null) {willAbort = true;connection.abort();willAbort = false;}
 	        connection = new XMLHttpRequest();
 	        connection.open("GET", logurl, true);
 	        connection.onreadystatechange = function(request) {
 	            if (connection.readyState == 4) {
 	                if (connection.status == 200) {
 	                    var response = connection.responseText;
-	                    this.processResponse(response);
+	                    processResponse(response);
 	                } else if (connection.status == 409) {
-	                    this.reload(curmode);
+	                    me.reload(curmode);
 	                }
 	            }
 	        } .bind(this);
@@ -179,7 +183,7 @@ function QRloginAuth(argss, lang, controls  /* = qr,download,restore,header*/) {
 	processResponse = function(response) {
 	    var r = response.trim();
 	    if (r == "") {
-	        reload(curmode);
+	        if (!willAbort) reload(curmode);
 	        return;
 	    }
 
@@ -301,7 +305,7 @@ function LangPanel(panel,curlang, QRloginAuth) {
                 lang = l;
                 drawPanel();
                 loadLang(lang);
-                localStorage["default_lang"] = lang;
+                try {localStorage["default_lang"] = lang} catch(err) {};
             } .bind(this, langlist[i]);
             lpanel.appendChild(img);
             
@@ -310,7 +314,7 @@ function LangPanel(panel,curlang, QRloginAuth) {
     this.setLang = function(l) {
         lang = l;
         drawPanel();        
-        localStorage["default_lang"] = lang;
+        try {localStorage["default_lang"] = lang;} catch (err) {};
     }    
 
     drawPanel();
@@ -345,7 +349,9 @@ function initObjects() {
     var querystr = location.hash.substr(0, 2) == "#?" ? getQueryString(location.hash.substr(1),QRlogin.decodeURIMessage) : getQueryString(location.search,QRlogin.decodeURIMessage);
     var lang = querystr["lang"];
     if (!lang) {
-        if (localStorage) lang = localStorage["default_lang"];
+        try {
+		if (localStorage) lang = localStorage["default_lang"];
+	} catch (err) {};
         if (!lang)
             lang = "en";
     }

@@ -434,8 +434,10 @@ natural SrvMain::Verify::onRequest(IHttpRequest& request, ConstStrA ) {
 		ConstStrA challenge = iter.getNext();
 		natural ntime = 0;
 		parseUnsignedNumber(time.getFwIter(),ntime,16);
-		if ((TimeStamp::now() - TimeStamp::fromUnix(ntime)).getMins() > 5)
-				return sendOAuth2Error(request,"invalid_grant");
+		TimeStamp ted = TimeStamp::now();
+		TimeStamp signt = TimeStamp::fromUnix(ntime);		
+		if (ted > signt && (ted - signt).getMins() > 5)
+			return sendOAuth2Error(request,"invalid_grant");
 
 		StringA address;
 		StringA msg;
