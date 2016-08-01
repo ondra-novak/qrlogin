@@ -9,6 +9,7 @@
 
 #include <httpserver/queryParser.h>
 #include <lightspeed/base/interface.tcc>
+#include <lightspeed/base/containers/map.tcc>
 #include "lightspeed/utils/FilePath.tcc"
 #include "signmsg.h"
 #include <lightspeed/utils/configParser.tcc>
