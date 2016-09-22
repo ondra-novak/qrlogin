@@ -2,7 +2,7 @@
 Scan QR code to sign in.
 
 
-working demo: https://qrlogin.novacisko.cz/
+working demo: https://qrlogin.cz/
 
 
 ## building
